@@ -1,0 +1,32 @@
+<div class="mt-2" *ngIf="collection">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
+    <div class="d-flex align-items-center">
+      <h1>{{collection.name}}</h1>
+      <a *ngIf="collection.owner_email == auth.email" class="text-muted h3 ml-2" routerLink="settings">⚙</a>
+    </div>
+    <div class="btn-group my-1" role="group">
+      <a class="btn btn-secondary" role="button" routerLink="statistics" routerLinkActive="active">Statistics</a>
+      <a class="btn btn-secondary" role="button" routerLink="sessions" routerLinkActive="active">Sessions</a>
+    </div>
+    <div>
+      <div class="btn-group btn-group-sm my-1" role="group">
+        <button *ngFor="let interval of intervals" type="button" class="btn btn-secondary" [class.active]="interval === selectedInterval" [disabled]="interval.day < selectedBucket.minInterval?.day" (click)="selectInterval(interval)">{{interval.label}}</button>
+      </div>
+      <div class="btn-group ml-auto btn-group-sm my-1" role="group">
+        <button *ngFor="let bucket of buckets" type="button" class="btn btn-secondary" [class.active]="bucket === selectedBucket" (click)="selectBucket(bucket)">{{bucket.label}}</button>
+      </div>
+    </div>
+  </div>
+  <div style="height: 27px">
+    <a *ngFor="let key of keys(setup.filter)" href="" class="badge badge-pill badge-secondary m-1" (click)="setup.del(key); false">
+      {{setup.filter[key]}}
+      <b>x</b>
+    </a>
+  </div>
+  <div class="d-flex align-items-center">
+    <div class="display-4 text-muted mb-5" role="button" (click)="prev()" style="cursor: pointer">&lsaquo;</div>
+    <k20a-chart style="height: 300px; width: calc(100% - 38px)" type="bar" [data]="data" [options]="options"></k20a-chart>
+    <div class="display-4 text-muted mb-5" role="button" (click)="next()" style="cursor: pointer">&rsaquo;</div>
+  </div>
+  <router-outlet></router-outlet>
+</div>

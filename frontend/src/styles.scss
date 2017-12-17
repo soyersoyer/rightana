@@ -1,0 +1,48 @@
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "../node_modules/ng2-toasty/style-default.css";
+
+
+.table .text-long {
+  position: relative;
+  width: 100%;
+}
+.table .text-long span {
+  overflow-x: auto;
+  white-space: nowrap;
+  position: absolute;
+  left: $table-cell-padding;
+  right: 14px;
+}
+/*.text-long:before {
+  content: '';
+  display: inline-block;
+}*/
+
+.table .text-long .badge-right {
+  position: absolute;
+  right: 0;
+}
+
+.w-0 {
+	width: 0;
+}
+
+.px-3px {
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
+.active a, a.active{
+  background-color: rgba(224, 232, 240, 0.5);
+  border-color: rgba(134, 142, 150, 0.5);
+  border-radius: 5px;
+}
+
+a {
+  outline: 0;
+}
+
+
+#toasty.toasty-position-top-right {
+  top: 68px;
+}

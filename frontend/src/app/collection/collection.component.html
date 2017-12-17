@@ -1,0 +1,21 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2 bg-light">
+      <div class="mt-2">
+        <div class="d-flex align-items-center flex-wrap text-truncate">
+          <h2>Collections</h2>
+          <a role="button" class="btn btn-secondary btn-sm ml-auto" routerLink="create">✚</a>
+        </div>
+        <ul class="nav flex-column">
+          <li *ngFor="let c of collections" role="menuitem" routerLinkActive="active" class="d-flex justify-content-between">
+            <a [routerLink]="[c.id]" class="px-3px">{{c.name}}</a>
+            <k20a-color-percent [percent]="c.pageview_percent"></k20a-color-percent>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

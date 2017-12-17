@@ -1,0 +1,79 @@
+<div class="my-2" *ngIf="sessions">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>Sessions <span class="text-muted">{{sessions.length}}</span></h2>
+    <span class="h4 text-muted">{{setup.from | date:"yyyy.MM.dd HH:mm"}} - {{setup.to | date:"yyyy.MM.dd HH:mm"}}</span>
+  </div>
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>Start</th>
+        <th>Length</th>
+        <th>Device</th>
+        <th>OS</th>
+        <th>Browser</th>
+        <th>Lang</th>
+        <th>Screen</th>
+        <th>Window</th>
+        <th>Hostname</th>
+        <th>Location</th>
+        <th>AS Name</th>
+        <th>Pageviews</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let s of sessions | slice:0:actual">
+        <tr>
+          <td><a routerLink="." (click)="toggleDetails(s)">{{s.start / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</a></td>
+          <td>{{getLengthInMinutes(s.start, s.end) | number:"1.0-0"}} m</td>
+          <td>{{s.device_type}}</td>
+          <td>{{s.device_os}}</td>
+          <td>{{s.browser_name}} {{s.browser_version}}</td>
+          <td>{{s.browser_language}}</td>
+          <td>{{s.screen_resolution}}</td>
+          <td>{{s.window_resolution}}</td>
+          <td>{{s.user_hostname}}</td>
+          <td>{{s.country_code}} {{s.city}}</td>
+          <td>{{s.as_name}}</td>
+          <td>{{s.pageview_count}}</td>
+        </tr>
+        <tr *ngIf="s.showDetails">
+          <td colspan="11">
+            <div><b>Start</b>: {{s.start / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
+            <div><b>End</b>: {{s.end / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
+            <div><b>User IP</b>: {{s.user_ip}}</div>
+            <div><b>User Hostname</b>: {{s.user_hostname}}</div>
+            <div><b>AS Number</b>: {{s.as_number}}</div>
+            <div><b>AS Name</b>: {{s.as_name}}</div>
+            <div><b>User Agent</b>: {{s.user_agent}}</div>
+            <div><b>Hostname</b>: {{s.hostname}}</div>
+          </td>
+        </tr>
+        <tr *ngIf="s.showDetails && s.pageviews">
+          <td colspan="11">
+            <table class="m-3 table table-sm table-responsive">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Path</th>
+                  <th>Referrer</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let pv of s.pageviews">
+                  <td>{{pv.time / 1000000 |date:"yyyy.MM.dd HH:mm:ss"}}</td>
+                  <td>{{pv.path}}</td>
+                  <td>{{pv.referrer_url}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </ng-container>
+      <tr *ngIf="actual < sessions.length">
+        <td colspan="12" class="text-center">
+          <a routerLink="." (click)="loadMore()">load more</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

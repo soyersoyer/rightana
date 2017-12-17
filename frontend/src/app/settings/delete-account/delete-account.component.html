@@ -1,0 +1,19 @@
+<div class="container mt-2">
+  <div style="max-width: 500px">
+    <h3>Delete your account</h3>
+    <div class="card border-danger">
+      <div class="card-body">
+        <div class="alert alert-danger text-small" role="alert">
+          The operation will delete your account and collections permanently, and CANNOT be undone!
+        </div>
+        <form [formGroup]="form" (submit)="deleteAccount()">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" class="form-control form-control-lg" formControlName="password">
+          </div>
+          <button type="submit" class="btn btn-danger btn-lg w-100">Confirm deletion</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

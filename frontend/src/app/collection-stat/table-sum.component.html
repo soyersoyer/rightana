@@ -1,0 +1,27 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th class="w-0 text-right">#</th>
+      <th>{{name}}</th>
+      <th class="w-0 text-right d-none d-sm-table-cell">Count</th>
+      <th class="w-0 text-center">%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let sum of sums | slice:0:(showAll?sums.length:5);let i = index">
+      <th scope="row" class="text-right">{{i+1}}</th>
+      <td class="text-long">
+        <span>{{sum.name}}</span>
+        <a *ngIf="key && !inFilter" routerLink="." class="badge-right" (click)="addFilter(sum.name)"><img width="16" src="assets/filter.svg"></a>
+        <a *ngIf="key && inFilter" routerLink="." class="badge-right" (click)="removeFilter()"><img width="16" src="assets/filtera.svg"></a>
+      </td>
+      <td class="text-right d-none d-sm-table-cell">{{sum.count}}</td>
+      <td class="text-right">{{sum.percent | percent:"1.1-1"}}</td>
+    </tr>
+    <tr *ngIf="!showAll && sums.length > 5">
+      <td colspan="4" class="text-center">
+        <a routerLink="." (click)="showMeAll()">show all</a>
+      </td>
+    </tr>
+  </tbody>
+</table>

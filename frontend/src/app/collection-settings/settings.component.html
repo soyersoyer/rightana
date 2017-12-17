@@ -1,0 +1,49 @@
+<div class="mt-2" *ngIf="collection">
+  <h1>Settings <a class="text-muted" routerLink="..">{{collection.name}}</a></h1>
+  <div class="row">
+    <div class="col">
+      <h2>Tracking code</h2>
+      <k20a-collection-tracking [collection]="collection"></k20a-collection-tracking>
+    </div>
+  </div>
+  <div style="max-width: 500px">
+    <h2 class="mt-5">Basic settings</h2>
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="form" (submit)="save()">
+          <div class="form-group">
+            <label>Name (Domain Name / Group Name)</label>
+            <input type="text" class="form-control" formControlName="name">
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-100">Save</button>
+        </form>
+      </div>
+    </div>
+    <k20a-collection-teammates [collection]="collection"></k20a-collection-teammates>
+    <h2 class="mt-5">Delete collection</h2>
+    <div class="card">
+      <div class="card-body">
+        <button type="submit" class="btn btn-danger btn-lg w-100" (click)="delete()">Delete</button>
+      </div>
+    </div>
+    <ng-container *ngIf="shards">
+      <h2 class="mt-5">Storage</h2>
+      <div class="card">
+        <div class="card-header">
+          {{shards.length}} shard <span class="text-muted">{{allSize | bytes}}</span>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let shard of shards">
+              <div>
+                <span>{{shard.id}}</span>
+                <span class="text-muted">{{shard.size | bytes}}</span>
+              </div>
+              <a routerLink="." class="btn btn-danger btn-sm" role="button" (click)="deleteShard(shard)">Delete</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

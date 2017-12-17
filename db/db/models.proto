@@ -1,0 +1,50 @@
+syntax = "proto3";
+package db;
+
+message User {
+	string Email = 1;
+	string Password = 2;
+}
+
+message Teammate {
+	string Email = 1;
+}
+
+message Collection {
+	string ID = 1;
+	string OwnerEmail = 2;
+	string Name = 3;
+	repeated Teammate Teammates = 4;
+}
+
+message AuthToken {
+	string ID = 1;
+	string OwnerEmail = 2;
+	int32 TTL = 3;
+	int64 Created = 4; //unixnano
+}
+
+message Session {
+	int64 End = 1;
+	string Hostname = 2;
+	string DeviceOS = 3;
+	string BrowserName = 4;
+	string BrowserVersion = 5;
+	string BrowserLanguage = 6;
+	string ScreenResolution = 7;
+	string WindowResolution = 8;
+	string DeviceType = 9;
+	string CountryCode = 10;
+	string City = 11;
+	string UserAgent = 12;
+	string UserIP = 13;
+	string UserHostname = 14;
+	int32 PageviewCount = 15;
+	int32 ASNumber = 16;
+	string ASName = 17;
+}
+
+message Pageview {
+	string Path = 1;
+	string ReferrerURL = 2;
+}
