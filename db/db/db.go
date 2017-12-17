@@ -11,8 +11,8 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 
-	"git.irl.hu/k20a/db/cipobolt"
-	"git.irl.hu/k20a/db/shardbolt"
+	"github.com/soyersoyer/k20a/db/cipobolt"
+	"github.com/soyersoyer/k20a/db/shardbolt"
 )
 
 type shardMap map[string]*shardbolt.DB

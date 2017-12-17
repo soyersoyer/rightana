@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"git.irl.hu/k20a/errors"
-	"git.irl.hu/k20a/models"
+	"github.com/soyersoyer/k20a/errors"
+	"github.com/soyersoyer/k20a/models"
 )
 
 type createUserT struct {

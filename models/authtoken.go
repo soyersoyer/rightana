@@ -5,8 +5,8 @@ import (
 
 	"github.com/satori/go.uuid"
 
-	"git.irl.hu/k20a/db/db"
-	"git.irl.hu/k20a/errors"
+	"github.com/soyersoyer/k20a/db/db"
+	"github.com/soyersoyer/k20a/errors"
 )
 
 type AuthToken = db.AuthToken

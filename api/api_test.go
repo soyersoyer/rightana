@@ -15,9 +15,9 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"git.irl.hu/k20a/config"
-	"git.irl.hu/k20a/db/db"
-	"git.irl.hu/k20a/models"
+	"github.com/soyersoyer/k20a/config"
+	"github.com/soyersoyer/k20a/db/db"
+	"github.com/soyersoyer/k20a/models"
 )
 
 type kv map[string]string

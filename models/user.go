@@ -5,9 +5,9 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"git.irl.hu/k20a/config"
-	"git.irl.hu/k20a/db/db"
-	"git.irl.hu/k20a/errors"
+	"github.com/soyersoyer/k20a/config"
+	"github.com/soyersoyer/k20a/db/db"
+	"github.com/soyersoyer/k20a/errors"
 )
 
 var (

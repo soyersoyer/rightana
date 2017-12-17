@@ -8,11 +8,11 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	"git.irl.hu/k20a/api"
-	"git.irl.hu/k20a/config"
-	"git.irl.hu/k20a/db/db"
-	"git.irl.hu/k20a/geoip"
-	"git.irl.hu/k20a/models"
+	"github.com/soyersoyer/k20a/api"
+	"github.com/soyersoyer/k20a/config"
+	"github.com/soyersoyer/k20a/db/db"
+	"github.com/soyersoyer/k20a/geoip"
+	"github.com/soyersoyer/k20a/models"
 )
 
 var (

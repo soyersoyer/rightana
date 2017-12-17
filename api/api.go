@@ -14,7 +14,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 
-	"git.irl.hu/k20a/errors"
+	"github.com/soyersoyer/k20a/errors"
 )
 
 func WebAppFileServer(dir string) http.HandlerFunc {

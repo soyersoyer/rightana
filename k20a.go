@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"git.irl.hu/k20a/cmd"
+	"github.com/soyersoyer/k20a/cmd"
 )
 
 var (

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"git.irl.hu/k20a/models"
+	"github.com/soyersoyer/k20a/models"
 )
 
 func GetUserEmail(ctx context.Context) string {
