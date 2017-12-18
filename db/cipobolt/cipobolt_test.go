@@ -131,8 +131,9 @@ func TestIterate(t *testing.T) {
 	k := ""
 	v := &Data{}
 	count := 0
-	err := cipo.Iterate(&k, v, func() {
+	err := cipo.Iterate(&k, v, func() error {
 		count++
+		return nil
 	})
 	if err != nil {
 		t.Error(err)
