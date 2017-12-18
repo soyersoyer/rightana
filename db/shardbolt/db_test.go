@@ -32,6 +32,10 @@ func TestMain(m *testing.M) {
 
 	ret := m.Run()
 
+	if ret == 0 {
+		os.RemoveAll(dir)
+	}
+
 	os.Exit(ret)
 }
 
