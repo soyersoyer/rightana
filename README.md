@@ -1,5 +1,5 @@
 # K20a
-K20A - Carefree web analytics on your server
+Carefree web analytics on your server
 
 ## Goals
 
