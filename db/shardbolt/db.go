@@ -99,7 +99,7 @@ func (db *DB) DeleteShard(id string) error {
 		}
 	}
 	if ashard == nil {
-		return fmt.Errorf("shard not found '%s'", id)
+		return fmt.Errorf("shard not found '%v'", id)
 	}
 	db.setShardArray(newShards)
 	if err := ashard.closeDB(); err != nil {

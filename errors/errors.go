@@ -32,7 +32,7 @@ type Error struct {
 func (e *Error) Error() string {
 	msg := e.Message
 	if e.Thing != "" {
-		msg += fmt.Sprintf(" (%s)", e.Thing)
+		msg += fmt.Sprintf(" (%v)", e.Thing)
 	}
 	if e.Additional != "" {
 		msg += " " + e.Additional
@@ -42,7 +42,7 @@ func (e *Error) Error() string {
 
 func (e *Error) HttpMessage() string {
 	if e.Thing != "" {
-		return fmt.Sprintf("%s (%s)", e.Message, e.Thing)
+		return fmt.Sprintf("%v (%v)", e.Message, e.Thing)
 	}
 	return e.Message
 }

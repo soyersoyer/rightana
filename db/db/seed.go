@@ -113,7 +113,7 @@ func Seed(from time.Time, to time.Time, collectionID string, n int) error {
 			PageviewCount:    int32(i%10 + 1),
 		}
 		if err := ShardUpsertTx(tx, GetKey(tfrom, sessionID), session); err != nil {
-			return fmt.Errorf("session %d insert error err: %s session: %s t %s id %s", i, err, session, tfrom, sessionID)
+			return fmt.Errorf("session %v insert error err: %v session: %v t %v id %v", i, err, session, tfrom, sessionID)
 		}
 		for j := 0; j < i%10+1; j++ {
 			referrer := ""
@@ -126,7 +126,7 @@ func Seed(from time.Time, to time.Time, collectionID string, n int) error {
 				ReferrerURL: referrer,
 			}
 			if err := ShardUpsertTx(tx, GetKey(tfrom, sessionID), pageview); err != nil {
-				return fmt.Errorf("pageview %d %d insert error err: %s pv %s t %s id %s", i, j, err, pageview, tfrom, sessionID)
+				return fmt.Errorf("pageview %v %v insert error err: %v pv %v t %v id %v", i, j, err, pageview, tfrom, sessionID)
 			}
 		}
 

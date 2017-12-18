@@ -32,7 +32,7 @@ func (db *DB) getShardFileName(s *shard) string {
 func getShardIDFromFilename(fname string) (string, error) {
 	idx := strings.Index(fname, ".bolt")
 	if idx == -1 {
-		return "", fmt.Errorf("invalid shard filename", fname)
+		return "", fmt.Errorf("invalid shard filename: %v", fname)
 	}
 	shardID := fname[:idx]
 	return shardID, nil
