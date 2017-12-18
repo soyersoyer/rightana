@@ -1,4 +1,6 @@
 # K20a
+![goreport](https://goreportcard.com/badge/github.com/soyersoyer/k20a)
+
 Carefree web analytics on your server
 
 ## Goals
