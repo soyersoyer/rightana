@@ -62,7 +62,7 @@ K20A - Carefree web analytics on your server
 ### From source
 
 1. Get a working go environment
-1. Get a working node environment (for buildong the Angular frontend)
+1. Get a working node environment (for building the Angular frontend)
 1. go get -u github.com/soyersoyer/k20a
 1. cd ~/go/src/github.com/soyersoyer/k20a
 1. ./build.sh
