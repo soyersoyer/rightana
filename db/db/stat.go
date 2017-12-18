@@ -379,16 +379,16 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 		referrerSums[pageview.ReferrerURL]++
 	})
 
-	avgSessionLength := sumOfSessionLength / coalesce(sessionTotal)
-	prevAvgSessionLength := sumOfPrevSessionLength / coalesce(prevSessionTotal)
+	avgSessionLength := safeDiv(sumOfSessionLength, sessionTotal)
+	prevAvgSessionLength := safeDiv(sumOfPrevSessionLength, prevSessionTotal)
 
 	bounceRate := getPercentByKey(&pageviewCountSums, "1")
 	prevBounceRate := getPercentByKey(&prevPageviewCountSums, "1")
 
 	return &CollectionStatDataT{
-		SessionTotal:         totalT{sessionTotal, float32(sessionTotal)/float32(coalesce(prevSessionTotal)) - 1.0},
-		PageviewTotal:        totalT{pageviewTotal, float32(pageviewTotal)/float32(coalesce(prevPageviewTotal)) - 1.0},
-		AvgSessionLength:     totalT{avgSessionLength, float32(avgSessionLength)/float32(coalesce(prevAvgSessionLength)) - 1.0},
+		SessionTotal:         totalT{sessionTotal, getGrowthPercent(sessionTotal, prevSessionTotal)},
+		PageviewTotal:        totalT{pageviewTotal, getGrowthPercent(pageviewTotal, prevPageviewTotal)},
+		AvgSessionLength:     totalT{avgSessionLength, getGrowthPercent(avgSessionLength, prevAvgSessionLength)},
 		BounceRate:           percentT{bounceRate, bounceRate/prevBounceRate - 1.0},
 		PageSums:             getSums(&pageSums),
 		ReferrerSums:         getSums(&referrerSums),
@@ -407,11 +407,18 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 	}, nil
 }
 
-func coalesce(n int) int {
-	if n != 0 {
-		return n
+func safeDiv(a, b int) int {
+	if b == 0 {
+		return 0
 	}
-	return 1
+	return a / b
+}
+
+func getGrowthPercent(actual, prev int) float32 {
+	if prev == 0 {
+		return 1.0
+	}
+	return float32(actual)/float32(prev) - 1.0
 }
 
 type SessionDataT struct {
