@@ -66,7 +66,7 @@ K20A - Carefree web analytics on your server
 1. go get -u github.com/soyersoyer/k20a
 1. cd ~/go/src/github.com/soyersoyer/k20a
 1. ./build.sh
-1. use the k20a binary
+1. Start it and/or add to your service starter
 
 ## Configuration
 The configuration filename is k20a.yaml (or an another format what the viper library support)
@@ -76,7 +76,7 @@ The configuration filename is k20a.yaml (or an another format what the viper lib
 |---|---|---|
 |Listening|:3000|Where should the server listen|
 |GeoIPCityFile|/var/lib/GeoIP/GeoLite2-City.mmdb|GeoIP2/GeoLite2 City file|
-|GeoIPASNFile|/var/lib/GeoIP/GeoLite2-ASN.mmdb|GeoIP2/GeoLit2 ASN file|
+|GeoIPASNFile|/var/lib/GeoIP/GeoLite2-ASN.mmdb|GeoIP2/GeoLite2 ASN file|
 |DataDir|data|Where is the base data dir|
 |EnableRegistration|true|Whether registration enabled or not|
 
