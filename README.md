@@ -1,5 +1,5 @@
 # K20a
-![goreport](https://goreportcard.com/badge/github.com/soyersoyer/k20a)
+[![Go Report Card](https://goreportcard.com/badge/github.com/soyersoyer/k20a)](https://goreportcard.com/report/github.com/soyersoyer/k20a)
 
 Carefree web analytics on your server
 
