@@ -81,7 +81,7 @@ The configuration filename is k20a.yaml (or an another format what the viper lib
 |EnableRegistration|true|Whether registration enabled or not|
 
 ## Limitations
-This software is under development and the database format is not stable yet. Don't use it if you regret your data!
+This software is under initial development (0.x) and the database format may change in the future. In other words, it is not guaranteed that the next version of the software will be able to read the the data stored by the current version.
 
 ## Coming features
 - Admin page
