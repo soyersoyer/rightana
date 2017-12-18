@@ -69,7 +69,7 @@ func CreateBucketGen(bucketType string, begin time.Time, end time.Time, timezone
 		end,
 		diff(begin),
 		diff,
-		[]*bucketSumT{&bucketSumT{begin.Unix(), 0}},
+		[]*bucketSumT{{begin.Unix(), 0}},
 	}
 }
 
