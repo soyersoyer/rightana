@@ -62,9 +62,9 @@ func RegisterUser(email string, password string) {
 	log.Println("user created:", user.Email)
 }
 
-func CreateCollection(trackingID string, name string, email string) {
+func CreateCollection(collectionID string, name string, email string) {
 	inits()
-	collection, err := models.CreateCollectionById(trackingID, name, email)
+	collection, err := models.CreateCollectionByID(collectionID, name, email)
 	if err != nil {
 		log.Fatalln(err)
 	}

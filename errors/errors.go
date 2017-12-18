@@ -40,17 +40,17 @@ func (e *Error) Error() string {
 	return msg
 }
 
-func (e *Error) HttpMessage() string {
+func (e *Error) HTTPMessage() string {
 	if e.Thing != "" {
 		return fmt.Sprintf("%v (%v)", e.Message, e.Thing)
 	}
 	return e.Message
 }
 
-func (base *Error) T(e string) *Error {
-	return &Error{base.Message, base.Code, e, base.Additional}
+func (e *Error) T(thing string) *Error {
+	return &Error{e.Message, e.Code, thing, e.Additional}
 }
 
-func (base *Error) Wrap(v ...interface{}) *Error {
-	return &Error{base.Message, base.Code, base.Thing, fmt.Sprint(v...)}
+func (e *Error) Wrap(v ...interface{}) *Error {
+	return &Error{e.Message, e.Code, e.Thing, fmt.Sprint(v...)}
 }

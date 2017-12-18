@@ -32,15 +32,15 @@ func CreateSession(userAgent string, remoteAddr string, input CreateSessionInput
 		return "", errors.BotsDontMatter
 	}
 
-	ip, err := getIp(remoteAddr)
+	ip, err := getIP(remoteAddr)
 	if err != nil {
 		return "", err
 	}
 
 	browserName, browserVersion := ua.Browser()
 
-	location := geoip.LocationByIp(ip)
-	asn := geoip.ASNByIp(ip)
+	location := geoip.LocationByIP(ip)
+	asn := geoip.ASNByIP(ip)
 
 	userHostname := ""
 	userHostnames, _ := net.LookupAddr(ip)
@@ -132,7 +132,7 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 	session.End = now.UnixNano()
 	session.PageviewCount = session.PageviewCount + 1
 
-	sID := db.GetIdFromKey(key)
+	sID := db.GetIDFromKey(key)
 	pKey := db.GetKey(now, sID)
 
 	pageview := &db.Pageview{
@@ -145,11 +145,7 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 			return err
 		}
 
-		if err := db.ShardUpsertTx(tx, pKey, pageview); err != nil {
-			return err
-		}
-
-		return nil
+		return db.ShardUpsertTx(tx, pKey, pageview)
 	})
 	if err != nil {
 		return errors.DBError.Wrap(err, input, key, session, pKey, pageview)
@@ -157,7 +153,7 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 	return nil
 }
 
-func getIp(remoteAddr string) (string, error) {
+func getIP(remoteAddr string) (string, error) {
 	if i := strings.IndexRune(remoteAddr, ':'); i < 0 {
 		return remoteAddr, nil
 	}

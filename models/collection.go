@@ -25,7 +25,7 @@ func CreateCollection(ownerEmail string, name string) (*Collection, error) {
 	return collection, nil
 }
 
-func CreateCollectionById(id string, name string, ownerEmail string) (*Collection, error) {
+func CreateCollectionByID(id string, name string, ownerEmail string) (*Collection, error) {
 	user, err := GetUserByEmail(ownerEmail)
 	if err != nil {
 		return nil, err
@@ -202,6 +202,6 @@ func GetPageviews(collection *Collection, sessionKey string) ([]*db.PageviewData
 	return data, nil
 }
 
-func SeedCollection(from time.Time, to time.Time, collectionId string, n int) error {
-	return db.Seed(from, to, collectionId, n)
+func SeedCollection(from time.Time, to time.Time, collectionID string, n int) error {
+	return db.Seed(from, to, collectionID, n)
 }

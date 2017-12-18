@@ -33,11 +33,11 @@ func createUserE(w http.ResponseWriter, r *http.Request) error {
 var createUser = handleError(createUserE)
 
 func SetUser(ctx context.Context, user *models.User) context.Context {
-	return context.WithValue(ctx, "user", user)
+	return context.WithValue(ctx, keyUser, user)
 }
 
 func GetUser(ctx context.Context) *models.User {
-	return ctx.Value("user").(*models.User)
+	return ctx.Value(keyUser).(*models.User)
 }
 
 func userBaseHandler(next http.Handler) http.Handler {

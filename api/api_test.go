@@ -73,10 +73,10 @@ var (
 )
 
 func TestPublicConfig(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	getPublicConfig(w, r)
 	var publicConfig publicConfigT
-	testJsonBody(t, w, &publicConfig)
+	testJSONBody(t, w, &publicConfig)
 	if publicConfig.EnableRegistration != config.ActualConfig.EnableRegistration {
 		t.Error(publicConfig)
 	}
@@ -84,7 +84,7 @@ func TestPublicConfig(t *testing.T) {
 
 func TestCreateUserRegistrationDisabled(t *testing.T) {
 	config.ActualConfig.EnableRegistration = false
-	w, r := postJson(userData)
+	w, r := postJSON(userData)
 	createUser(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Registration disabled\n")
@@ -96,11 +96,11 @@ func TestCreateUser(t *testing.T) {
 }
 
 func testCreateUserSuccess(t *testing.T, userData createUserT) string {
-	w, r := postJson(userData)
+	w, r := postJSON(userData)
 	createUser(w, r)
 	testCode(t, w, 200)
 	var email string
-	testJsonBody(t, w, &email)
+	testJSONBody(t, w, &email)
 	if email != userData.Email {
 		t.Error(email)
 	}
@@ -108,18 +108,18 @@ func testCreateUserSuccess(t *testing.T, userData createUserT) string {
 }
 
 func TestCreateUserSecondFail(t *testing.T) {
-	w, r := postJson(userData)
+	w, r := postJSON(userData)
 	createUser(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "User exist ("+userData.Email+")\n")
 }
 
 func TestCreateUser2(t *testing.T) {
-	w, r := postJson(user2Data)
+	w, r := postJSON(user2Data)
 	createUser(w, r)
 	testCode(t, w, 200)
 	var email string
-	testJsonBody(t, w, &email)
+	testJSONBody(t, w, &email)
 	if email != user2Data.Email {
 		t.Error(email)
 	}
@@ -127,7 +127,7 @@ func TestCreateUser2(t *testing.T) {
 
 func TestCreateUserShortPw(t *testing.T) {
 	userData := createUserT{"shortpw@irl.hu", "short"}
-	w, r := postJson(userData)
+	w, r := postJSON(userData)
 	createUser(w, r)
 	testCode(t, w, 400)
 	testBody(t, w, "Password too short\n")
@@ -135,34 +135,34 @@ func TestCreateUserShortPw(t *testing.T) {
 
 func TestCreateUserBadEmail(t *testing.T) {
 	userData := createUserT{"bademail", "short"}
-	w, r := postJson(userData)
+	w, r := postJSON(userData)
 	createUser(w, r)
 	testCode(t, w, 400)
 	testBody(t, w, "Invalid email ("+userData.Email+")\n")
 }
 
 func TestCreateTokenInvalidUser(t *testing.T) {
-	w, r := postJson(badTokenUserData)
+	w, r := postJSON(badTokenUserData)
 	createToken(w, r)
 
 	testCode(t, w, 404)
 }
 
 func TestCreateTokenInvalidPassword(t *testing.T) {
-	w, r := postJson(badTokenPwData)
+	w, r := postJSON(badTokenPwData)
 	createToken(w, r)
 
 	testCode(t, w, 403)
 }
 
 func testCreateTokenSuccess(t *testing.T, tokenData createTokenT) string {
-	w, r := postJson(tokenData)
+	w, r := postJSON(tokenData)
 	createToken(w, r)
 
 	testCode(t, w, 200)
 
 	var token db.AuthToken
-	testJsonBody(t, w, &token)
+	testJSONBody(t, w, &token)
 	if token.ID == "" {
 		t.Error("token id is empty")
 	}
@@ -176,19 +176,19 @@ func TestCreateTokenSuccess(t *testing.T) {
 
 func TestDeleteToken(t *testing.T) {
 	token := testCreateTokenSuccess(t, tokenData)
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = getReqWithRouteContext(r, kv{"token": token})
 	deleteToken(w, r)
 	testCode(t, w, 200)
 	var tokenRet string
-	testJsonBody(t, w, &tokenRet)
+	testJSONBody(t, w, &tokenRet)
 	if tokenRet != token {
 		t.Error(tokenRet)
 	}
 }
 
 func TestDeleteTokenFail(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = getReqWithRouteContext(r, kv{"token": "notoken"})
 	deleteToken(w, r)
 	testCode(t, w, 403)
@@ -196,7 +196,7 @@ func TestDeleteTokenFail(t *testing.T) {
 }
 
 func TestUserBaseHandlerBadEmail(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setEmail(r, "adminn@irl.hu")
 	userBaseHandler(getNoHandler(t)).ServeHTTP(w, r)
 	testCode(t, w, 404)
@@ -205,7 +205,7 @@ func TestUserBaseHandlerBadEmail(t *testing.T) {
 
 func TestUserBaseHandler(t *testing.T) {
 	email := "admin@irl.hu"
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setEmail(r, email)
 	userBaseHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := GetUser(r.Context())
@@ -218,7 +218,7 @@ func TestUserBaseHandler(t *testing.T) {
 func TestUserAccessHandler(t *testing.T) {
 	email := "admin@irl.hu"
 	user := getDbUser(email)
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setUserEmail(r, user.Email)
 	r = setEmail(r, email)
 	userBaseHandler(userAccessHandler(getNullHandler())).ServeHTTP(w, r)
@@ -228,7 +228,7 @@ func TestUserAccessHandler(t *testing.T) {
 func TestUserAccessHandlerBad(t *testing.T) {
 	email := "admin@irl.hu"
 	user := getDbUser(email)
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setUserEmail(r, user.Email+"1")
 	r = setEmail(r, email)
 	userBaseHandler(userAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
@@ -244,33 +244,33 @@ func TestUpdateUserPassword(t *testing.T) {
 	testCreateTokenSuccess(t, tokenData)
 	var emailOut string
 
-	w, r := postJson(updateUserPwShortData)
+	w, r := postJSON(updateUserPwShortData)
 	r = setEmail(r, email)
 	userBaseHandler(http.HandlerFunc(updateUserPassword)).ServeHTTP(w, r)
 	testCode(t, w, 400)
 	testBody(t, w, "Password too short\n")
 
-	w, r = postJson(updateUserPwData)
+	w, r = postJSON(updateUserPwData)
 	r = setEmail(r, email)
 	userBaseHandler(http.HandlerFunc(updateUserPassword)).ServeHTTP(w, r)
 	testCode(t, w, 200)
-	testJsonBody(t, w, &emailOut)
+	testJSONBody(t, w, &emailOut)
 	if emailOut != email {
 		t.Error(emailOut)
 	}
 
-	w, r = postJson(updateUserPwData)
+	w, r = postJSON(updateUserPwData)
 	r = setEmail(r, email)
 	userBaseHandler(http.HandlerFunc(updateUserPassword)).ServeHTTP(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Password not match\n")
 
-	w, r = postJson(updateUserPwDataBack)
+	w, r = postJSON(updateUserPwDataBack)
 	r = setEmail(r, email)
 	userBaseHandler(http.HandlerFunc(updateUserPassword)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 
-	testJsonBody(t, w, &emailOut)
+	testJSONBody(t, w, &emailOut)
 	if emailOut != email {
 		t.Error(emailOut)
 	}
@@ -278,12 +278,12 @@ func TestUpdateUserPassword(t *testing.T) {
 
 func createCollectionSuccess(t *testing.T, email string, collection *collectionT) {
 	name := collection.Name
-	w, r := postJson(collection)
+	w, r := postJSON(collection)
 	user := getDbUser(email)
 	r = setUserEmail(r, user.Email)
 	createCollection(w, r)
 	testCode(t, w, 200)
-	testJsonBody(t, w, &collection)
+	testJSONBody(t, w, &collection)
 	if collection.Name != name {
 		t.Error(collection)
 	}
@@ -306,11 +306,11 @@ func TestDeleteUser(t *testing.T) {
 	input := deleteUserInputT{
 		Password: user.Password,
 	}
-	w, r := postJson(input)
+	w, r := postJSON(input)
 	r = setEmail(r, user.Email)
 	userBaseHandler(http.HandlerFunc(deleteUser)).ServeHTTP(w, r)
 	testCode(t, w, 200)
-	testJsonBody(t, w, &emailOut)
+	testJSONBody(t, w, &emailOut)
 	if emailOut != user.Email {
 		t.Error(emailOut)
 	}
@@ -324,7 +324,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestLoggedInHandlerTokenNotSet(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	LoggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
 
 	testCode(t, w, 403)
@@ -332,7 +332,7 @@ func TestLoggedInHandlerTokenNotSet(t *testing.T) {
 }
 
 func TestLoggedInHandlerTokenInvalid(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	setAuthToken(r, "INVALIDTOKEN")
 	LoggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
 
@@ -350,7 +350,7 @@ func TestLoggedInHandlerTokenExpired(t *testing.T) {
 	dbToken.TTL = 0
 	dbToken.Created -= 3 * 60 * 60 * 24
 	db.UpdateAuthToken(dbToken)
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	setAuthToken(r, token)
 	LoggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
 
@@ -361,7 +361,7 @@ func TestLoggedInHandlerTokenExpired(t *testing.T) {
 func TestLoggedInHandlerSuccess(t *testing.T) {
 	token := testCreateTokenSuccess(t, tokenData)
 	user := getDbUser(userData.Email)
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	setAuthToken(r, token)
 	LoggedOnlyHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userEmail := getUserEmail(r)
@@ -373,13 +373,13 @@ func TestLoggedInHandlerSuccess(t *testing.T) {
 }
 
 func TestGetCollectionZero(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
 	r = setUserEmail(r, user.Email)
 	getCollections(w, r)
 	testCode(t, w, 200)
 	collections := []models.CollectionSummaryT{}
-	testJsonBody(t, w, &collections)
+	testJSONBody(t, w, &collections)
 	if len(collections) != 0 {
 		t.Error(w.Body, collections)
 	}
@@ -390,13 +390,13 @@ func TestCreateCollectionSuccess(t *testing.T) {
 }
 
 func TestGetCollectionsOne(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
 	r = setUserEmail(r, user.Email)
 	getCollections(w, r)
 	testCode(t, w, 200)
 	collections := []models.CollectionSummaryT{}
-	testJsonBody(t, w, &collections)
+	testJSONBody(t, w, &collections)
 	if len(collections) != 1 {
 		t.Error(w.Body)
 		t.Error(collections)
@@ -409,11 +409,11 @@ func TestGetCollectionsOne(t *testing.T) {
 }
 
 func TestGetCollection(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(getCollection)).ServeHTTP(w, r)
 	var collection collectionT
-	testJsonBody(t, w, &collection)
+	testJSONBody(t, w, &collection)
 	if collection.Name != collectionData.Name || collection.ID != collectionID {
 		t.Error(collection)
 	}
@@ -425,12 +425,12 @@ func TestUpdateCollection(t *testing.T) {
 	}
 	createCollectionSuccess(t, userData.Email, &collection)
 	collection.Name = "NewName2"
-	w, r := postJson(collection)
+	w, r := postJSON(collection)
 	r = setCollectionID(r, collection.ID)
 	collectionBaseHandler(http.HandlerFunc(updateCollection)).ServeHTTP(w, r)
 	var updated collectionT
 	testCode(t, w, 200)
-	testJsonBody(t, w, &updated)
+	testJSONBody(t, w, &updated)
 	if collection.Name != updated.Name || collection.ID != updated.ID {
 		t.Error(collection, updated)
 	}
@@ -441,11 +441,11 @@ func TestDeleteCollection(t *testing.T) {
 		Name: "NewName",
 	}
 	createCollectionSuccess(t, userData.Email, &collection)
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setCollectionID(r, collection.ID)
 	collectionBaseHandler(http.HandlerFunc(deleteCollection)).ServeHTTP(w, r)
 	var collectionID string
-	testJsonBody(t, w, &collectionID)
+	testJSONBody(t, w, &collectionID)
 	if collectionID != collection.ID {
 		t.Error(collectionID, collection.ID)
 	}
@@ -453,14 +453,14 @@ func TestDeleteCollection(t *testing.T) {
 
 func TestCreateSession(t *testing.T) {
 	sessionData.CollectionID = collectionID
-	w, r := postJson(sessionData)
+	w, r := postJSON(sessionData)
 	r.Header.Set("User-Agent", userAgent)
 	createSession(w, r)
 	testCode(t, w, 200)
 }
 
 func TestCollectionBaseHandler(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		collection := GetCollection(r.Context())
@@ -471,7 +471,7 @@ func TestCollectionBaseHandler(t *testing.T) {
 }
 
 func TestCollectionReadAccessHandler(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
 	r = setUserEmail(r, user.Email)
 	r = setCollectionID(r, collectionID)
@@ -480,7 +480,7 @@ func TestCollectionReadAccessHandler(t *testing.T) {
 }
 
 func TestCollectionWriteAccessHandler(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
 	r = setUserEmail(r, user.Email)
 	r = setCollectionID(r, collectionID)
@@ -489,7 +489,7 @@ func TestCollectionWriteAccessHandler(t *testing.T) {
 }
 
 func TestCollectionReadAccessHandlerNoRight(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
 	r = setUserEmail(r, user2.Email)
 	r = setCollectionID(r, collectionID)
@@ -498,7 +498,7 @@ func TestCollectionReadAccessHandlerNoRight(t *testing.T) {
 }
 
 func TestCollectionWriteAccessHandlerNoRight(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
 	r = setUserEmail(r, user2.Email)
 	r = setCollectionID(r, collectionID)
@@ -510,7 +510,7 @@ func TestAddTeammate(t *testing.T) {
 	notfoundTeammate := teammateT{Email: "notfound@irl.hu"}
 	teammate := teammateT{Email: user2Data.Email}
 
-	w, r := postJson(notfoundTeammate)
+	w, r := postJSON(notfoundTeammate)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(addTeammate)).ServeHTTP(w, r)
 	testCode(t, w, 404)
@@ -518,7 +518,7 @@ func TestAddTeammate(t *testing.T) {
 
 	addTeammateSuccess(t, collectionID, &teammate)
 
-	w, r = postJson(teammate)
+	w, r = postJSON(teammate)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(addTeammate)).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -526,19 +526,19 @@ func TestAddTeammate(t *testing.T) {
 }
 
 func addTeammateSuccess(t *testing.T, collectionID string, teammate *teammateT) {
-	w, r := postJson(teammate)
+	w, r := postJSON(teammate)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(addTeammate)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 }
 
 func TestGetCollaborators(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(getTeammates)).ServeHTTP(w, r)
 
 	var teammates []*teammateT
-	testJsonBody(t, w, &teammates)
+	testJSONBody(t, w, &teammates)
 	if len(teammates) != 1 {
 		t.Error(len(teammates), "!=", 1)
 	}
@@ -548,7 +548,7 @@ func TestGetCollaborators(t *testing.T) {
 }
 
 func TestTeammateCollectionReadAccess(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
 	r = setUserEmail(r, user2.Email)
 	r = setCollectionID(r, collectionID)
@@ -557,7 +557,7 @@ func TestTeammateCollectionReadAccess(t *testing.T) {
 }
 
 func TestTeammateCollectionWriteAccessNoRight(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
 	r = setUserEmail(r, user2.Email)
 	r = setCollectionID(r, collectionID)
@@ -566,23 +566,23 @@ func TestTeammateCollectionWriteAccessNoRight(t *testing.T) {
 }
 
 func TestRemoveTeammate(t *testing.T) {
-	w, r := postJson(nil)
+	w, r := postJSON(nil)
 	r = getReqWithRouteContext(r, kv{"email": user2Data.Email, "collectionID": collectionID})
 	collectionBaseHandler(http.HandlerFunc(removeTeammate)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 
-	w, r = postJson(nil)
+	w, r = postJSON(nil)
 	r = getReqWithRouteContext(r, kv{"email": user2Data.Email, "collectionID": collectionID})
 	collectionBaseHandler(http.HandlerFunc(removeTeammate)).ServeHTTP(w, r)
 	testCode(t, w, 404)
 	testBody(t, w, "User not exist ("+user2Data.Email+")\n")
 
-	w, r = postJson(nil)
+	w, r = postJSON(nil)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(getTeammates)).ServeHTTP(w, r)
 
 	var teammates []*teammateT
-	testJsonBody(t, w, &teammates)
+	testJSONBody(t, w, &teammates)
 	if len(teammates) != 0 {
 		t.Error(len(teammates), "!=", 0)
 	}
@@ -609,7 +609,7 @@ func TestDeleteUserAndTeammate(t *testing.T) {
 	addTeammateSuccess(t, collection.ID, &teammate)
 
 	input := deleteUserInputT{Password: user2.Password}
-	w, r := postJson(input)
+	w, r := postJSON(input)
 	r = setEmail(r, user2.Email)
 	userBaseHandler(http.HandlerFunc(deleteUser)).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -623,19 +623,19 @@ func TestDeleteUserAndTeammate(t *testing.T) {
 	}
 
 	input = deleteUserInputT{Password: user1.Password}
-	w, r = postJson(input)
+	w, r = postJSON(input)
 	r = setEmail(r, user1.Email)
 	userBaseHandler(http.HandlerFunc(deleteUser)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 }
 
 func TestGetSessions(t *testing.T) {
-	w, r := postJson(collectionInput)
+	w, r := postJSON(collectionInput)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(getSessions)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 	sessions := []db.SessionDataT{}
-	testJsonBody(t, w, &sessions)
+	testJSONBody(t, w, &sessions)
 	if len(sessions) != 1 {
 		t.Error(w.Body, sessions, collectionInput)
 	}
@@ -658,7 +658,7 @@ func TestGetSessions(t *testing.T) {
 func TestCreatePageView(t *testing.T) {
 	pageViewData.CollectionID = collectionID
 	pageViewData.SessionKey = sessionKey
-	w, r := postJson(pageViewData)
+	w, r := postJSON(pageViewData)
 	r.Header.Set("User-Agent", userAgent)
 	createPageview(w, r)
 	testCode(t, w, 200)
@@ -667,19 +667,19 @@ func TestCreatePageView(t *testing.T) {
 func TestUpdateSession(t *testing.T) {
 	sessionUpdateData.CollectionID = collectionID
 	sessionUpdateData.SessionKey = sessionKey
-	w, r := postJson(sessionUpdateData)
+	w, r := postJSON(sessionUpdateData)
 	updateSession(w, r)
 	testCode(t, w, 200)
 }
 
 func TestGetPageViews(t *testing.T) {
 	pageviewInput.SessionKey = sessionKey
-	w, r := postJson(pageviewInput)
+	w, r := postJSON(pageviewInput)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(getPageviews)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 	pageViews := []db.PageviewDataT{}
-	testJsonBody(t, w, &pageViews)
+	testJSONBody(t, w, &pageViews)
 	if len(pageViews) != 1 {
 		t.Error(w.Body)
 		t.Error(pageViews)
@@ -688,12 +688,12 @@ func TestGetPageViews(t *testing.T) {
 
 /*
 func TestGetCollectionData(t *testing.T) {
-	w, r := postJson(collectionInput)
+	w, r := postJSON(collectionInput)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(getCollectionData)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 	var output db.CollectionDataT
-	testJsonBody(t, w, &output)
+	testJSONBody(t, w, &output)
 
 	if output.ID == "" {
 		t.Error(output.ID)
@@ -719,7 +719,7 @@ func TestGetCollectionData(t *testing.T) {
 */
 /*
 func TestGetCollectionStatData(t *testing.T) {
-	w, r := postJson(collectionInput)
+	w, r := postJSON(collectionInput)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(getCollectionStatData)).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -802,7 +802,7 @@ func runCmd(stdin, command string, args ...string) error {
 	return nil
 }
 
-func postJson(data interface{}) (*httptest.ResponseRecorder, *http.Request) {
+func postJSON(data interface{}) (*httptest.ResponseRecorder, *http.Request) {
 	w := httptest.NewRecorder()
 	b, _ := json.Marshal(data)
 	r := httptest.NewRequest("POST", "/users", bytes.NewBuffer(b))
@@ -833,7 +833,7 @@ func testBody(t *testing.T, w *httptest.ResponseRecorder, body string) {
 	}
 }
 
-func testJsonBody(t *testing.T, w *httptest.ResponseRecorder, v interface{}) {
+func testJSONBody(t *testing.T, w *httptest.ResponseRecorder, v interface{}) {
 	if err := json.NewDecoder(w.Body).Decode(v); err != nil {
 		t.Error(err)
 	}

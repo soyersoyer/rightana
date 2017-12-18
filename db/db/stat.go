@@ -132,7 +132,7 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 			if !matchFilter(input.Filter, session) {
 				return
 			}
-			validSessions[GetIdFromKey(k)] = empty{}
+			validSessions[GetIDFromKey(k)] = empty{}
 		}
 		bg.Add(t)
 	})
@@ -146,7 +146,7 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 			return
 		}
 		if len(input.Filter) != 0 {
-			if _, ok := validSessions[GetIdFromKey(k)]; !ok {
+			if _, ok := validSessions[GetIDFromKey(k)]; !ok {
 				return
 			}
 		}
@@ -341,7 +341,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 			if !matchFilter(input.Filter, session) {
 				return
 			}
-			validSessions[GetIdFromKey(k)] = empty{}
+			validSessions[GetIDFromKey(k)] = empty{}
 		}
 		sessionTotal++
 		sumOfSessionLength += int(session.End/1000000000 - t.UnixNano()/1000000000)
@@ -368,7 +368,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 		}
 
 		if len(input.Filter) != 0 {
-			if _, ok := validSessions[GetIdFromKey(k)]; !ok {
+			if _, ok := validSessions[GetIDFromKey(k)]; !ok {
 				return
 			}
 		}

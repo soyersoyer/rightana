@@ -36,8 +36,8 @@ func map2Month(key []byte) string {
 	return t.Format("2006-01")
 }
 
-func InitDatabase(basedir_ string) {
-	basedir = path.Clean(basedir_) + "/"
+func InitDatabase(basedirParam string) {
+	basedir = path.Clean(basedirParam) + "/"
 	os.MkdirAll(basedir, os.ModePerm)
 	bdb, err := bolt.Open(basedir+filename, 0600, nil)
 	if err != nil {
@@ -77,10 +77,7 @@ func DeleteUser(user *User) error {
 		if err := deleteCollectionsByUserEmailTx(tx, user.Email); err != nil {
 			return err
 		}
-		if err := deleteCollababorationsByUserEmailTx(tx, user.Email); err != nil {
-			return err
-		}
-		return nil
+		return deleteCollababorationsByUserEmailTx(tx, user.Email)
 	})
 }
 
@@ -167,10 +164,7 @@ func deleteCollectionTx(tx *bolt.Tx, collection *Collection) error {
 	if err := cipo.DeleteTx(tx, collection.ID, collection); err != nil {
 		return err
 	}
-	if err := deleteShardDB(collection.ID); err != nil {
-		return err
-	}
-	return nil
+	return deleteShardDB(collection.ID)
 }
 
 func GetCollectionsByUserEmail(email string) ([]Collection, error) {
@@ -199,7 +193,7 @@ func UserIsTeammate(collection *Collection, email string) bool {
 }
 
 type Shard struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Size int    `json:"size"`
 }
 
@@ -328,7 +322,7 @@ func GetTimeFromKey(key []byte) time.Time {
 	return t
 }
 
-func GetIdFromKey(key []byte) uint32 {
+func GetIDFromKey(key []byte) uint32 {
 	id, err := unmarshal(key[len(key)-4:])
 	if err != nil {
 		panic(err)

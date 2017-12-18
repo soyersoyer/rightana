@@ -12,7 +12,7 @@ var (
 	app                   = kingpin.New("k20a", "Knight20 Studio's open source web analytics.")
 	serve                 = app.Command("serve", "Serve")
 	seed                  = app.Command("seed", "Seed")
-	seedCollectionID      = seed.Arg("collection-id", "Collection ID").Required().String()
+	seedCollectionID      = seed.Arg("id", "Collection's ID").Required().String()
 	seedCount             = seed.Arg("count", "Session Count").Required().Int()
 	register              = app.Command("register", "Register a new user.")
 	registerEmail         = register.Arg("email", "Email for user.").Required().String()

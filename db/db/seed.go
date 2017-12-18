@@ -82,8 +82,8 @@ func Seed(from time.Time, to time.Time, collectionID string, n int) error {
 		ua := user_agent.New(userAgent)
 		browserName, browserVersion := ua.Browser()
 		ip := fmt.Sprintf("95.85.%d.%d", randInt(1, 254), randInt(1, 254))
-		location := geoip.LocationByIp(ip)
-		asn := geoip.ASNByIp(ip)
+		location := geoip.LocationByIP(ip)
+		asn := geoip.ASNByIP(ip)
 		host := collection.Name
 		duration := time.Duration(to.Sub(from).Seconds()/float64(n)*float64(i)) * time.Second
 		tfrom := from.Add(duration)

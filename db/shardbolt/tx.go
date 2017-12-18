@@ -22,27 +22,27 @@ func (db *DB) Begin(writeable bool) *MultiTx {
 }
 
 func (tx *MultiTx) Rollback() error {
-	var err error
+	var errAny error
 	for _, v := range tx.txs {
-		err_ := v.tx.Rollback()
-		if err_ != nil {
-			log.Println(err_)
-			err = err_
+		err := v.tx.Rollback()
+		if err != nil {
+			log.Println(err)
+			errAny = err
 		}
 	}
-	return err
+	return errAny
 }
 
 func (tx *MultiTx) Commit() error {
-	var err error
+	var errAny error
 	for _, v := range tx.txs {
-		err_ := v.tx.Commit()
-		if err_ != nil {
-			log.Println(err_)
-			err = err_
+		err := v.tx.Commit()
+		if err != nil {
+			log.Println(err)
+			errAny = err
 		}
 	}
-	return err
+	return errAny
 }
 
 func (tx *MultiTx) Put(bucket []byte, key []byte, value []byte) error {

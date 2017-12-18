@@ -105,9 +105,7 @@ func (db *DB) DeleteShard(id string) error {
 	if err := ashard.closeDB(); err != nil {
 		return err
 	}
-	if err := os.Remove(db.getShardFileName(ashard)); err != nil {
-		return err
-	}
+	os.Remove(db.getShardFileName(ashard))
 	return nil
 }
 
@@ -168,7 +166,7 @@ func (db *DB) Update(fn func(tx *MultiTx) error) error {
 }
 
 type ShardSize struct {
-	Id   string
+	ID   string
 	Size int
 }
 

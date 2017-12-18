@@ -8,11 +8,11 @@ import (
 )
 
 func GetUserEmail(ctx context.Context) string {
-	return ctx.Value("userEmail").(string)
+	return ctx.Value(keyUserEmail).(string)
 }
 
 func SetUserEmail(ctx context.Context, userEmail string) context.Context {
-	return context.WithValue(ctx, "userEmail", userEmail)
+	return context.WithValue(ctx, keyUserEmail, userEmail)
 }
 
 func LoggedOnlyHandler(next http.Handler) http.Handler {

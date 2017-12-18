@@ -28,7 +28,7 @@ type Location struct {
 	City        string
 }
 
-func LocationByIp(ipAddr string) *Location {
+func LocationByIP(ipAddr string) *Location {
 	if cityDB != nil {
 		ip := net.ParseIP(ipAddr)
 		record, err := cityDB.City(ip)
@@ -47,7 +47,7 @@ type AS struct {
 	Name   string
 }
 
-func ASNByIp(ipAddr string) *AS {
+func ASNByIP(ipAddr string) *AS {
 	if asnDB != nil {
 		ip := net.ParseIP(ipAddr)
 		if record, err := asnDB.ASN(ip); err == nil {

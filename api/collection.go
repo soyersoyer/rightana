@@ -47,11 +47,11 @@ func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 var createCollection = handleError(createCollectionE)
 
 func SetCollection(ctx context.Context, collection *models.Collection) context.Context {
-	return context.WithValue(ctx, "collection", collection)
+	return context.WithValue(ctx, keyCollection, collection)
 }
 
 func GetCollection(ctx context.Context) *models.Collection {
-	return ctx.Value("collection").(*models.Collection)
+	return ctx.Value(keyCollection).(*models.Collection)
 }
 
 func collectionBaseHandler(next http.Handler) http.Handler {

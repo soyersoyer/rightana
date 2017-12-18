@@ -17,6 +17,14 @@ import (
 	"github.com/soyersoyer/k20a/errors"
 )
 
+type ctxKey int
+
+const (
+	keyUserEmail ctxKey = iota
+	keyCollection
+	keyUser
+)
+
 func WebAppFileServer(dir string) http.HandlerFunc {
 	fs := http.FileServer(http.Dir(dir))
 
@@ -118,7 +126,7 @@ func handleError(fn HandlerFuncWithError) http.HandlerFunc {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			case *errors.Error:
 				log.Println(e)
-				http.Error(w, e.HttpMessage(), e.Code)
+				http.Error(w, e.HTTPMessage(), e.Code)
 			}
 		}
 	}
