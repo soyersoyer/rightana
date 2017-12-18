@@ -36,7 +36,7 @@ func CreateUser(email string, password string) (*User, error) {
 		Password: hashedPass,
 	}
 	if err := db.InsertUser(user); err != nil {
-		if err == db.KeyExists {
+		if err == db.ErrKeyExists {
 			return nil, errors.UserExist.T(email)
 		}
 		return nil, errors.DBError.Wrap(err, user)

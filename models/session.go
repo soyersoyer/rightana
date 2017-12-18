@@ -50,7 +50,7 @@ func CreateSession(userAgent string, remoteAddr string, input CreateSessionInput
 
 	collection, err := db.GetCollection(input.CollectionID)
 	if err != nil {
-		if err == db.KeyNotExists {
+		if err == db.ErrKeyNotExists {
 			return "", errors.CollectionNotExist.T(input.CollectionID).Wrap(err)
 		}
 		return "", errors.DBError.Wrap(err, input.CollectionID)

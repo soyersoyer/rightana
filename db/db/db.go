@@ -24,8 +24,8 @@ var (
 	cipo     *cipobolt.DB
 	shardDBs = atomic.Value{}
 
-	KeyExists    = cipobolt.KeyExists
-	KeyNotExists = cipobolt.KeyNotExists
+	ErrKeyExists    = cipobolt.ErrKeyExists
+	ErrKeyNotExists = cipobolt.ErrKeyNotExists
 )
 
 func map2Month(key []byte) string {

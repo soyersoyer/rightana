@@ -31,7 +31,7 @@ func CreateAuthToken(email string, password string) (string, error) {
 
 func DeleteAuthToken(tokenID string) error {
 	if err := db.DeleteAuthToken(tokenID); err != nil {
-		if err == db.KeyNotExists {
+		if err == db.ErrKeyNotExists {
 			return errors.AuthtokenNotExist.T(tokenID)
 		}
 		return errors.DBError.Wrap(err, tokenID)
@@ -56,7 +56,7 @@ func CheckAuthToken(tokenID string) (string, error) {
 func getAuthToken(tokenID string) (*AuthToken, error) {
 	token, err := db.GetAuthToken(tokenID)
 	if err != nil {
-		if err == db.KeyNotExists {
+		if err == db.ErrKeyNotExists {
 			return nil, errors.AuthtokenNotExist.T(tokenID)
 		}
 		return nil, errors.DBError.Wrap(err, tokenID)

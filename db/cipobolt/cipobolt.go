@@ -11,8 +11,8 @@ type DecFun func([]byte, interface{}) error
 type BucFun func(interface{}) []byte
 
 var (
-	KeyNotExists = errors.New("key not exists")
-	KeyExists    = errors.New("key exists")
+	ErrKeyNotExists = errors.New("key not exists")
+	ErrKeyExists    = errors.New("key exists")
 )
 
 type DB struct {
@@ -75,7 +75,7 @@ func (db *DB) GetTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 	bb := db.bucket(value)
 	b := tx.Bucket(bb)
 	if b == nil {
-		return KeyNotExists
+		return ErrKeyNotExists
 	}
 
 	kb, err := db.encode(key)
@@ -85,7 +85,7 @@ func (db *DB) GetTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 
 	data := b.Get(kb)
 	if data == nil {
-		return KeyNotExists
+		return ErrKeyNotExists
 	}
 
 	return db.decode(data, value)
@@ -122,7 +122,7 @@ func (db *DB) UpdateTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 
 	v := b.Get(kb)
 	if v == nil {
-		return KeyNotExists
+		return ErrKeyNotExists
 	}
 
 	return b.Put(kb, vb)
@@ -138,7 +138,7 @@ func (db *DB) InsertTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 
 	v := b.Get(kb)
 	if v != nil {
-		return KeyExists
+		return ErrKeyExists
 	}
 
 	return b.Put(kb, vb)
@@ -163,12 +163,12 @@ func (db *DB) DeleteTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 
 	b := tx.Bucket(db.bucket(value))
 	if b == nil {
-		return KeyNotExists
+		return ErrKeyNotExists
 	}
 
 	v := b.Get(kb)
 	if v == nil {
-		return KeyNotExists
+		return ErrKeyNotExists
 	}
 
 	return b.Delete(kb)
