@@ -16,9 +16,10 @@ type Config struct {
 
 var (
 	ActualConfig = Config{}
+	file         = "k20a"
 )
 
-func ReadConfig(file string) Config {
+func ReadConfig() Config {
 
 	viper.AddConfigPath("/etc/k20a/")
 	viper.AddConfigPath("$HOME/.k20a/")

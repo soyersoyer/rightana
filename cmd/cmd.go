@@ -15,12 +15,8 @@ import (
 	"github.com/soyersoyer/k20a/models"
 )
 
-var (
-	configFile = "k20a"
-)
-
 func inits() {
-	config.ReadConfig(configFile)
+	config.ReadConfig()
 	geoip.OpenDB(config.ActualConfig.GeoIPCityFile, config.ActualConfig.GeoIPASNFile)
 	db.InitDatabase(config.ActualConfig.DataDir)
 }
