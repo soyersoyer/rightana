@@ -105,8 +105,7 @@ func (db *DB) DeleteShard(id string) error {
 	if err := ashard.closeDB(); err != nil {
 		return err
 	}
-	os.Remove(db.getShardFileName(ashard))
-	return nil
+	return os.Remove(db.getShardFileName(ashard))
 }
 
 func (db *DB) Iterate(bucket []byte, fromKey []byte, toKey []byte, fn func(k []byte, v []byte)) {
