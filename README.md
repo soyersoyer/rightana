@@ -4,6 +4,23 @@
 
 Carefree web analytics on your server
 
+## What is K20a?
+
+Its a self hosted web analytics software.
+
+## How does it work?
+
+From the user's perspective it is very similar to GA
+- register
+- add your site
+- get a tracking code
+- include it to your webpage
+- View the reports
+
+## Who uses K20a?
+
+We use it to track our and our client's websites.
+
 ## Goals
 
 - Easy to install
@@ -14,6 +31,7 @@ Carefree web analytics on your server
 - Visitor friendly
 - You don't have to sell your visitor's data to a company
 - Tracks sessions, not users
+
 
 ### Screenshots
 
