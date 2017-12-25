@@ -1,6 +1,7 @@
 package cipobolt
 
 import (
+	"bytes"
 	"errors"
 
 	"github.com/boltdb/bolt"
@@ -41,9 +42,21 @@ func (db *DB) Get(key interface{}, value interface{}) error {
 	})
 }
 
+func (db *DB) CountPrefix(prefix interface{}, value interface{}, count *int) error {
+	return db.bolt.View(func(tx *bolt.Tx) error {
+		return db.CountPrefixTx(tx, prefix, value, count)
+	})
+}
+
 func (db *DB) Iterate(key interface{}, value interface{}, fn func() error) error {
 	return db.bolt.View(func(tx *bolt.Tx) error {
 		return db.IterateTx(tx, key, value, fn)
+	})
+}
+
+func (db *DB) IteratePrefix(key interface{}, value interface{}, prefix interface{}, fn func() error) error {
+	return db.bolt.View(func(tx *bolt.Tx) error {
+		return db.IteratePrefixTx(tx, key, value, prefix, fn)
 	})
 }
 
@@ -71,6 +84,12 @@ func (db *DB) Delete(key interface{}, value interface{}) error {
 	})
 }
 
+func (db *DB) DeletePrefix(prefix interface{}, value interface{}) error {
+	return db.bolt.Update(func(tx *bolt.Tx) error {
+		return db.DeleteTx(tx, prefix, value)
+	})
+}
+
 func (db *DB) GetTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 	bb := db.bucket(value)
 	b := tx.Bucket(bb)
@@ -91,6 +110,26 @@ func (db *DB) GetTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 	return db.decode(data, value)
 }
 
+func (db *DB) CountPrefixTx(tx *bolt.Tx, prefix interface{}, value interface{}, count *int) error {
+	*count = 0
+	bb := db.bucket(value)
+	b := tx.Bucket(bb)
+	if b == nil {
+		return ErrKeyNotExists
+	}
+
+	pb, err := db.encode(prefix)
+	if err != nil {
+		return err
+	}
+
+	c := b.Cursor()
+	for k, _ := c.Seek(pb); k != nil && bytes.HasPrefix(k, pb); k, _ = c.Next() {
+		*count++
+	}
+	return nil
+}
+
 func (db *DB) IterateTx(tx *bolt.Tx, key interface{}, value interface{}, fn func() error) error {
 	bb := db.bucket(value)
 	b := tx.Bucket(bb)
@@ -99,6 +138,32 @@ func (db *DB) IterateTx(tx *bolt.Tx, key interface{}, value interface{}, fn func
 	}
 	c := b.Cursor()
 	for k, v := c.First(); k != nil; k, v = c.Next() {
+		if err := db.decode(k, key); err != nil {
+			return err
+		}
+		if err := db.decode(v, value); err != nil {
+			return err
+		}
+		if err := fn(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (db *DB) IteratePrefixTx(tx *bolt.Tx, key interface{}, value interface{}, prefix interface{}, fn func() error) error {
+	bb := db.bucket(value)
+	b := tx.Bucket(bb)
+	if b == nil {
+		return nil
+	}
+	c := b.Cursor()
+
+	bPrefix, err := db.encode(prefix)
+	if err != nil {
+		return err
+	}
+	for k, v := c.Seek(bPrefix); k != nil && bytes.HasPrefix(k, bPrefix); k, v = c.Next() {
 		if err := db.decode(k, key); err != nil {
 			return err
 		}
@@ -172,6 +237,27 @@ func (db *DB) DeleteTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 	}
 
 	return b.Delete(kb)
+}
+
+func (db *DB) DeletePrefixTx(tx *bolt.Tx, prefix interface{}, value interface{}) error {
+	pb, err := db.encode(prefix)
+	if err != nil {
+		return err
+	}
+
+	b := tx.Bucket(db.bucket(value))
+	if b == nil {
+		return ErrKeyNotExists
+	}
+
+	c := b.Cursor()
+	for k, _ := c.Seek(pb); k != nil && bytes.HasPrefix(k, pb); k, _ = c.Next() {
+		if err := b.Delete(k); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (db *DB) getBytes(key interface{}, value interface{}) ([]byte, []byte, []byte, error) {
