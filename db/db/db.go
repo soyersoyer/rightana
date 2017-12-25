@@ -77,7 +77,7 @@ func DeleteUser(user *User) error {
 		if err := deleteCollectionsByUserEmailTx(tx, user.Email); err != nil {
 			return err
 		}
-		return deleteCollababorationsByUserEmailTx(tx, user.Email)
+		return deleteTeammateByUserEmailTx(tx, user.Email)
 	})
 }
 
@@ -103,7 +103,7 @@ func deleteCollectionsByUserEmailTx(tx *bolt.Tx, email string) error {
 	})
 }
 
-func deleteCollababorationsByUserEmailTx(tx *bolt.Tx, email string) error {
+func deleteTeammateByUserEmailTx(tx *bolt.Tx, email string) error {
 	key := ""
 	v := Collection{}
 	return cipo.IterateTx(tx, &key, &v, func() error {

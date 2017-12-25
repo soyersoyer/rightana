@@ -21,10 +21,10 @@ export class TeammatesComponent implements OnInit {
     this.form = this.fb.group({
       email: [null, [Validators.required]],
     });
-    this.getCollaborators();
+    this.getTeammates();
   }
 
-  getCollaborators() {
+  getTeammates() {
     this.backend
       .getTeammates(this.collection.id)
       .subscribe(teammates => this.teammates = teammates);
@@ -34,7 +34,7 @@ export class TeammatesComponent implements OnInit {
     this.backend
       .addTeammate(this.collection.id, this.form.value.email)
       .subscribe(_ => {
-        this.getCollaborators();
+        this.getTeammates();
         this.form.reset();
       });
   }
@@ -42,6 +42,6 @@ export class TeammatesComponent implements OnInit {
   remove(email: string) {
     this.backend
       .removeTeammate(this.collection.id, email)
-      .subscribe(_ => this.getCollaborators());
+      .subscribe(_ => this.getTeammates());
   }
 }
