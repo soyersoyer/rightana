@@ -50,8 +50,10 @@ var (
 	}
 	key1 = "hello1"
 	key2 = "hello2"
+	key3 = "prehello"
 	val1 = &Data{"world1"}
 	val2 = &Data{"world2"}
+	val3 = &Data{"prehello"}
 )
 
 func TestMain(m *testing.M) {
@@ -150,6 +152,46 @@ func TestDelete(t *testing.T) {
 	}
 	err = cipo.Get(key1, val1)
 	if err == nil {
+		t.Error("non existent get should fail")
+	}
+}
+
+func TestCountPrefix(t *testing.T) {
+	if err := cipo.Insert(key3, val3); err != nil {
+		t.Error(err)
+	}
+
+	checkValue(t, key3, val3)
+
+	count := 0
+	if err := cipo.CountPrefix("pre", &Data{}, &count); err != nil {
+		t.Error(err)
+	}
+	if count != 1 {
+		t.Error("there should be one value")
+	}
+}
+
+func TestIteratePrefix(t *testing.T) {
+	k := ""
+	v := &Data{}
+	count := 0
+	if err := cipo.IteratePrefix(&k, v, "pre", func() error {
+		count++
+		return nil
+	}); err != nil {
+		t.Error(err)
+	}
+	if count != 1 {
+		t.Error("there should be one value")
+	}
+}
+
+func DeletePrefix(t *testing.T) {
+	if err := cipo.DeletePrefix("pre", &Data{}); err != nil {
+		t.Error(err)
+	}
+	if err := cipo.Get(key3, val3); err != nil {
 		t.Error("non existent get should fail")
 	}
 }
