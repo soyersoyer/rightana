@@ -3,7 +3,6 @@ package db
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"time"
 
 	proto "github.com/golang/protobuf/proto"
@@ -20,7 +19,7 @@ var (
 func bucketName(value interface{}) []byte {
 	switch value := value.(type) {
 	default:
-		panic(fmt.Errorf("bucketName: invalid type: %+v", reflect.TypeOf(value)))
+		panic(fmt.Errorf("bucketName: invalid type: %T", value))
 	case *User:
 		return BUser
 	case *Collection:
@@ -37,7 +36,7 @@ func bucketName(value interface{}) []byte {
 func protoEncode(value interface{}) ([]byte, error) {
 	switch value := value.(type) {
 	default:
-		return nil, fmt.Errorf("protoEncode: invalid type: %+v", reflect.TypeOf(value))
+		return nil, fmt.Errorf("protoEncode: invalid type: %T", value)
 	case string:
 		return []byte(value), nil
 	case uint32:
@@ -50,7 +49,7 @@ func protoEncode(value interface{}) ([]byte, error) {
 func protoDecode(data []byte, value interface{}) error {
 	switch value := value.(type) {
 	default:
-		return fmt.Errorf("protoDecode: invalid type: %+v", reflect.TypeOf(value))
+		return fmt.Errorf("protoDecode: invalid type: %T", value)
 	case *string:
 		*value = string(data)
 		return nil
