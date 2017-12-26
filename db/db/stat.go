@@ -11,6 +11,17 @@ import (
 
 type empty struct{}
 
+type set map[uint32]empty
+
+func (s set) add(id uint32) {
+	s[id] = empty{}
+}
+
+func (s set) contains(id uint32) bool {
+	_, ok := s[id]
+	return ok
+}
+
 type CollectionDataInputT struct {
 	From     time.Time
 	To       time.Time
@@ -115,7 +126,26 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 	toKey := marshalTime(input.To)
 
 	session := &Session{}
-	validSessions := map[uint32]empty{}
+	pageview := &Pageview{}
+
+	validSessions := set{}
+	validPVSessions := set{}
+
+	sessionFilter := createSessionFilter(input.Filter)
+	pvFilter := createPageviewFilter(input.Filter)
+
+	if pvFilter != nil {
+		sdb.Iterate(BPageview, fromKey, toKey, func(k []byte, v []byte) {
+			if err := protoDecode(v, pageview); err != nil {
+				log.Println(err, v)
+				return
+			}
+			if !pvFilter.match(pageview) {
+				return
+			}
+			validPVSessions.add(GetIDFromKey(k))
+		})
+	}
 
 	bg := CreateBucketGen(input.Bucket, input.From, input.To, input.Timezone)
 	sdb.Iterate(BSession, fromKey, toKey, func(k []byte, v []byte) {
@@ -124,15 +154,18 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 			log.Println("bad key: ", k)
 			return
 		}
+		if pvFilter != nil && !validPVSessions.contains(GetIDFromKey(k)) {
+			return
+		}
 		if err := protoDecode(v, session); err != nil {
 			log.Println(err, v)
 			return
 		}
-		if len(input.Filter) != 0 {
-			if !matchFilter(input.Filter, session) {
+		if sessionFilter != nil {
+			if !sessionFilter.match(session) {
 				return
 			}
-			validSessions[GetIDFromKey(k)] = empty{}
+			validSessions.add(GetIDFromKey(k))
 		}
 		bg.Add(t)
 	})
@@ -145,11 +178,19 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 			log.Println("bad key: ", k)
 			return
 		}
-		if len(input.Filter) != 0 {
-			if _, ok := validSessions[GetIDFromKey(k)]; !ok {
+		if sessionFilter != nil && !validSessions.contains(GetIDFromKey(k)) {
+			return
+		}
+		if pvFilter != nil {
+			if err := protoDecode(v, pageview); err != nil {
+				log.Println(err, v)
+				return
+			}
+			if !pvFilter.match(pageview) {
 				return
 			}
 		}
+
 		bg.Add(t)
 	})
 	output.PageviewSums = bg.Close()
@@ -220,47 +261,143 @@ func getPercentByKey(m *map[string]int, key string) float32 {
 	return float32((*m)[key]) / float32(total)
 }
 
-func matchFilter(filter map[string]string, session *Session) bool {
-	if v, ok := filter["hostname"]; ok && session.Hostname != v {
-		return false
-	}
-	if v, ok := filter["device_type"]; ok && session.DeviceType != v {
-		return false
-	}
-	if v, ok := filter["device_os"]; ok && session.DeviceOS != v {
-		return false
-	}
-	if v, ok := filter["browser_name"]; ok && session.BrowserName != v {
-		return false
-	}
-	if v, ok := filter["browser_version"]; ok && session.BrowserVersion != v {
-		return false
-	}
-	if v, ok := filter["browser_language"]; ok && session.BrowserLanguage != v {
-		return false
-	}
+type sessionFilter struct {
+	Hostname         *string
+	DeviceType       *string
+	DeviceOS         *string
+	BrowserName      *string
+	BrowserVersion   *string
+	BrowserLanguage  *string
+	PageviewCount    *int32
+	ScreenResolution *string
+	WindowResolution *string
+	CountryCode      *string
+	City             *string
+	ASName           *string
+}
 
+func createSessionFilter(filter map[string]string) *sessionFilter {
+	empty := &sessionFilter{}
+	sf := &sessionFilter{}
+	if v, ok := filter["hostname"]; ok {
+		sf.Hostname = &v
+	}
+	if v, ok := filter["device_type"]; ok {
+		sf.DeviceType = &v
+	}
+	if v, ok := filter["device_os"]; ok {
+		sf.DeviceOS = &v
+	}
+	if v, ok := filter["browser_name"]; ok {
+		sf.BrowserName = &v
+	}
+	if v, ok := filter["browser_version"]; ok {
+		sf.BrowserVersion = &v
+	}
+	if v, ok := filter["browser_language"]; ok {
+		sf.BrowserLanguage = &v
+	}
 	if v, ok := filter["pageview_count"]; ok {
 		i, err := strconv.Atoi(v)
 		if err != nil {
 			log.Println("bad pageview_count int filter", v)
-		} else if session.PageviewCount != int32(i) {
-			return false
+		} else {
+			ic := int32(i)
+			sf.PageviewCount = &ic
 		}
 	}
-	if v, ok := filter["screen_resolution"]; ok && session.ScreenResolution != v {
+	if v, ok := filter["screen_resolution"]; ok {
+		sf.ScreenResolution = &v
+	}
+	if v, ok := filter["window_resolution"]; ok {
+		sf.WindowResolution = &v
+	}
+	if v, ok := filter["country_code"]; ok {
+		sf.CountryCode = &v
+	}
+	if v, ok := filter["city"]; ok {
+		sf.City = &v
+	}
+	if v, ok := filter["as_name"]; ok {
+		sf.ASName = &v
+	}
+	if *sf == *empty {
+		return nil
+	}
+	return sf
+}
+
+func (sf *sessionFilter) match(session *Session) bool {
+	if sf == nil {
+		return true
+	}
+	if sf.Hostname != nil && *sf.Hostname != session.Hostname {
 		return false
 	}
-	if v, ok := filter["window_resolution"]; ok && session.WindowResolution != v {
+	if sf.DeviceType != nil && *sf.DeviceType != session.DeviceType {
 		return false
 	}
-	if v, ok := filter["country_code"]; ok && session.CountryCode != v {
+	if sf.DeviceOS != nil && *sf.DeviceOS != session.DeviceOS {
 		return false
 	}
-	if v, ok := filter["city"]; ok && session.City != v {
+	if sf.BrowserName != nil && *sf.BrowserName != session.BrowserName {
 		return false
 	}
-	if v, ok := filter["as_name"]; ok && session.ASName != v {
+	if sf.BrowserVersion != nil && *sf.BrowserVersion != session.BrowserVersion {
+		return false
+	}
+	if sf.BrowserLanguage != nil && *sf.BrowserLanguage != session.BrowserLanguage {
+		return false
+	}
+	if sf.PageviewCount != nil && *sf.PageviewCount != session.PageviewCount {
+		return false
+	}
+	if sf.ScreenResolution != nil && *sf.ScreenResolution != session.ScreenResolution {
+		return false
+	}
+	if sf.WindowResolution != nil && *sf.WindowResolution != session.WindowResolution {
+		return false
+	}
+	if sf.CountryCode != nil && *sf.CountryCode != session.CountryCode {
+		return false
+	}
+	if sf.City != nil && *sf.City != session.City {
+		return false
+	}
+	if sf.ASName != nil && *sf.ASName != session.ASName {
+		return false
+	}
+	return true
+}
+
+type pageviewFilter struct {
+	page     *string
+	referrer *string
+}
+
+func createPageviewFilter(filter map[string]string) *pageviewFilter {
+	empty := &pageviewFilter{}
+	pvf := &pageviewFilter{}
+	if v, ok := filter["page"]; ok {
+		pvf.page = &v
+	}
+	if v, ok := filter["referrer"]; ok {
+		pvf.referrer = &v
+	}
+	if *pvf == *empty {
+		return nil
+	}
+	return pvf
+}
+
+func (pvf *pageviewFilter) match(pv *Pageview) bool {
+	if pvf == nil {
+		return true
+	}
+	if pvf.page != nil && *pvf.page != pv.Path {
+		return false
+	}
+	if pvf.referrer != nil && *pvf.referrer != pv.ReferrerURL {
 		return false
 	}
 	return true
@@ -299,11 +436,34 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 
 	prevTime := input.From.Add(input.From.Sub(input.To))
 
-	session := &Session{}
-
 	prevKey := marshalTime(prevTime)
 	fromKey := marshalTime(input.From)
 	toKey := marshalTime(input.To)
+
+	pvFilter := createPageviewFilter(input.Filter)
+	sessionFilter := createSessionFilter(input.Filter)
+
+	prevValidPVSessions := set{}
+	prevValidSessions := set{}
+
+	validPVSessions := set{}
+	validSessions := set{}
+
+	session := &Session{}
+	pageview := &Pageview{}
+
+	if pvFilter != nil {
+		sdb.Iterate(BPageview, prevKey, fromKey, func(k []byte, v []byte) {
+			if err := protoDecode(v, pageview); err != nil {
+				log.Println(err, v)
+				return
+			}
+			if !pvFilter.match(pageview) {
+				return
+			}
+			prevValidPVSessions.add(GetIDFromKey(k))
+		})
+	}
 
 	sdb.Iterate(BSession, prevKey, fromKey, func(k []byte, v []byte) {
 		t, err := unmarshalTime(k)
@@ -311,9 +471,18 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 			log.Println("bad key: ", k)
 			return
 		}
+		if pvFilter != nil && !prevValidPVSessions.contains(GetIDFromKey(k)) {
+			return
+		}
 		if err := protoDecode(v, session); err != nil {
 			log.Println(err, v)
 			return
+		}
+		if sessionFilter != nil {
+			if !sessionFilter.match(session) {
+				return
+			}
+			prevValidSessions.add(GetIDFromKey(k))
 		}
 		prevSessionTotal++
 		sumOfPrevSessionLength += int(session.End/1000000000 - t.UnixNano()/1000000000)
@@ -322,10 +491,35 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 	})
 
 	sdb.Iterate(BPageview, prevKey, fromKey, func(k []byte, v []byte) {
+		sid := GetIDFromKey(k)
+		if sessionFilter != nil && !prevValidSessions.contains(sid) {
+			return
+		}
+		if pvFilter != nil && !prevValidPVSessions.contains(sid) {
+			return
+		}
+		if err := protoDecode(v, pageview); err != nil {
+			log.Println(err, v)
+			return
+		}
+		if pvFilter != nil && !pvFilter.match(pageview) {
+			return
+		}
 		prevPageviewTotal++
 	})
 
-	validSessions := map[uint32]empty{}
+	if pvFilter != nil {
+		sdb.Iterate(BPageview, fromKey, toKey, func(k []byte, v []byte) {
+			if err := protoDecode(v, pageview); err != nil {
+				log.Println(err, v)
+				return
+			}
+			if !pvFilter.match(pageview) {
+				return
+			}
+			validPVSessions.add(GetIDFromKey(k))
+		})
+	}
 
 	sdb.Iterate(BSession, fromKey, toKey, func(k []byte, v []byte) {
 		t, err := unmarshalTime(k)
@@ -333,16 +527,20 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 			log.Println("bad key: ", k)
 			return
 		}
+		if pvFilter != nil && !validPVSessions.contains(GetIDFromKey(k)) {
+			return
+		}
 		if err := protoDecode(v, session); err != nil {
 			log.Println(err, v)
 			return
 		}
-		if len(input.Filter) != 0 {
-			if !matchFilter(input.Filter, session) {
+		if sessionFilter != nil {
+			if !sessionFilter.match(session) {
 				return
 			}
-			validSessions[GetIDFromKey(k)] = empty{}
+			validSessions.add(GetIDFromKey(k))
 		}
+
 		sessionTotal++
 		sumOfSessionLength += int(session.End/1000000000 - t.UnixNano()/1000000000)
 
@@ -360,19 +558,21 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 		asNameSums[session.ASName]++
 	})
 
-	pageview := &Pageview{}
 	sdb.Iterate(BPageview, fromKey, toKey, func(k []byte, v []byte) {
+		sid := GetIDFromKey(k)
+		if sessionFilter != nil && !validSessions.contains(sid) {
+			return
+		}
+		if pvFilter != nil && !validPVSessions.contains(sid) {
+			return
+		}
 		if err := protoDecode(v, pageview); err != nil {
 			log.Println(err, v)
 			return
 		}
-
-		if len(input.Filter) != 0 {
-			if _, ok := validSessions[GetIDFromKey(k)]; !ok {
-				return
-			}
+		if pvFilter != nil && !pvFilter.match(pageview) {
+			return
 		}
-
 		pageviewTotal++
 
 		pageSums[pageview.Path]++
@@ -462,13 +662,36 @@ func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*Sessio
 	fromKey := marshalTime(input.From)
 	toKey := marshalTime(input.To)
 
+	sessionFilter := createSessionFilter(input.Filter)
+	pvFilter := createPageviewFilter(input.Filter)
+
 	session := &Session{}
+	pageview := &Pageview{}
+
+	validPVSessions := set{}
+
+	if pvFilter != nil {
+		sdb.Iterate(BPageview, fromKey, toKey, func(k []byte, v []byte) {
+			if err := protoDecode(v, pageview); err != nil {
+				log.Println(err, v)
+				return
+			}
+			if !pvFilter.match(pageview) {
+				return
+			}
+			validPVSessions.add(GetIDFromKey(k))
+		})
+	}
+
 	sdb.Iterate(BSession, fromKey, toKey, func(k []byte, v []byte) {
+		if pvFilter != nil && !validPVSessions.contains(GetIDFromKey(k)) {
+			return
+		}
 		if err := protoDecode(v, session); err != nil {
 			log.Println(err, v)
 			return
 		}
-		if len(input.Filter) != 0 && !matchFilter(input.Filter, session) {
+		if !sessionFilter.match(session) {
 			return
 		}
 		ret = append(ret, &SessionDataT{
