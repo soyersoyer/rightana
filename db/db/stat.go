@@ -222,18 +222,18 @@ type CollectionStatDataT struct {
 
 type totalT struct {
 	Count       int     `json:"count"`
-	DiffPercent float32 `json:"diff_percent"`
+	DiffPercent float64 `json:"diff_percent"`
 }
 
 type percentT struct {
-	Percent     float32 `json:"percent"`
-	DiffPercent float32 `json:"diff_percent"`
+	Percent     float64 `json:"percent"`
+	DiffPercent float64 `json:"diff_percent"`
 }
 
 type sumT struct {
 	Name    string  `json:"name"`
 	Count   int     `json:"count"`
-	Percent float32 `json:"percent"`
+	Percent float64 `json:"percent"`
 }
 
 func getTotal(m *map[string]int) int {
@@ -248,18 +248,18 @@ func getSums(m *map[string]int) []sumT {
 	output := []sumT{}
 	total := getTotal(m)
 	for k, v := range *m {
-		output = append(output, sumT{Name: k, Count: v, Percent: float32(v) / float32(total)})
+		output = append(output, sumT{Name: k, Count: v, Percent: float64(v) / float64(total)})
 	}
 	sort.Slice(output, func(i, j int) bool { return output[i].Count > output[j].Count })
 	return output
 }
 
-func getPercentByKey(m *map[string]int, key string) float32 {
+func getPercentByKey(m *map[string]int, key string) float64 {
 	total := getTotal(m)
-	if total == 0 || (*m)[key] == 0 {
+	if total == 0 {
 		return 1.0
 	}
-	return float32((*m)[key]) / float32(total)
+	return float64((*m)[key]) / float64(total)
 }
 
 type sessionFilter struct {
@@ -599,7 +599,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 		SessionTotal:         totalT{sessionTotal, getGrowthPercent(sessionTotal, prevSessionTotal)},
 		PageviewTotal:        totalT{pageviewTotal, getGrowthPercent(pageviewTotal, prevPageviewTotal)},
 		AvgSessionLength:     totalT{avgSessionLength, getGrowthPercent(avgSessionLength, prevAvgSessionLength)},
-		BounceRate:           percentT{bounceRate, bounceRate/prevBounceRate - 1.0},
+		BounceRate:           percentT{bounceRate, getGrowthPercentF(bounceRate, prevBounceRate)},
 		PageSums:             getSums(&pageSums),
 		QueryStringSums:      getSums(&queryStringSums),
 		ReferrerSums:         getSums(&referrerSums),
@@ -625,11 +625,18 @@ func safeDiv(a, b int) int {
 	return a / b
 }
 
-func getGrowthPercent(actual, prev int) float32 {
+func getGrowthPercent(actual, prev int) float64 {
 	if prev == 0 {
 		return 1.0
 	}
-	return float32(actual)/float32(prev) - 1.0
+	return float64(actual)/float64(prev) - 1.0
+}
+
+func getGrowthPercentF(actual, prev float64) float64 {
+	if prev == 0.0 {
+		return 1.0
+	}
+	return actual/prev - 1.0
 }
 
 type SessionDataT struct {
