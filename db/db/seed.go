@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/mssola/user_agent"
@@ -43,8 +44,8 @@ var resolutions = []string{
 
 var urls = []string{
 	"dl",
-	"ld",
-	"ndl",
+	"ld?q=22222",
+	"ndl;matrixnotation=true",
 	"hdl",
 }
 
@@ -121,9 +122,11 @@ func Seed(from time.Time, to time.Time, collectionID string, n int) error {
 				referrer = randElem(referrers)
 			}
 			tfrom = tfrom.Add(time.Duration(j) * time.Minute)
+			path, queryString := splitURL(randElem(urls))
 			pageview := &Pageview{
-				Path:        randElem(urls),
+				Path:        path,
 				ReferrerURL: referrer,
+				QueryString: queryString,
 			}
 			if err := ShardUpsertTx(tx, GetKey(tfrom, sessionID), pageview); err != nil {
 				return fmt.Errorf("pageview %v %v insert error err: %v pv %v t %v id %v", i, j, err, pageview, tfrom, sessionID)
@@ -147,4 +150,13 @@ func randInt(min int, max int) int {
 
 func randElem(list []string) string {
 	return list[rand.Intn(len(list))]
+}
+
+/* TODO - remove from here */
+func splitURL(url string) (path, queryString string) {
+	idx := strings.IndexAny(url, "?;")
+	if idx < 0 {
+		return url, ""
+	}
+	return url[:idx], url[idx+1:]
 }

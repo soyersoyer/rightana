@@ -46,5 +46,6 @@ message Session {
 
 message Pageview {
 	string Path = 1;
+	string QueryString = 3;
 	string ReferrerURL = 2;
 }

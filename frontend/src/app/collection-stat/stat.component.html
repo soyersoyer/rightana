@@ -37,6 +37,10 @@
     <div class="col-md-8">
       <h3>Pages</h3>
       <k20a-table-sum name="Pages" [sums]="sums.page_sums" key="page"></k20a-table-sum>
+      <ng-container *ngIf="setup.in('page') && (sums.query_string_sums.length > 1 || sums.query_string_sums[0].name != '')">
+        <h3>Query strings</h3>
+        <k20a-table-sum name="Query string" [sums]="sums.query_string_sums" key="query_string"></k20a-table-sum>
+      </ng-container>
       <h3>Referrers</h3>
       <k20a-table-sum name="Referrer" [sums]="sums.referrer_sums" key="referrer"></k20a-table-sum>
       <h3>Hosts</h3>

@@ -135,9 +135,12 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 	sID := db.GetIDFromKey(key)
 	pKey := db.GetKey(now, sID)
 
+	path, queryString := splitURL(input.Path)
+
 	pageview := &db.Pageview{
-		Path:        input.Path,
+		Path:        path,
 		ReferrerURL: input.Referrer,
+		QueryString: queryString,
 	}
 
 	err = db.ShardUpdate(input.CollectionID, func(tx *shardbolt.MultiTx) error {
@@ -159,4 +162,12 @@ func getIP(remoteAddr string) (string, error) {
 	}
 	ip, _, err := net.SplitHostPort(remoteAddr)
 	return ip, err
+}
+
+func splitURL(url string) (path, queryString string) {
+	idx := strings.IndexAny(url, "?;")
+	if idx < 0 {
+		return url, ""
+	}
+	return url[:idx], url[idx+1:]
 }

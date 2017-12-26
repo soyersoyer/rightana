@@ -204,6 +204,7 @@ type CollectionStatDataT struct {
 	AvgSessionLength     totalT   `json:"avg_session_length"`
 	BounceRate           percentT `json:"bounce_rate"`
 	PageSums             []sumT   `json:"page_sums"`
+	QueryStringSums      []sumT   `json:"query_string_sums"`
 	ReferrerSums         []sumT   `json:"referrer_sums"`
 	HostnameSums         []sumT   `json:"hostname_sums"`
 	DeviceTypeSums       []sumT   `json:"device_type_sums"`
@@ -371,18 +372,22 @@ func (sf *sessionFilter) match(session *Session) bool {
 }
 
 type pageviewFilter struct {
-	page     *string
-	referrer *string
+	Page        *string
+	QueryString *string
+	Referrer    *string
 }
 
 func createPageviewFilter(filter map[string]string) *pageviewFilter {
 	empty := &pageviewFilter{}
 	pvf := &pageviewFilter{}
 	if v, ok := filter["page"]; ok {
-		pvf.page = &v
+		pvf.Page = &v
+	}
+	if v, ok := filter["query_string"]; ok {
+		pvf.QueryString = &v
 	}
 	if v, ok := filter["referrer"]; ok {
-		pvf.referrer = &v
+		pvf.Referrer = &v
 	}
 	if *pvf == *empty {
 		return nil
@@ -394,10 +399,13 @@ func (pvf *pageviewFilter) match(pv *Pageview) bool {
 	if pvf == nil {
 		return true
 	}
-	if pvf.page != nil && *pvf.page != pv.Path {
+	if pvf.Page != nil && *pvf.Page != pv.Path {
 		return false
 	}
-	if pvf.referrer != nil && *pvf.referrer != pv.ReferrerURL {
+	if pvf.QueryString != nil && *pvf.QueryString != pv.QueryString {
+		return false
+	}
+	if pvf.Referrer != nil && *pvf.Referrer != pv.ReferrerURL {
 		return false
 	}
 	return true
@@ -419,6 +427,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 	prevPageviewCountSums := make(map[string]int)
 
 	pageSums := make(map[string]int)
+	queryStringSums := make(map[string]int)
 	referrerSums := make(map[string]int)
 
 	hostnameSums := make(map[string]int)
@@ -576,6 +585,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 		pageviewTotal++
 
 		pageSums[pageview.Path]++
+		queryStringSums[pageview.QueryString]++
 		referrerSums[pageview.ReferrerURL]++
 	})
 
@@ -591,6 +601,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 		AvgSessionLength:     totalT{avgSessionLength, getGrowthPercent(avgSessionLength, prevAvgSessionLength)},
 		BounceRate:           percentT{bounceRate, bounceRate/prevBounceRate - 1.0},
 		PageSums:             getSums(&pageSums),
+		QueryStringSums:      getSums(&queryStringSums),
 		ReferrerSums:         getSums(&referrerSums),
 		HostnameSums:         getSums(&hostnameSums),
 		DeviceTypeSums:       getSums(&deviceTypeSums),
