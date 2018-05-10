@@ -1,4 +1,4 @@
 k20a
 k20a.yml
 data
-api/bindata_assetfs.go
+api/statik/statik.go

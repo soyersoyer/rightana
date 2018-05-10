@@ -1,6 +1,6 @@
 package api
 
-//go:generate go-bindata-assetfs -ignore .map -pkg api -prefix ../ ../frontend/dist/ ../frontend/dist/assets/
+//go:generate statik -src=../frontend/dist/
 
 import (
 	"encoding/json"
@@ -10,11 +10,11 @@ import (
 	"path"
 	"path/filepath"
 
-	//	"github.com/elazarl/go-bindata-assetfs"
-	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
+	"github.com/rakyll/statik/fs"
 
+	_ "github.com/soyersoyer/k20a/api/statik" //the embedded statik fs data
 	"github.com/soyersoyer/k20a/errors"
 )
 
@@ -26,7 +26,7 @@ const (
 	keyUser
 )
 
-func WebAppFileServer(dir string) http.HandlerFunc {
+func webAppFileServer(dir string) http.HandlerFunc {
 	fs := http.FileServer(http.Dir(dir))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,20 +38,25 @@ func WebAppFileServer(dir string) http.HandlerFunc {
 	})
 }
 
-func WebAppFileServerBundled(dir string) http.HandlerFunc {
-	fs := http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: dir})
+func webAppFileServerBundled() http.HandlerFunc {
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fileServer := http.FileServer(statikFS)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := AssetInfo(filepath.Join(dir, filepath.FromSlash(path.Clean("/"+r.URL.Path))))
+		_, err := statikFS.Open(filepath.FromSlash(path.Clean("/" + r.URL.Path)))
 		if err != nil {
 			r.URL.Path = "/"
 		}
-		fs.ServeHTTP(w, r)
+		fileServer.ServeHTTP(w, r)
 	})
 }
 
 func Wire(r *chi.Mux) {
-	r.Get("/*", WebAppFileServer("frontend/dist"))
+	r.Get("/*", webAppFileServer("frontend/dist"))
+	//r.Get("/*", webAppFileServerBundled())
 	r.Route("/api", func(r chi.Router) {
 		cors := cors.New(cors.Options{
 			AllowedOrigins:   []string{"*"},
