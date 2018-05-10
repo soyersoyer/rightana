@@ -1,4 +1,4 @@
-package models
+package service
 
 import (
 	"math/rand"
@@ -9,9 +9,13 @@ import (
 	"github.com/soyersoyer/k20a/errors"
 )
 
+// Collection is the db's collection struct
 type Collection = db.Collection
+
+// CollectionDataInputT is the db's collectionDataInputT struct
 type CollectionDataInputT = db.CollectionDataInputT
 
+// CreateCollection creates a collection
 func CreateCollection(ownerEmail string, name string) (*Collection, error) {
 	collection := &Collection{
 		ID:         "K20A-" + randStringBytes(8),
@@ -25,6 +29,7 @@ func CreateCollection(ownerEmail string, name string) (*Collection, error) {
 	return collection, nil
 }
 
+// CreateCollectionByID creates a collection with a fixed ID
 func CreateCollectionByID(id string, name string, ownerEmail string) (*Collection, error) {
 	user, err := GetUserByEmail(ownerEmail)
 	if err != nil {
@@ -56,6 +61,7 @@ func randStringBytes(n int) string {
 	return string(b)
 }
 
+// CollectionReadAccessCheck checks the read access
 func CollectionReadAccessCheck(collection *Collection, userEmail string) error {
 	if collection.OwnerEmail != userEmail && !db.UserIsTeammate(collection, userEmail) {
 		return errors.AccessDenied
@@ -63,6 +69,7 @@ func CollectionReadAccessCheck(collection *Collection, userEmail string) error {
 	return nil
 }
 
+// CollectionWriteAccessCheck checks the write access
 func CollectionWriteAccessCheck(collection *Collection, userEmail string) error {
 	if collection.OwnerEmail != userEmail {
 		return errors.AccessDenied
@@ -70,6 +77,7 @@ func CollectionWriteAccessCheck(collection *Collection, userEmail string) error 
 	return nil
 }
 
+// GetCollection fetch a collection by ID
 func GetCollection(id string) (*Collection, error) {
 	collection, err := db.GetCollection(id)
 	if err != nil {
@@ -78,6 +86,7 @@ func GetCollection(id string) (*Collection, error) {
 	return collection, nil
 }
 
+// UpdateCollection updates the collection's name
 func UpdateCollection(collection *Collection, name string) error {
 	collection.Name = name
 	if err := db.UpdateCollection(collection); err != nil {
@@ -86,6 +95,7 @@ func UpdateCollection(collection *Collection, name string) error {
 	return nil
 }
 
+// DeleteCollection deletes the collection
 func DeleteCollection(collection *Collection) error {
 	if err := db.DeleteCollection(collection); err != nil {
 		return errors.DBError.Wrap(err, collection)
@@ -93,13 +103,15 @@ func DeleteCollection(collection *Collection) error {
 	return nil
 }
 
+// CollectionSummaryT the struct for the Collection's summary
 type CollectionSummaryT struct {
 	ID              string  `json:"id"`
 	Name            string  `json:"name"`
 	PageviewPercent float32 `json:"pageview_percent"`
 }
 
-func GetCollectionSummaryByUserEmail(email string) ([]CollectionSummaryT, error) {
+// GetCollectionSummariesByUserEmail returns the collection summaries for the user
+func GetCollectionSummariesByUserEmail(email string) ([]CollectionSummaryT, error) {
 	ret := []CollectionSummaryT{}
 	collections, err := db.GetCollectionsByUserEmail(email)
 	if err != nil {
@@ -122,6 +134,7 @@ func GetCollectionSummaryByUserEmail(email string) ([]CollectionSummaryT, error)
 	return ret, nil
 }
 
+// GetCollectionShards return the collection shards
 func GetCollectionShards(collection *Collection) ([]db.Shard, error) {
 	shards, err := db.GetCollectionShards(collection)
 	if err != nil {
@@ -130,6 +143,7 @@ func GetCollectionShards(collection *Collection) ([]db.Shard, error) {
 	return shards, nil
 }
 
+// DeleteCollectionShard deletes a shard
 func DeleteCollectionShard(collection *Collection, shardID string) error {
 	if err := db.DeleteCollectionShard(collection, shardID); err != nil {
 		return errors.DBError.Wrap(err, shardID)
@@ -137,6 +151,7 @@ func DeleteCollectionShard(collection *Collection, shardID string) error {
 	return nil
 }
 
+// AddTeammate adds a teammate to the collection
 func AddTeammate(collection *Collection, email string) error {
 	user, err := db.GetUserByEmail(email)
 	if err != nil {
@@ -151,6 +166,7 @@ func AddTeammate(collection *Collection, email string) error {
 	return nil
 }
 
+// RemoveTeammate removes the teammate from the collection
 func RemoveTeammate(collection *Collection, email string) error {
 	if coll := db.GetTeammate(collection, email); coll == nil {
 		return errors.UserNotExist.T(email)
@@ -161,6 +177,7 @@ func RemoveTeammate(collection *Collection, email string) error {
 	return nil
 }
 
+// GetCollectionData returns the collection data
 func GetCollectionData(collection *Collection, input *CollectionDataInputT) (*db.CollectionDataT, error) {
 	data, err := db.GetBucketSums(collection, input)
 	if err != nil {
@@ -169,6 +186,7 @@ func GetCollectionData(collection *Collection, input *CollectionDataInputT) (*db
 	return data, nil
 }
 
+// GetCollectionStatData return the collection stats
 func GetCollectionStatData(collection *Collection, input *CollectionDataInputT) (*db.CollectionStatDataT, error) {
 	data, err := db.GetStatistics(collection, input)
 	if err != nil {
@@ -177,6 +195,7 @@ func GetCollectionStatData(collection *Collection, input *CollectionDataInputT) 
 	return data, nil
 }
 
+// GetSessions return the collection's sessions
 func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*db.SessionDataT, error) {
 	data, err := db.GetSessions(collection, input)
 	if err != nil {
@@ -185,6 +204,7 @@ func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*db.Ses
 	return data, nil
 }
 
+// GetPageviews return the pageviews for the collection
 func GetPageviews(collection *Collection, sessionKey string) ([]*db.PageviewDataT, error) {
 	key, err := db.DecodeSessionKey(sessionKey)
 	if err != nil {
@@ -195,13 +215,14 @@ func GetPageviews(collection *Collection, sessionKey string) ([]*db.PageviewData
 		return nil, errors.SessionNotExist.T(sessionKey).Wrap(err, collection.ID)
 	}
 
-	data, err := db.GetPageviews(collection, key, session)
+	data, err := db.GetPageviews(collection, key)
 	if err != nil {
 		return nil, errors.DBError.Wrap(err, collection.ID, session)
 	}
 	return data, nil
 }
 
+// SeedCollection seed a collection with n sessions
 func SeedCollection(from time.Time, to time.Time, collectionID string, n int) error {
 	return db.Seed(from, to, collectionID, n)
 }

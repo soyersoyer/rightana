@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// GetTeammate returns the teammate by email
 func GetTeammate(collection *Collection, email string) *Teammate {
 	idx := findTeammate(collection, email)
 	if idx == -1 {
@@ -12,6 +13,7 @@ func GetTeammate(collection *Collection, email string) *Teammate {
 	return collection.Teammates[idx]
 }
 
+// AddTeammate adds a Teammate to a user
 func AddTeammate(collection *Collection, user *User) error {
 	idx := findTeammate(collection, user.Email)
 	if idx != -1 {
@@ -21,6 +23,7 @@ func AddTeammate(collection *Collection, user *User) error {
 	return UpdateCollection(collection)
 }
 
+// RemoveTeammate removes a teammate by email
 func RemoveTeammate(collection *Collection, email string) error {
 	idx := findTeammate(collection, email)
 	if idx == -1 {

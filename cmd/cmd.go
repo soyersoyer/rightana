@@ -12,7 +12,7 @@ import (
 	"github.com/soyersoyer/k20a/config"
 	"github.com/soyersoyer/k20a/db/db"
 	"github.com/soyersoyer/k20a/geoip"
-	"github.com/soyersoyer/k20a/models"
+	"github.com/soyersoyer/k20a/service"
 )
 
 func inits() {
@@ -21,6 +21,7 @@ func inits() {
 	db.InitDatabase(config.ActualConfig.DataDir)
 }
 
+// Serve starts a http server
 func Serve() {
 	inits()
 	r := chi.NewRouter()
@@ -38,29 +39,32 @@ func Serve() {
 	log.Fatal(err)
 }
 
+// Seed seed a collection with count session
 func Seed(trackingID string, count int) {
 	inits()
 	now := time.Now()
 	start := now.AddDate(0, -int(now.Month())+1, -int(now.Day())+1)
 	end := start.AddDate(1, 0, 0)
-	if err := models.SeedCollection(start, end, trackingID, count); err != nil {
+	if err := service.SeedCollection(start, end, trackingID, count); err != nil {
 		log.Fatalln(err)
 	}
 }
 
+// RegisterUser registers a new user
 func RegisterUser(email string, password string) {
 	inits()
 	config.ActualConfig.EnableRegistration = true
-	user, err := models.CreateUser(email, password)
+	user, err := service.CreateUser(email, password)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	log.Println("user created:", user.Email)
 }
 
+// CreateCollection creates a collection with name and the owner's email
 func CreateCollection(collectionID string, name string, email string) {
 	inits()
-	collection, err := models.CreateCollectionByID(collectionID, name, email)
+	collection, err := service.CreateCollectionByID(collectionID, name, email)
 	if err != nil {
 		log.Fatalln(err)
 	}

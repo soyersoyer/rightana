@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 	"sync/atomic"
 
 	"github.com/boltdb/bolt"
@@ -15,11 +16,12 @@ import (
 type shardArray []*shard
 
 type DB struct {
-	dir     string
-	mapFn   func([]byte) string
-	mode    os.FileMode
-	options *Options
-	shards  atomic.Value
+	dir        string
+	mapFn      func([]byte) string
+	mode       os.FileMode
+	options    *Options
+	shards     atomic.Value
+	shardMutex sync.Mutex
 }
 
 type Options struct {
@@ -126,6 +128,24 @@ func (db *DB) Iterate(bucket []byte, fromKey []byte, toKey []byte, fn func(k []b
 	}
 }
 
+func (db *DB) IteratePrefix(bucket []byte, prefixKey []byte, fn func(k []byte, v []byte)) {
+	shards := db.getShards(prefixKey, prefixKey)
+	for _, v := range shards {
+		v.db.View(func(tx *bolt.Tx) error {
+			b := tx.Bucket(bucket)
+			if b == nil {
+				log.Println("bucket not found", string(bucket))
+				return nil
+			}
+			c := b.Cursor()
+			for k, v := c.Seek(prefixKey); k != nil && bytes.HasPrefix(k, prefixKey); k, v = c.Next() {
+				fn(k, v)
+			}
+			return nil
+		})
+	}
+}
+
 func (db *DB) Get(bucket []byte, key []byte) ([]byte, error) {
 	actualShard := db.getActualShard(key)
 	if actualShard == nil {
@@ -162,6 +182,21 @@ func (db *DB) Update(fn func(tx *MultiTx) error) error {
 	}
 	success = true
 	return tx.Commit()
+}
+
+func (db *DB) BatchUpsert(bucket []byte, key []byte, value []byte) error {
+	actualShard, err := db.ensureShard(key)
+	if err != nil {
+		return err
+	}
+	return actualShard.db.Batch(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists(bucket)
+		if err != nil {
+			return err
+		}
+		b.FillPercent = db.options.FillPercent
+		return b.Put(key, value)
+	})
 }
 
 type ShardSize struct {

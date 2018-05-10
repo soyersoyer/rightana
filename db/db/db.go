@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -23,8 +24,11 @@ var (
 
 	cipo     *cipobolt.DB
 	shardDBs = atomic.Value{}
+	dbMutex  sync.Mutex
 
-	ErrKeyExists    = cipobolt.ErrKeyExists
+	// ErrKeyExists is an error what you can get if the key exists but it shouldn't
+	ErrKeyExists = cipobolt.ErrKeyExists
+	// ErrKeyNotExists is an error what you can get if the key not exists but it should
 	ErrKeyNotExists = cipobolt.ErrKeyNotExists
 )
 
@@ -264,6 +268,15 @@ func getShardDB(collectionID string) (*shardbolt.DB, error) {
 	dbs := shardDBs.Load().(shardMap)
 	db, ok := dbs[collectionID]
 	if !ok {
+		dbMutex.Lock()
+		defer dbMutex.Unlock()
+		dbs := shardDBs.Load().(shardMap)
+		db2, ok := dbs[collectionID]
+		if ok {
+			log.Println(db2)
+			return db2, nil
+		}
+
 		if collectionID == "" {
 			return nil, fmt.Errorf("collectionId is empty")
 		}
@@ -330,6 +343,18 @@ func GetIDFromKey(key []byte) uint32 {
 	return id
 }
 
+func GetPVKey(sessionkey []byte, t time.Time) []byte {
+	return append(sessionkey, marshalTime(t)...)
+}
+
+func GetTimeFromPVKey(key []byte) time.Time {
+	t, err := unmarshalTime(key[len(key)-8:])
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
 func ShardUpdate(collectionID string, fn func(tx *shardbolt.MultiTx) error) error {
 	sdb, err := getShardDB(collectionID)
 	if err != nil {
@@ -351,6 +376,19 @@ func ShardUpsert(collectionID string, key []byte, v proto.Message) error {
 	return sdb.Update(func(tx *shardbolt.MultiTx) error {
 		return tx.Put(bb, key, vb)
 	})
+}
+
+func ShardUpsertBatch(collectionID string, key []byte, v proto.Message) error {
+	sdb, err := getShardDB(collectionID)
+	if err != nil {
+		return err
+	}
+	bb := bucketName(v)
+	vb, err := proto.Marshal(v)
+	if err != nil {
+		return err
+	}
+	return sdb.BatchUpsert(bb, key, vb)
 }
 
 func ShardUpsertTx(tx *shardbolt.MultiTx, key []byte, v proto.Message) error {

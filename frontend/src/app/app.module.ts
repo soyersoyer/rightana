@@ -89,7 +89,6 @@ const routes: Routes = [
     AuthService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true, deps: [AuthService]},
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true, deps: [ToastyService, AuthService] },
-
   ],
   bootstrap: [AppComponent]
 })

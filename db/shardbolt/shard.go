@@ -83,6 +83,12 @@ func (db *DB) createActualShard(key []byte) (*shard, error) {
 func (db *DB) ensureShard(key []byte) (*shard, error) {
 	actualShard := db.getActualShard(key)
 	if actualShard == nil {
+		db.shardMutex.Lock()
+		defer db.shardMutex.Unlock()
+		actualShard = db.getActualShard(key)
+		if actualShard != nil {
+			return actualShard, nil
+		}
 		var err error
 		actualShard, err = db.createActualShard(key)
 		if err != nil {

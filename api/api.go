@@ -10,7 +10,8 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/elazarl/go-bindata-assetfs"
+	//	"github.com/elazarl/go-bindata-assetfs"
+	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 
@@ -50,7 +51,7 @@ func WebAppFileServerBundled(dir string) http.HandlerFunc {
 }
 
 func Wire(r *chi.Mux) {
-	r.Get("/*", WebAppFileServerBundled("frontend/dist"))
+	r.Get("/*", WebAppFileServer("frontend/dist"))
 	r.Route("/api", func(r chi.Router) {
 		cors := cors.New(cors.Options{
 			AllowedOrigins:   []string{"*"},

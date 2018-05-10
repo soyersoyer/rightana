@@ -6,7 +6,7 @@
   <table class="table table-sm">
     <thead>
       <tr>
-        <th>Start</th>
+        <th>Begin</th>
         <th>Length</th>
         <th>Device</th>
         <th>OS</th>
@@ -23,8 +23,8 @@
     <tbody>
       <ng-container *ngFor="let s of sessions | slice:0:actual">
         <tr>
-          <td><a routerLink="." (click)="toggleDetails(s)">{{s.start / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</a></td>
-          <td>{{getLengthInMinutes(s.start, s.end) | number:"1.0-0"}} m</td>
+          <td><a routerLink="." (click)="toggleDetails(s)">{{s.begin / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</a></td>
+          <td>{{getLengthInMinutes(s.begin, s.end) | number:"1.0-0"}} m</td>
           <td>{{s.device_type}}</td>
           <td>{{s.device_os}}</td>
           <td>{{s.browser_name}} {{s.browser_version}}</td>
@@ -38,7 +38,7 @@
         </tr>
         <tr *ngIf="s.showDetails">
           <td colspan="11">
-            <div><b>Start</b>: {{s.start / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
+            <div><b>Begin</b>: {{s.begin / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
             <div><b>End</b>: {{s.end / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
             <div><b>User IP</b>: {{s.user_ip}}</div>
             <div><b>User Hostname</b>: {{s.user_hostname}}</div>
@@ -46,6 +46,7 @@
             <div><b>AS Name</b>: {{s.as_name}}</div>
             <div><b>User Agent</b>: {{s.user_agent}}</div>
             <div><b>Hostname</b>: {{s.hostname}}</div>
+            <div><b>Referrer</b>: {{s.referrer}}</div>
           </td>
         </tr>
         <tr *ngIf="s.showDetails && s.pageviews">
@@ -55,14 +56,12 @@
                 <tr>
                   <th>Time</th>
                   <th>Path</th>
-                  <th>Referrer</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let pv of s.pageviews">
                   <td>{{pv.time / 1000000 |date:"yyyy.MM.dd HH:mm:ss"}}</td>
                   <td>{{pv.path}}</td>
-                  <td>{{pv.referrer_url}}</td>
                 </tr>
               </tbody>
             </table>

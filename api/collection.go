@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/soyersoyer/k20a/errors"
-	"github.com/soyersoyer/k20a/models"
+	"github.com/soyersoyer/k20a/service"
 )
 
 type collectionT struct {
@@ -18,7 +18,7 @@ type collectionT struct {
 
 func getCollectionsE(w http.ResponseWriter, r *http.Request) error {
 	ownerEmail := GetUserEmail(r.Context())
-	summary, err := models.GetCollectionSummaryByUserEmail(ownerEmail)
+	summary, err := service.GetCollectionSummariesByUserEmail(ownerEmail)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	ownerEmail := GetUserEmail(r.Context())
-	collection, err := models.CreateCollection(ownerEmail, input.Name)
+	collection, err := service.CreateCollection(ownerEmail, input.Name)
 	if err != nil {
 		return err
 	}
@@ -46,19 +46,19 @@ func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 
 var createCollection = handleError(createCollectionE)
 
-func SetCollection(ctx context.Context, collection *models.Collection) context.Context {
+func SetCollection(ctx context.Context, collection *service.Collection) context.Context {
 	return context.WithValue(ctx, keyCollection, collection)
 }
 
-func GetCollection(ctx context.Context) *models.Collection {
-	return ctx.Value(keyCollection).(*models.Collection)
+func GetCollection(ctx context.Context) *service.Collection {
+	return ctx.Value(keyCollection).(*service.Collection)
 }
 
 func collectionBaseHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
 			collectionID := chi.URLParam(r, "collectionID")
-			collection, err := models.GetCollection(collectionID)
+			collection, err := service.GetCollection(collectionID)
 			if err != nil {
 				return err
 			}
@@ -73,7 +73,7 @@ func collectionReadAccessHandler(next http.Handler) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) error {
 			userEmail := GetUserEmail(r.Context())
 			collection := GetCollection(r.Context())
-			if err := models.CollectionReadAccessCheck(collection, userEmail); err != nil {
+			if err := service.CollectionReadAccessCheck(collection, userEmail); err != nil {
 				return err
 			}
 			next.ServeHTTP(w, r)
@@ -86,7 +86,7 @@ func collectionWriteAccessHandler(next http.Handler) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) error {
 			userEmail := GetUserEmail(r.Context())
 			collection := GetCollection(r.Context())
-			if err := models.CollectionWriteAccessCheck(collection, userEmail); err != nil {
+			if err := service.CollectionWriteAccessCheck(collection, userEmail); err != nil {
 				return err
 			}
 			next.ServeHTTP(w, r)
@@ -111,7 +111,7 @@ func updateCollectionE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	if err := models.UpdateCollection(collection, input.Name); err != nil {
+	if err := service.UpdateCollection(collection, input.Name); err != nil {
 		return err
 	}
 	return respond(w, collectionT{
@@ -125,7 +125,7 @@ var updateCollection = handleError(updateCollectionE)
 func deleteCollectionE(w http.ResponseWriter, r *http.Request) error {
 	collection := GetCollection(r.Context())
 
-	if err := models.DeleteCollection(collection); err != nil {
+	if err := service.DeleteCollection(collection); err != nil {
 		return err
 	}
 	return respond(w, collection.ID)
@@ -135,7 +135,7 @@ var deleteCollection = handleError(deleteCollectionE)
 
 func getCollectionShardsE(w http.ResponseWriter, r *http.Request) error {
 	collection := GetCollection(r.Context())
-	shards, err := models.GetCollectionShards(collection)
+	shards, err := service.GetCollectionShards(collection)
 	if err != nil {
 		return err
 	}
@@ -147,7 +147,7 @@ var getCollectionShards = handleError(getCollectionShardsE)
 func deleteCollectionShardE(w http.ResponseWriter, r *http.Request) error {
 	collection := GetCollection(r.Context())
 	shardID := chi.URLParam(r, "shardID")
-	if err := models.DeleteCollectionShard(collection, shardID); err != nil {
+	if err := service.DeleteCollectionShard(collection, shardID); err != nil {
 		return err
 	}
 	return respond(w, shardID)
@@ -176,7 +176,7 @@ func addTeammateE(w http.ResponseWriter, r *http.Request) error {
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
-	if err := models.AddTeammate(collection, input.Email); err != nil {
+	if err := service.AddTeammate(collection, input.Email); err != nil {
 		return err
 	}
 	return respond(w, input)
@@ -187,7 +187,7 @@ var addTeammate = handleError(addTeammateE)
 func removeTeammateE(w http.ResponseWriter, r *http.Request) error {
 	collection := GetCollection(r.Context())
 	email := chi.URLParam(r, "email")
-	if err := models.RemoveTeammate(collection, email); err != nil {
+	if err := service.RemoveTeammate(collection, email); err != nil {
 		return err
 	}
 	return respond(w, email)
@@ -196,13 +196,13 @@ func removeTeammateE(w http.ResponseWriter, r *http.Request) error {
 var removeTeammate = handleError(removeTeammateE)
 
 func getCollectionDataE(w http.ResponseWriter, r *http.Request) error {
-	var input models.CollectionDataInputT
+	var input service.CollectionDataInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
 	collection := GetCollection(r.Context())
-	data, err := models.GetCollectionData(collection, &input)
+	data, err := service.GetCollectionData(collection, &input)
 	if err != nil {
 		return err
 	}
@@ -212,13 +212,13 @@ func getCollectionDataE(w http.ResponseWriter, r *http.Request) error {
 var getCollectionData = handleError(getCollectionDataE)
 
 func getCollectionStatDataE(w http.ResponseWriter, r *http.Request) error {
-	var input models.CollectionDataInputT
+	var input service.CollectionDataInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
 	collection := GetCollection(r.Context())
-	data, err := models.GetCollectionStatData(collection, &input)
+	data, err := service.GetCollectionStatData(collection, &input)
 	if err != nil {
 		return err
 	}
@@ -228,13 +228,13 @@ func getCollectionStatDataE(w http.ResponseWriter, r *http.Request) error {
 var getCollectionStatData = handleError(getCollectionStatDataE)
 
 func getSessionsE(w http.ResponseWriter, r *http.Request) error {
-	var input models.CollectionDataInputT
+	var input service.CollectionDataInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
 	collection := GetCollection(r.Context())
-	sessions, err := models.GetSessions(collection, &input)
+	sessions, err := service.GetSessions(collection, &input)
 	if err != nil {
 		return err
 	}
@@ -254,7 +254,7 @@ func getPageviewsE(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	collection := GetCollection(r.Context())
-	data, err := models.GetPageviews(collection, input.SessionKey)
+	data, err := service.GetPageviews(collection, input.SessionKey)
 	if err != nil {
 		return err
 	}

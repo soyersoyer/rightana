@@ -64,6 +64,7 @@ var userHostnames = []string{
 	"digi.hu",
 }
 
+// Seed seeds a collection with n session
 func Seed(from time.Time, to time.Time, collectionID string, n int) error {
 	rand.Seed(time.Now().UTC().UnixNano())
 	start := time.Now()
@@ -111,25 +112,21 @@ func Seed(from time.Time, to time.Time, collectionID string, n int) error {
 			ASNumber:         int32(asn.Number),
 			ASName:           asn.Name,
 			UserAgent:        userAgent,
-			PageviewCount:    int32(i%10 + 1),
+			Referrer:         randElem(referrers),
 		}
-		if err := ShardUpsertTx(tx, GetKey(tfrom, sessionID), session); err != nil {
+		sessionKey := GetKey(tfrom, sessionID)
+		if err := ShardUpsertTx(tx, sessionKey, session); err != nil {
 			return fmt.Errorf("session %v insert error err: %v session: %v t %v id %v", i, err, session, tfrom, sessionID)
 		}
 		for j := 0; j < i%10+1; j++ {
-			referrer := ""
-			if j == 0 {
-				referrer = randElem(referrers)
-			}
-			tfrom = tfrom.Add(time.Duration(j) * time.Minute)
+			pvfrom := tfrom.Add(time.Duration(j) * time.Minute)
 			path, queryString := splitURL(randElem(urls))
 			pageview := &Pageview{
 				Path:        path,
-				ReferrerURL: referrer,
 				QueryString: queryString,
 			}
-			if err := ShardUpsertTx(tx, GetKey(tfrom, sessionID), pageview); err != nil {
-				return fmt.Errorf("pageview %v %v insert error err: %v pv %v t %v id %v", i, j, err, pageview, tfrom, sessionID)
+			if err := ShardUpsertTx(tx, GetPVKey(sessionKey, pvfrom), pageview); err != nil {
+				return fmt.Errorf("pageview %v %v insert error err: %v pv %v", i, j, err, pageview)
 			}
 		}
 

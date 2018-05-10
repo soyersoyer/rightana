@@ -1,4 +1,4 @@
-package models
+package service
 
 import (
 	"time"
@@ -9,8 +9,10 @@ import (
 	"github.com/soyersoyer/k20a/errors"
 )
 
+// AuthToken is the db's authToken struct
 type AuthToken = db.AuthToken
 
+// CreateAuthToken creates an AuthToken
 func CreateAuthToken(email string, password string) (string, error) {
 	user, err := db.GetUserByEmail(email)
 	if err != nil || user == nil {
@@ -29,6 +31,7 @@ func CreateAuthToken(email string, password string) (string, error) {
 	return token.ID, nil
 }
 
+// DeleteAuthToken deletes an AuthToken
 func DeleteAuthToken(tokenID string) error {
 	if err := db.DeleteAuthToken(tokenID); err != nil {
 		if err == db.ErrKeyNotExists {
@@ -39,6 +42,7 @@ func DeleteAuthToken(tokenID string) error {
 	return nil
 }
 
+// CheckAuthToken check whether the AuthToken is valid
 func CheckAuthToken(tokenID string) (string, error) {
 	token, err := getAuthToken(tokenID)
 	if err != nil {

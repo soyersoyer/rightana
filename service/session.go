@@ -1,4 +1,4 @@
-package models
+package service
 
 import (
 	"encoding/base64"
@@ -10,11 +10,11 @@ import (
 	"github.com/mssola/user_agent"
 
 	"github.com/soyersoyer/k20a/db/db"
-	"github.com/soyersoyer/k20a/db/shardbolt"
 	"github.com/soyersoyer/k20a/errors"
 	"github.com/soyersoyer/k20a/geoip"
 )
 
+// CreateSessionInputT is the struct for creating a session
 type CreateSessionInputT struct {
 	CollectionID     string
 	Hostname         string
@@ -22,8 +22,10 @@ type CreateSessionInputT struct {
 	ScreenResolution string
 	WindowResolution string
 	DeviceType       string
+	Referrer         string
 }
 
+// CreateSession creates a session
 func CreateSession(userAgent string, remoteAddr string, input CreateSessionInputT) (string, error) {
 	now := time.Now()
 	ua := user_agent.New(userAgent)
@@ -73,16 +75,17 @@ func CreateSession(userAgent string, remoteAddr string, input CreateSessionInput
 		ASName:           asn.Name,
 		UserAgent:        userAgent,
 		End:              now.UnixNano(),
-		PageviewCount:    0,
+		Referrer:         input.Referrer,
 	}
 	key := db.GetKey(now, rand.Uint32())
-	if err := db.ShardUpsert(collection.ID, key, session); err != nil {
+	if err := db.ShardUpsertBatch(collection.ID, key, session); err != nil {
 		return "", errors.DBError.Wrap(err, session)
 	}
 	sessionKey := db.EncodeSessionKey(key)
 	return sessionKey, nil
 }
 
+// UpdateSession updates the session.End field
 func UpdateSession(userAgent string, CollectionID string, sessionKey string) error {
 	ua := user_agent.New(userAgent)
 
@@ -100,19 +103,20 @@ func UpdateSession(userAgent string, CollectionID string, sessionKey string) err
 	}
 	session.End = time.Now().UnixNano()
 
-	if err := db.ShardUpsert(CollectionID, key, session); err != nil {
+	if err := db.ShardUpsertBatch(CollectionID, key, session); err != nil {
 		return errors.DBError.Wrap(err, CollectionID, key, session)
 	}
 	return nil
 }
 
+// CreatePageviewInputT is the input for the CreatePageView
 type CreatePageviewInputT struct {
 	CollectionID string
 	SessionKey   string
 	Path         string
-	Referrer     string
 }
 
+// CreatePageview creates a pageview
 func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 	now := time.Now()
 	ua := user_agent.New(userAgent)
@@ -125,33 +129,22 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 	if err != nil {
 		return errors.SessionNotExist.T(input.SessionKey).Wrap(err, input.SessionKey)
 	}
-	session, err := db.GetSession(input.CollectionID, key)
+	_, err = db.GetSession(input.CollectionID, key)
 	if err != nil {
 		return errors.SessionNotExist.T(input.SessionKey).Wrap(err, input.CollectionID)
 	}
-	session.End = now.UnixNano()
-	session.PageviewCount = session.PageviewCount + 1
 
-	sID := db.GetIDFromKey(key)
-	pKey := db.GetKey(now, sID)
+	pvKey := db.GetPVKey(key, now)
 
 	path, queryString := splitURL(input.Path)
 
 	pageview := &db.Pageview{
 		Path:        path,
-		ReferrerURL: input.Referrer,
 		QueryString: queryString,
 	}
 
-	err = db.ShardUpdate(input.CollectionID, func(tx *shardbolt.MultiTx) error {
-		if err := db.ShardUpsertTx(tx, key, session); err != nil {
-			return err
-		}
-
-		return db.ShardUpsertTx(tx, pKey, pageview)
-	})
-	if err != nil {
-		return errors.DBError.Wrap(err, input, key, session, pKey, pageview)
+	if err := db.ShardUpsertBatch(input.CollectionID, pvKey, pageview); err != nil {
+		return errors.DBError.Wrap(err, input)
 	}
 	return nil
 }

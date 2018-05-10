@@ -1,4 +1,4 @@
-package models
+package service
 
 import (
 	"regexp"
@@ -14,8 +14,10 @@ var (
 	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
+// User is the the database user struct
 type User = db.User
 
+// CreateUser can create an user
 func CreateUser(email string, password string) (*User, error) {
 	if !config.ActualConfig.EnableRegistration {
 		return nil, errors.RegistrationDisabled
@@ -45,6 +47,7 @@ func CreateUser(email string, password string) (*User, error) {
 	return user, nil
 }
 
+// ChangePassword change a user's password when the password match
 func ChangePassword(user *User, currentPassword string, password string) error {
 	if !passwordCheck(password) {
 		return errors.PasswordTooShort
@@ -65,6 +68,7 @@ func ChangePassword(user *User, currentPassword string, password string) error {
 	return nil
 }
 
+// DeleteUser deletes a user when the password patch
 func DeleteUser(user *User, password string) error {
 	if err := compareHashAndPassword(user.Password, password); err != nil {
 		return errors.PasswordNotMatch
@@ -75,6 +79,7 @@ func DeleteUser(user *User, password string) error {
 	return nil
 }
 
+// GetUserByEmail fetch an user by the user's email
 func GetUserByEmail(email string) (*User, error) {
 	user, err := db.GetUserByEmail(email)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/soyersoyer/k20a/models"
+	"github.com/soyersoyer/k20a/service"
 )
 
 func GetUserEmail(ctx context.Context) string {
@@ -20,7 +20,7 @@ func LoggedOnlyHandler(next http.Handler) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) error {
 			authToken := r.Header.Get("Authorization")
 
-			userEmail, err := models.CheckAuthToken(authToken)
+			userEmail, err := service.CheckAuthToken(authToken)
 			if err != nil {
 				return err
 			}

@@ -36,6 +36,7 @@ window.k20a = function() {
       sr: screen.width + "x" + screen.height,
       wr: window.innerWidth + "x" + window.innerHeight,
       dt: getDeviceType(),
+      r: document.referrer,
     }
     postDataTo(d, '/sessions', true, function(response) {
       var key = JSON.parse(response);
@@ -63,7 +64,6 @@ window.k20a = function() {
       c: collectionId,
       s: sessionKey,
       p: path,
-      r: document.referrer,
     };
     postDataTo(d, '/pageviews', true, function() {
       if (debug) {

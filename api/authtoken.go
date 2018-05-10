@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/soyersoyer/k20a/errors"
-	"github.com/soyersoyer/k20a/models"
+	"github.com/soyersoyer/k20a/service"
 )
 
 type createTokenT struct {
@@ -25,7 +25,7 @@ func createTokenE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	tokenID, err := models.CreateAuthToken(input.Email, input.Password)
+	tokenID, err := service.CreateAuthToken(input.Email, input.Password)
 	if err != nil {
 		return err
 	}
@@ -37,7 +37,7 @@ var createToken = handleError(createTokenE)
 
 func deleteTokenE(w http.ResponseWriter, r *http.Request) error {
 	tokenID := chi.URLParam(r, "token")
-	if err := models.DeleteAuthToken(tokenID); err != nil {
+	if err := service.DeleteAuthToken(tokenID); err != nil {
 		return err
 	}
 	return respond(w, tokenID)

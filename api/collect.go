@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/soyersoyer/k20a/errors"
-	"github.com/soyersoyer/k20a/models"
+	"github.com/soyersoyer/k20a/service"
 )
 
 type createSessionInputT struct {
@@ -15,6 +15,7 @@ type createSessionInputT struct {
 	ScreenResolution string `json:"sr"`
 	WindowResolution string `json:"wr"`
 	DeviceType       string `json:"dt"`
+	Referrer         string `json:"r"`
 }
 
 func createSessionE(w http.ResponseWriter, r *http.Request) error {
@@ -23,7 +24,7 @@ func createSessionE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	sessionKey, err := models.CreateSession(r.UserAgent(), r.RemoteAddr, models.CreateSessionInputT(input))
+	sessionKey, err := service.CreateSession(r.UserAgent(), r.RemoteAddr, service.CreateSessionInputT(input))
 	if err != nil {
 		return err
 	}
@@ -44,7 +45,7 @@ func updateSessionE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	return models.UpdateSession(r.UserAgent(), input.CollectionID, input.SessionKey)
+	return service.UpdateSession(r.UserAgent(), input.CollectionID, input.SessionKey)
 }
 
 var updateSession = handleError(updateSessionE)
@@ -53,7 +54,6 @@ type createPageviewInputT struct {
 	CollectionID string `json:"c"`
 	SessionKey   string `json:"s"`
 	Path         string `json:"p"`
-	Referrer     string `json:"r"`
 }
 
 func createPageviewE(w http.ResponseWriter, r *http.Request) error {
@@ -62,7 +62,7 @@ func createPageviewE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	return models.CreatePageview(r.UserAgent(), models.CreatePageviewInputT(input))
+	return service.CreatePageview(r.UserAgent(), service.CreatePageviewInputT(input))
 }
 
 var createPageview = handleError(createPageviewE)

@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/soyersoyer/k20a/errors"
-	"github.com/soyersoyer/k20a/models"
+	"github.com/soyersoyer/k20a/service"
 )
 
 type createUserT struct {
@@ -22,7 +22,7 @@ func createUserE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	user, err := models.CreateUser(input.Email, input.Password)
+	user, err := service.CreateUser(input.Email, input.Password)
 	if err != nil {
 		return err
 	}
@@ -32,19 +32,19 @@ func createUserE(w http.ResponseWriter, r *http.Request) error {
 
 var createUser = handleError(createUserE)
 
-func SetUser(ctx context.Context, user *models.User) context.Context {
+func SetUser(ctx context.Context, user *service.User) context.Context {
 	return context.WithValue(ctx, keyUser, user)
 }
 
-func GetUser(ctx context.Context) *models.User {
-	return ctx.Value(keyUser).(*models.User)
+func GetUser(ctx context.Context) *service.User {
+	return ctx.Value(keyUser).(*service.User)
 }
 
 func userBaseHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
 			email := chi.URLParam(r, "email")
-			user, err := models.GetUserByEmail(email)
+			user, err := service.GetUserByEmail(email)
 			if err != nil {
 				return err
 			}
@@ -79,7 +79,7 @@ func updateUserPasswordE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	if err := models.ChangePassword(user, input.CurrentPassword, input.Password); err != nil {
+	if err := service.ChangePassword(user, input.CurrentPassword, input.Password); err != nil {
 		return err
 	}
 
@@ -99,7 +99,7 @@ func deleteUserE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	if err := models.DeleteUser(user, input.Password); err != nil {
+	if err := service.DeleteUser(user, input.Password); err != nil {
 		return err
 	}
 	return respond(w, user.Email)

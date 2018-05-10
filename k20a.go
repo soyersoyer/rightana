@@ -14,6 +14,10 @@ var (
 	seed                  = app.Command("seed", "Seed")
 	seedCollectionID      = seed.Arg("id", "Collection's ID").Required().String()
 	seedCount             = seed.Arg("count", "Session Count").Required().Int()
+	netseed               = app.Command("netseed", "Network Seed")
+	netseedServer         = netseed.Arg("server", "Server address (eg http://localhost:3000)").Required().String()
+	netseedCollectionID   = netseed.Arg("id", "Collection's ID").Required().String()
+	netseedCount          = netseed.Arg("count", "Session Count").Required().Int()
 	register              = app.Command("register", "Register a new user.")
 	registerEmail         = register.Arg("email", "Email for user.").Required().String()
 	registerPassword      = register.Arg("password", "Password for user.").Required().String()
@@ -32,6 +36,8 @@ func main() {
 		cmd.Serve()
 	case "seed":
 		cmd.Seed(*seedCollectionID, *seedCount)
+	case "netseed":
+		cmd.NetSeed(*netseedServer, *netseedCollectionID, *netseedCount)
 	case "register":
 		cmd.RegisterUser(*registerEmail, *registerPassword)
 	case "create-collection":

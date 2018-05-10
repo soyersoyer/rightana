@@ -8,6 +8,7 @@ import (
 	proto "github.com/golang/protobuf/proto"
 )
 
+// These are the bucket's names
 var (
 	BUser       = []byte("User")
 	BCollection = []byte("Collection")

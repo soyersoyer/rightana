@@ -74,7 +74,7 @@ export class Session {
   country_code: string;
   city: string;
   user_agent: string;
-  start: Date;
+  begin: Date;
   end: Date;
 }
 
