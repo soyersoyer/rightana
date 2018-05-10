@@ -17,7 +17,7 @@ import (
 
 	"github.com/soyersoyer/k20a/config"
 	"github.com/soyersoyer/k20a/db/db"
-	"github.com/soyersoyer/k20a/models"
+	"github.com/soyersoyer/k20a/service"
 )
 
 type kv map[string]string
@@ -47,6 +47,7 @@ var (
 		ScreenResolution: screenResolution,
 		WindowResolution: windowResolution,
 		DeviceType:       deviceType,
+		Referrer:         "http://irl.hu",
 	}
 	sessionUpdateData = updateSessionInputT{
 		SessionKey: "",
@@ -57,7 +58,6 @@ var (
 	pageViewData = createPageviewInputT{
 		SessionKey: "",
 		Path:       "dl",
-		Referrer:   "http://irl.hu",
 	}
 	fromTime, _     = time.Parse("2006-01-02", time.Now().AddDate(0, 0, -2).Format("2006-01-02"))
 	toTime          = fromTime.AddDate(0, 0, 7)
@@ -378,7 +378,7 @@ func TestGetCollectionZero(t *testing.T) {
 	r = setUserEmail(r, user.Email)
 	getCollections(w, r)
 	testCode(t, w, 200)
-	collections := []models.CollectionSummaryT{}
+	collections := []service.CollectionSummaryT{}
 	testJSONBody(t, w, &collections)
 	if len(collections) != 0 {
 		t.Error(w.Body, collections)
@@ -395,7 +395,7 @@ func TestGetCollectionsOne(t *testing.T) {
 	r = setUserEmail(r, user.Email)
 	getCollections(w, r)
 	testCode(t, w, 200)
-	collections := []models.CollectionSummaryT{}
+	collections := []service.CollectionSummaryT{}
 	testJSONBody(t, w, &collections)
 	if len(collections) != 1 {
 		t.Error(w.Body)
