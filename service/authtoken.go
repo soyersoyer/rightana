@@ -22,7 +22,7 @@ func CreateAuthToken(email string, password string) (string, error) {
 		return "", errors.PasswordNotMatch
 	}
 	token := db.AuthToken{
-		ID:         uuid.NewV4().String(),
+		ID:         uuid.Must(uuid.NewV4()).String(),
 		OwnerEmail: email,
 	}
 	if err := db.InsertAuthToken(&token); err != nil {
