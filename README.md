@@ -77,7 +77,7 @@ We use it to track our and our client's websites.
 
 ### From binary
 
-1. Download the latest version from the Releases section (currently only x64 linux versions)
+1. Download the latest version from the [Releases](https://github.com/soyersoyer/k20a/releases) section (currently only x64 linux versions)
 1. Start it and/or add to your service starter
 
 ### From source
