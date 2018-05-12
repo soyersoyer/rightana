@@ -13,6 +13,7 @@ type Config struct {
 	GeoIPASNFile       string
 	DataDir            string
 	EnableRegistration bool
+	UseBundledWebApp   bool
 }
 
 var (
@@ -36,6 +37,7 @@ func ReadConfig() Config {
 	viper.SetDefault("GeoIPASNFile", "/var/lib/GeoIP/GeoLite2-ASN.mmdb")
 	viper.SetDefault("DataDir", "data")
 	viper.SetDefault("EnableRegistration", true)
+	viper.SetDefault("UseBundledWebApp", true)
 
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -46,6 +48,7 @@ func ReadConfig() Config {
 	ActualConfig.GeoIPASNFile = viper.GetString("GeoIPASNFile")
 	ActualConfig.DataDir = viper.GetString("DataDir")
 	ActualConfig.EnableRegistration = viper.GetBool("EnableRegistration")
+	ActualConfig.UseBundledWebApp = viper.GetBool("UseBundledWebApp")
 
 	log.Printf("using config: %+v", ActualConfig)
 	return ActualConfig

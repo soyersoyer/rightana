@@ -15,6 +15,7 @@ import (
 	"github.com/rakyll/statik/fs"
 
 	_ "github.com/soyersoyer/k20a/api/statik" //the embedded statik fs data
+	"github.com/soyersoyer/k20a/config"
 	"github.com/soyersoyer/k20a/errors"
 )
 
@@ -56,8 +57,11 @@ func webAppFileServerBundled() http.HandlerFunc {
 
 // Wire function wires the http endpoints
 func Wire(r *chi.Mux) {
-	r.Get("/*", webAppFileServer("frontend/dist"))
-	//r.Get("/*", webAppFileServerBundled())
+	if config.ActualConfig.UseBundledWebApp {
+		r.Get("/*", webAppFileServerBundled())
+	} else {
+		r.Get("/*", webAppFileServer("frontend/dist"))
+	}
 	r.Route("/api", func(r chi.Router) {
 		cors := cors.New(cors.Options{
 			AllowedOrigins:   []string{"*"},
