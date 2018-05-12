@@ -107,6 +107,6 @@ This software is under initial development (0.x) and the database format may cha
 
 ## Coming features
 - Admin page
-- Filters for pageviews
+- Demo server
 - Backup solution
 - Realtime views
