@@ -46,3 +46,7 @@ a {
 #toasty.toasty-position-top-right {
   top: 68px;
 }
+
+.min-height-100vh-minus-top {
+	min-height: calc(100vh - 56px);
+}
