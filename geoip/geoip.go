@@ -10,6 +10,7 @@ import (
 var cityDB *geoip2.Reader
 var asnDB *geoip2.Reader
 
+// OpenDB opens the geoip2 databases
 func OpenDB(cityDBFile string, asnDBFile string) {
 	openDB(&cityDB, cityDBFile)
 	openDB(&asnDB, asnDBFile)
@@ -23,11 +24,13 @@ func openDB(db **geoip2.Reader, dbFile string) {
 	}
 }
 
+// Location contains the Geoip2 Location data
 type Location struct {
 	CountryCode string
 	City        string
 }
 
+// LocationByIP returns the corresponding Location data
 func LocationByIP(ipAddr string) *Location {
 	if cityDB != nil {
 		ip := net.ParseIP(ipAddr)
@@ -42,11 +45,13 @@ func LocationByIP(ipAddr string) *Location {
 	return &Location{}
 }
 
+// AS contains the Geoip2 AS data
 type AS struct {
 	Number uint
 	Name   string
 }
 
+// ASNByIP returns the corresponding AS data
 func ASNByIP(ipAddr string) *AS {
 	if asnDB != nil {
 		ip := net.ParseIP(ipAddr)

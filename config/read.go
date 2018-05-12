@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config contains the configuration options
 type Config struct {
 	Listening          string
 	GeoIPCityFile      string
@@ -15,10 +16,12 @@ type Config struct {
 }
 
 var (
+	// ActualConfig stores the last readed config value
 	ActualConfig = Config{}
 	file         = "k20a"
 )
 
+// ReadConfig reads the config file from the default locations
 func ReadConfig() Config {
 
 	viper.AddConfigPath("/etc/k20a/")

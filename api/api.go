@@ -54,6 +54,7 @@ func webAppFileServerBundled() http.HandlerFunc {
 	})
 }
 
+// Wire function wires the http endpoints
 func Wire(r *chi.Mux) {
 	r.Get("/*", webAppFileServer("frontend/dist"))
 	//r.Get("/*", webAppFileServerBundled())
@@ -82,7 +83,7 @@ func userRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", createUser)
 	r.Route("/{email}", func(r chi.Router) {
-		r.Use(LoggedOnlyHandler)
+		r.Use(loggedOnlyHandler)
 		r.Use(userBaseHandler)
 		r.Use(userAccessHandler)
 		r.Patch("/password", updateUserPassword)
@@ -93,7 +94,7 @@ func userRouter() http.Handler {
 
 func loggedInRouter() http.Handler {
 	r := chi.NewRouter()
-	r.Use(LoggedOnlyHandler)
+	r.Use(loggedOnlyHandler)
 	r.Get("/", getCollections)
 	r.Post("/", createCollection)
 	r.Route("/{collectionID}", func(r chi.Router) {
@@ -121,9 +122,9 @@ func respond(w http.ResponseWriter, d interface{}) error {
 	return enc.Encode(d)
 }
 
-type HandlerFuncWithError func(w http.ResponseWriter, r *http.Request) error
+type handlerFuncWithError func(w http.ResponseWriter, r *http.Request) error
 
-func handleError(fn HandlerFuncWithError) http.HandlerFunc {
+func handleError(fn handlerFuncWithError) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := fn(w, r); err != nil {
 			switch e := err.(type) {

@@ -208,7 +208,7 @@ func TestUserBaseHandler(t *testing.T) {
 	w, r := postJSON(nil)
 	r = setEmail(r, email)
 	userBaseHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user := GetUser(r.Context())
+		user := getUserCtx(r.Context())
 		if user.Email != email {
 			t.Error(user)
 		}
@@ -219,7 +219,7 @@ func TestUserAccessHandler(t *testing.T) {
 	email := "admin@irl.hu"
 	user := getDbUser(email)
 	w, r := postJSON(nil)
-	r = setUserEmail(r, user.Email)
+	r = setUserEmailReq(r, user.Email)
 	r = setEmail(r, email)
 	userBaseHandler(userAccessHandler(getNullHandler())).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -229,7 +229,7 @@ func TestUserAccessHandlerBad(t *testing.T) {
 	email := "admin@irl.hu"
 	user := getDbUser(email)
 	w, r := postJSON(nil)
-	r = setUserEmail(r, user.Email+"1")
+	r = setUserEmailReq(r, user.Email+"1")
 	r = setEmail(r, email)
 	userBaseHandler(userAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -280,7 +280,7 @@ func createCollectionSuccess(t *testing.T, email string, collection *collectionT
 	name := collection.Name
 	w, r := postJSON(collection)
 	user := getDbUser(email)
-	r = setUserEmail(r, user.Email)
+	r = setUserEmailReq(r, user.Email)
 	createCollection(w, r)
 	testCode(t, w, 200)
 	testJSONBody(t, w, &collection)
@@ -325,7 +325,7 @@ func TestDeleteUser(t *testing.T) {
 
 func TestLoggedInHandlerTokenNotSet(t *testing.T) {
 	w, r := postJSON(nil)
-	LoggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
+	loggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
 
 	testCode(t, w, 403)
 	testBody(t, w, "Authtoken expired\n")
@@ -334,7 +334,7 @@ func TestLoggedInHandlerTokenNotSet(t *testing.T) {
 func TestLoggedInHandlerTokenInvalid(t *testing.T) {
 	w, r := postJSON(nil)
 	setAuthToken(r, "INVALIDTOKEN")
-	LoggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
+	loggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
 
 	testCode(t, w, 403)
 	testBody(t, w, "Authtoken expired\n")
@@ -352,7 +352,7 @@ func TestLoggedInHandlerTokenExpired(t *testing.T) {
 	db.UpdateAuthToken(dbToken)
 	w, r := postJSON(nil)
 	setAuthToken(r, token)
-	LoggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
+	loggedOnlyHandler(getNoHandler(t)).ServeHTTP(w, r)
 
 	testCode(t, w, 403)
 	testBody(t, w, "Authtoken expired\n")
@@ -363,8 +363,8 @@ func TestLoggedInHandlerSuccess(t *testing.T) {
 	user := getDbUser(userData.Email)
 	w, r := postJSON(nil)
 	setAuthToken(r, token)
-	LoggedOnlyHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userEmail := getUserEmail(r)
+	loggedOnlyHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userEmail := getUserEmailReq(r)
 		if userEmail != user.Email {
 			t.Error("bad useremail", userEmail, user.Email)
 		}
@@ -375,7 +375,7 @@ func TestLoggedInHandlerSuccess(t *testing.T) {
 func TestGetCollectionZero(t *testing.T) {
 	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
-	r = setUserEmail(r, user.Email)
+	r = setUserEmailReq(r, user.Email)
 	getCollections(w, r)
 	testCode(t, w, 200)
 	collections := []service.CollectionSummaryT{}
@@ -392,7 +392,7 @@ func TestCreateCollectionSuccess(t *testing.T) {
 func TestGetCollectionsOne(t *testing.T) {
 	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
-	r = setUserEmail(r, user.Email)
+	r = setUserEmailReq(r, user.Email)
 	getCollections(w, r)
 	testCode(t, w, 200)
 	collections := []service.CollectionSummaryT{}
@@ -463,7 +463,7 @@ func TestCollectionBaseHandler(t *testing.T) {
 	w, r := postJSON(nil)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		collection := GetCollection(r.Context())
+		collection := getCollectionCtx(r.Context())
 		if collection.ID != collectionID {
 			t.Error("Bad collection id")
 		}
@@ -473,7 +473,7 @@ func TestCollectionBaseHandler(t *testing.T) {
 func TestCollectionReadAccessHandler(t *testing.T) {
 	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
-	r = setUserEmail(r, user.Email)
+	r = setUserEmailReq(r, user.Email)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(collectionReadAccessHandler(getNullHandler())).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -482,7 +482,7 @@ func TestCollectionReadAccessHandler(t *testing.T) {
 func TestCollectionWriteAccessHandler(t *testing.T) {
 	w, r := postJSON(nil)
 	user := getDbUser(userData.Email)
-	r = setUserEmail(r, user.Email)
+	r = setUserEmailReq(r, user.Email)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(collectionWriteAccessHandler(getNullHandler())).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -491,7 +491,7 @@ func TestCollectionWriteAccessHandler(t *testing.T) {
 func TestCollectionReadAccessHandlerNoRight(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
-	r = setUserEmail(r, user2.Email)
+	r = setUserEmailReq(r, user2.Email)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(collectionReadAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -500,7 +500,7 @@ func TestCollectionReadAccessHandlerNoRight(t *testing.T) {
 func TestCollectionWriteAccessHandlerNoRight(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
-	r = setUserEmail(r, user2.Email)
+	r = setUserEmailReq(r, user2.Email)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -550,7 +550,7 @@ func TestGetCollaborators(t *testing.T) {
 func TestTeammateCollectionReadAccess(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
-	r = setUserEmail(r, user2.Email)
+	r = setUserEmailReq(r, user2.Email)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(collectionReadAccessHandler(getNullHandler())).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -559,7 +559,7 @@ func TestTeammateCollectionReadAccess(t *testing.T) {
 func TestTeammateCollectionWriteAccessNoRight(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUser(user2Data.Email)
-	r = setUserEmail(r, user2.Email)
+	r = setUserEmailReq(r, user2.Email)
 	r = setCollectionID(r, collectionID)
 	collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -874,12 +874,12 @@ func setEmail(r *http.Request, email string) *http.Request {
 	return getReqWithRouteContext(r, kv{"email": email})
 }
 
-func setUserEmail(r *http.Request, userEmail string) *http.Request {
-	return r.WithContext(SetUserEmail(r.Context(), userEmail))
+func setUserEmailReq(r *http.Request, userEmail string) *http.Request {
+	return r.WithContext(setUserEmailCtx(r.Context(), userEmail))
 }
 
-func getUserEmail(r *http.Request) string {
-	return GetUserEmail(r.Context())
+func getUserEmailReq(r *http.Request) string {
+	return getUserEmailCtx(r.Context())
 }
 
 func getDbUser(email string) *db.User {

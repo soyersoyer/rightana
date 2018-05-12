@@ -32,11 +32,11 @@ func createUserE(w http.ResponseWriter, r *http.Request) error {
 
 var createUser = handleError(createUserE)
 
-func SetUser(ctx context.Context, user *service.User) context.Context {
+func setUserCtx(ctx context.Context, user *service.User) context.Context {
 	return context.WithValue(ctx, keyUser, user)
 }
 
-func GetUser(ctx context.Context) *service.User {
+func getUserCtx(ctx context.Context) *service.User {
 	return ctx.Value(keyUser).(*service.User)
 }
 
@@ -48,7 +48,7 @@ func userBaseHandler(next http.Handler) http.Handler {
 			if err != nil {
 				return err
 			}
-			ctx := SetUser(r.Context(), user)
+			ctx := setUserCtx(r.Context(), user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return nil
 		}))
@@ -57,8 +57,8 @@ func userBaseHandler(next http.Handler) http.Handler {
 func userAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userEmail := GetUserEmail(r.Context())
-			user := GetUser(r.Context())
+			userEmail := getUserEmailCtx(r.Context())
+			user := getUserCtx(r.Context())
 			if user.Email != userEmail {
 				return errors.AccessDenied
 			}
@@ -73,7 +73,7 @@ type updateUserPasswordT struct {
 }
 
 func updateUserPasswordE(w http.ResponseWriter, r *http.Request) error {
-	user := GetUser(r.Context())
+	user := getUserCtx(r.Context())
 	var input updateUserPasswordT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)
@@ -93,7 +93,7 @@ type deleteUserInputT struct {
 }
 
 func deleteUserE(w http.ResponseWriter, r *http.Request) error {
-	user := GetUser(r.Context())
+	user := getUserCtx(r.Context())
 	var input deleteUserInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)

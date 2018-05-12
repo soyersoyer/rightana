@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// The possible errors
 var (
 	RegistrationDisabled = &Error{"Registration disabled", 403, "", ""}
 	InvalidEmail         = &Error{"Invalid email", 400, "", ""}
@@ -22,6 +23,7 @@ var (
 	TeammateExist        = &Error{"Teammate exist", 403, "", ""}
 )
 
+// Error is the Extended error struct
 type Error struct {
 	Message    string
 	Code       int
@@ -40,6 +42,7 @@ func (e *Error) Error() string {
 	return msg
 }
 
+// HTTPMessage returns the default HTTP error message
 func (e *Error) HTTPMessage() string {
 	if e.Thing != "" {
 		return fmt.Sprintf("%v (%v)", e.Message, e.Thing)
@@ -47,10 +50,12 @@ func (e *Error) HTTPMessage() string {
 	return e.Message
 }
 
+// T sets the thing which causes the error
 func (e *Error) T(thing string) *Error {
 	return &Error{e.Message, e.Code, thing, e.Additional}
 }
 
+// Wrap add more information to the error
 func (e *Error) Wrap(v ...interface{}) *Error {
 	return &Error{e.Message, e.Code, e.Thing, fmt.Sprint(v...)}
 }
