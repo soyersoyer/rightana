@@ -89,14 +89,13 @@ func Seed(from time.Time, to time.Time, collectionID string, n int) error {
 		host := collection.Name
 		duration := time.Duration(to.Sub(from).Seconds()/float64(n)*float64(i)) * time.Second
 		tfrom := from.Add(duration)
-		randomSessionDuration := time.Duration(rand.Intn(7200)) * time.Second
-		tend := tfrom.Add(randomSessionDuration)
+		randomSessionDuration := rand.Intn(7200)
 		if i%100 == 0 {
 			fmt.Printf("\r%d", i)
 		}
 
 		session := &Session{
-			End:              tend.UnixNano(),
+			Duration:         int32(randomSessionDuration),
 			Hostname:         host,
 			DeviceOS:         ua.OS(),
 			UserIP:           ip,

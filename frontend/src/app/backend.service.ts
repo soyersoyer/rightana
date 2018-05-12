@@ -75,7 +75,7 @@ export class Session {
   city: string;
   user_agent: string;
   begin: Date;
-  end: Date;
+  duration: number;
 }
 
 export class Pageview {

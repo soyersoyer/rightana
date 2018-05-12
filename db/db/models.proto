@@ -25,8 +25,7 @@ message AuthToken {
 }
 
 message Session {
-	reserved 15;
-	int64 End = 1;
+	int32 Duration = 1;
 	string Hostname = 2;
 	string DeviceOS = 3;
 	string BrowserName = 4;
@@ -40,13 +39,12 @@ message Session {
 	string UserAgent = 12;
 	string UserIP = 13;
 	string UserHostname = 14;
+	string Referrer = 15;
 	int32 ASNumber = 16;
 	string ASName = 17;
-	string Referrer = 18;
 }
 
 message Pageview {
-	reserved 2;
 	string Path = 1;
-	string QueryString = 3;
+	string QueryString = 2;
 }

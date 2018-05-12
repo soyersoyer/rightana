@@ -74,7 +74,7 @@ func CreateSession(userAgent string, remoteAddr string, input CreateSessionInput
 		ASNumber:         int32(asn.Number),
 		ASName:           asn.Name,
 		UserAgent:        userAgent,
-		End:              now.UnixNano(),
+		Duration:         0,
 		Referrer:         input.Referrer,
 	}
 	key := db.GetKey(now, rand.Uint32())
@@ -101,7 +101,8 @@ func UpdateSession(userAgent string, CollectionID string, sessionKey string) err
 	if err != nil {
 		return errors.SessionNotExist.T(sessionKey).Wrap(err, CollectionID)
 	}
-	session.End = time.Now().UnixNano()
+	sessionBegin := db.GetTimeFromKey(key)
+	session.Duration = int32(time.Now().Sub(sessionBegin).Seconds())
 
 	if err := db.ShardUpsertBatch(CollectionID, key, session); err != nil {
 		return errors.DBError.Wrap(err, CollectionID, key, session)

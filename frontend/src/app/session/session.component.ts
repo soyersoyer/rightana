@@ -49,10 +49,6 @@ export class SessionComponent implements OnInit, OnDestroy {
       });
   }
 
-  getLengthInMinutes(start: number, end: number): number {
-    return (end - start) /1000000000 / 60;
-  }
-
   toggleDetails(session: SessionD) {
     if (!session.showDetails) {
       session.showDetails = true;

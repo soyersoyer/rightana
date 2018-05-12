@@ -170,8 +170,8 @@ func readSessions(sdb *shardbolt.DB, from, to time.Time,
 		sdb.IteratePrefix(BPageview, k, func(pvk []byte, pvv []byte) {
 			pageview.Time = GetTimeFromPVKey(pvk)
 			session.PageviewCount++
-			if session.End == session.Begin.UnixNano() {
-				session.End = pageview.Time.UnixNano()
+			if session.Duration == 0 {
+				session.Duration = int32(pageview.Time.Sub(session.Begin).Seconds())
 			}
 			/* TODO - ability to skip the pageview decoding */
 			if err := protoDecode(pvv, &pageview.Pageview); err != nil {
@@ -489,7 +489,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 	readSessions(sdb, prevTime, input.From, input.Filter,
 		func(session *ExtSession) {
 			prevSessionTotal++
-			sumOfPrevSessionLength += int(session.End/1000000000 - session.Begin.UnixNano()/1000000000)
+			sumOfPrevSessionLength += int(session.Duration)
 
 			prevPageviewCountSums[strconv.Itoa(session.PageviewCount)]++
 		},
@@ -500,7 +500,7 @@ func GetStatistics(collection *Collection, input *CollectionDataInputT) (*Collec
 	readSessions(sdb, input.From, input.To, input.Filter,
 		func(session *ExtSession) {
 			sessionTotal++
-			sumOfSessionLength += int(session.End/1000000000 - session.Begin.UnixNano()/1000000000)
+			sumOfSessionLength += int(session.Duration)
 
 			hostnameSums[session.Hostname]++
 			deviceTypeSums[session.DeviceType]++
@@ -592,7 +592,7 @@ type SessionDataT struct {
 	UserIP           string `json:"user_ip"`
 	UserHostname     string `json:"user_hostname"`
 	Begin            int64  `json:"begin"`
-	End              int64  `json:"end"`
+	Duration         int32  `json:"duration"`
 	PageviewCount    int    `json:"pageview_count"`
 	Referrer         string `json:"referrer"`
 }
@@ -636,7 +636,7 @@ func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*Sessio
 				UserIP:           session.UserIP,
 				UserHostname:     session.UserHostname,
 				Begin:            session.Begin.UnixNano(),
-				End:              session.End,
+				Duration:         session.Duration,
 				PageviewCount:    session.PageviewCount,
 				Referrer:         session.Referrer,
 			})

@@ -7,7 +7,7 @@
     <thead>
       <tr>
         <th>Begin</th>
-        <th>Length</th>
+        <th>Duration</th>
         <th>Device</th>
         <th>OS</th>
         <th>Browser</th>
@@ -24,7 +24,7 @@
       <ng-container *ngFor="let s of sessions | slice:0:actual">
         <tr>
           <td><a routerLink="." (click)="toggleDetails(s)">{{s.begin / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</a></td>
-          <td>{{getLengthInMinutes(s.begin, s.end) | number:"1.0-0"}} m</td>
+          <td>{{s.duration/60 | number:"1.0-0"}} m</td>
           <td>{{s.device_type}}</td>
           <td>{{s.device_os}}</td>
           <td>{{s.browser_name}} {{s.browser_version}}</td>
@@ -39,7 +39,7 @@
         <tr *ngIf="s.showDetails">
           <td colspan="11">
             <div><b>Begin</b>: {{s.begin / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
-            <div><b>End</b>: {{s.end / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
+            <div><b>End</b>: {{s.begin / 1000000 + s.duration*1000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
             <div><b>User IP</b>: {{s.user_ip}}</div>
             <div><b>User Hostname</b>: {{s.user_hostname}}</div>
             <div><b>AS Number</b>: {{s.as_number}}</div>
