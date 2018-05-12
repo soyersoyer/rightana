@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	app                   = kingpin.New("k20a", "Knight20 Studio's open source web analytics.")
+	app                   = kingpin.New("k20a", "K20 Studio's open source web analytics.")
 	serve                 = app.Command("serve", "Serve")
 	seed                  = app.Command("seed", "Seed")
 	seedCollectionID      = seed.Arg("id", "Collection's ID").Required().String()
@@ -28,7 +28,7 @@ var (
 )
 
 func main() {
-	app.Version("0.2")
+	app.Version("0.3")
 	app.UsageTemplate(kingpin.CompactUsageTemplate)
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
