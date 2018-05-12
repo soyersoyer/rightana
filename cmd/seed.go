@@ -65,7 +65,7 @@ var userHostnames = []string{
 	"digi.hu",
 }
 
-// NetSeed seeds a collectoin over the network
+// NetSeed seeds a collection over the network
 func NetSeed(serverURL, collectionID string, n int) {
 	defer trace("seed")()
 	log.Println("seeding:", serverURL, "id:", collectionID, "with n:", n)
