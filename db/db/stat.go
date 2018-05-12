@@ -23,6 +23,7 @@ func (s set) contains(id uint32) bool {
 	return ok
 }
 
+// CollectionDataInputT is the input filter struct for the clients
 type CollectionDataInputT struct {
 	From     time.Time
 	To       time.Time
@@ -31,6 +32,7 @@ type CollectionDataInputT struct {
 	Filter   map[string]string
 }
 
+// CollectionDataT is the collection's data struct for the clients
 type CollectionDataT struct {
 	ID           string        `json:"id"`
 	Name         string        `json:"name"`
@@ -83,13 +85,13 @@ func getTimeMap(bucketType string) func(time.Time, *time.Location) int64 {
 	}
 }
 
-type BucketGen struct {
+type bucketGen struct {
 	loc     *time.Location
 	timeMap func(time.Time, *time.Location) int64
 	Buckets map[int64]int
 }
 
-func CreateBucketGen(bucketType string, begin time.Time, end time.Time, timezone string) *BucketGen {
+func createBucketGen(bucketType string, begin time.Time, end time.Time, timezone string) *bucketGen {
 	diff := getDiff(bucketType)
 	timeMap := getTimeMap(bucketType)
 	loc, err := time.LoadLocation(timezone)
@@ -113,18 +115,18 @@ func CreateBucketGen(bucketType string, begin time.Time, end time.Time, timezone
 		actual = diff(actual)
 	}
 
-	return &BucketGen{
+	return &bucketGen{
 		loc,
 		timeMap,
 		buckets,
 	}
 }
 
-func (bg *BucketGen) Add(t time.Time) {
+func (bg *bucketGen) Add(t time.Time) {
 	bg.Buckets[bg.timeMap(t, bg.loc)]++
 }
 
-func (bg *BucketGen) Close() []*bucketSumT {
+func (bg *bucketGen) Close() []*bucketSumT {
 	bucketSums := make([]*bucketSumT, 0, len(bg.Buckets))
 	for k, v := range bg.Buckets {
 		bucketSums = append(bucketSums, &bucketSumT{k, v})
@@ -211,8 +213,8 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 		PageviewSums: nil,
 	}
 
-	sbg := CreateBucketGen(input.Bucket, input.From, input.To, input.Timezone)
-	pvbg := CreateBucketGen(input.Bucket, input.From, input.To, input.Timezone)
+	sbg := createBucketGen(input.Bucket, input.From, input.To, input.Timezone)
+	pvbg := createBucketGen(input.Bucket, input.From, input.To, input.Timezone)
 
 	readSessions(sdb, input.From, input.To, input.Filter,
 		func(session *ExtSession) {
@@ -229,6 +231,7 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 	return output, nil
 }
 
+// CollectionStatDataT is the collection's statistic data struct for the clients
 type CollectionStatDataT struct {
 	SessionTotal         totalT   `json:"session_total"`
 	PageviewTotal        totalT   `json:"pageview_total"`
@@ -448,6 +451,7 @@ func (pvf *pageviewFilter) match(pv *Pageview) bool {
 	return true
 }
 
+// GetStatistics returns the statistic data for the collection
 func GetStatistics(collection *Collection, input *CollectionDataInputT) (*CollectionStatDataT, error) {
 	sdb, err := getShardDB(collection.ID)
 	if err != nil {
@@ -569,6 +573,7 @@ func getGrowthPercentF(actual, prev float64) float64 {
 	return actual/prev - 1.0
 }
 
+// SessionDataT is the session data struct for the clients
 type SessionDataT struct {
 	Key              string `json:"key"`
 	Hostname         string `json:"hostname"`
@@ -592,14 +597,17 @@ type SessionDataT struct {
 	Referrer         string `json:"referrer"`
 }
 
+// EncodeSessionKey encodes a session key with base64
 func EncodeSessionKey(k []byte) string {
 	return base64.StdEncoding.EncodeToString(k)
 }
 
+// DecodeSessionKey decodes a session key from base64
 func DecodeSessionKey(key string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(key)
 }
 
+// GetSessions returns the collection's sessions
 func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*SessionDataT, error) {
 	sdb, err := getShardDB(collection.ID)
 	if err != nil {
@@ -637,12 +645,14 @@ func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*Sessio
 	return ret, nil
 }
 
+// PageviewDataT is the pageview data struct for the clients
 type PageviewDataT struct {
 	Time        int64  `json:"time"`
 	Path        string `json:"path"`
 	QueryString string `json:"query_string"`
 }
 
+// GetPageviews returns the session's pageviews
 func GetPageviews(collection *Collection, sessionKey []byte) ([]*PageviewDataT, error) {
 	sdb, err := getShardDB(collection.ID)
 	if err != nil {

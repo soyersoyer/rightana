@@ -135,8 +135,8 @@ func GetCollectionSummariesByUserEmail(email string) ([]CollectionSummaryT, erro
 }
 
 // GetCollectionShards return the collection shards
-func GetCollectionShards(collection *Collection) ([]db.Shard, error) {
-	shards, err := db.GetCollectionShards(collection)
+func GetCollectionShards(collection *Collection) ([]db.ShardDataT, error) {
+	shards, err := db.GetCollectionShardDatas(collection)
 	if err != nil {
 		return nil, errors.DBError.Wrap(err, collection)
 	}

@@ -40,6 +40,7 @@ func map2Month(key []byte) string {
 	return t.Format("2006-01")
 }
 
+// InitDatabase initializes the databases, creates the directories if necessary
 func InitDatabase(basedirParam string) {
 	basedir = path.Clean(basedirParam) + "/"
 	os.MkdirAll(basedir, os.ModePerm)
@@ -51,24 +52,29 @@ func InitDatabase(basedirParam string) {
 	shardDBs.Store(shardMap{})
 }
 
+// UpdateUser updates an user
 func UpdateUser(user *User) error {
 	return cipo.Update(user.Email, user)
 }
 
+// InsertUser inserts an user
 func InsertUser(user *User) error {
 	return cipo.Insert(user.Email, user)
 }
 
+// UpsertUser upserts an user
 func UpsertUser(user *User) error {
 	return cipo.Upsert(user.Email, user)
 }
 
+// GetUserByEmail returns an user with the email parameter
 func GetUserByEmail(email string) (*User, error) {
 	user := &User{}
 	err := cipo.Get(email, user)
 	return user, err
 }
 
+// DeleteUser deletes an user
 func DeleteUser(user *User) error {
 	return cipo.Bolt().Update(func(tx *bolt.Tx) error {
 		if err := cipo.DeleteTx(tx, user.Email, user); err != nil {
@@ -120,30 +126,36 @@ func deleteTeammateByUserEmailTx(tx *bolt.Tx, email string) error {
 	})
 }
 
+// InsertAuthToken inserts an authtoken
 func InsertAuthToken(token *AuthToken) error {
 	token.TTL = 1209600
 	token.Created = time.Now().UnixNano()
 	return cipo.Insert(token.ID, token)
 }
 
+// GetAuthToken returns an authtoken with the id parameter
 func GetAuthToken(id string) (*AuthToken, error) {
 	token := &AuthToken{}
 	err := cipo.Get(id, token)
 	return token, err
 }
 
+// UpdateAuthToken updates an authtoken
 func UpdateAuthToken(token *AuthToken) error {
 	return cipo.Update(token.ID, token)
 }
 
+// DeleteAuthToken deletes an authtoken
 func DeleteAuthToken(id string) error {
 	return cipo.Delete(id, &AuthToken{})
 }
 
+// InsertCollection inserts a new collection
 func InsertCollection(collection *Collection) error {
 	return cipo.Insert(collection.ID, collection)
 }
 
+// UpdateCollection updates a new collection
 func UpdateCollection(collection *Collection) error {
 	return cipo.Update(collection.ID, collection)
 }
@@ -152,12 +164,14 @@ func updateCollectionTx(tx *bolt.Tx, collection *Collection) error {
 	return cipo.UpdateTx(tx, collection.ID, collection)
 }
 
+// GetCollection returns a collection with the id parameter
 func GetCollection(id string) (*Collection, error) {
 	collection := Collection{}
 	err := cipo.Get(id, &collection)
 	return &collection, err
 }
 
+// DeleteCollection deletes a collection
 func DeleteCollection(collection *Collection) error {
 	return cipo.Bolt().Update(func(tx *bolt.Tx) error {
 		return deleteCollectionTx(tx, collection)
@@ -171,6 +185,7 @@ func deleteCollectionTx(tx *bolt.Tx, collection *Collection) error {
 	return deleteShardDB(collection.ID)
 }
 
+// GetCollectionsByUserEmail returns collections for the usser with the email address
 func GetCollectionsByUserEmail(email string) ([]Collection, error) {
 	key := ""
 	collection := Collection{}
@@ -187,6 +202,7 @@ func GetCollectionsByUserEmail(email string) ([]Collection, error) {
 	return collections, nil
 }
 
+// UserIsTeammate check whether the User inside the collection's team
 func UserIsTeammate(collection *Collection, email string) bool {
 	for _, v := range collection.Teammates {
 		if v.Email == email {
@@ -196,23 +212,26 @@ func UserIsTeammate(collection *Collection, email string) bool {
 	return false
 }
 
-type Shard struct {
+// ShardDataT is the shard data struct for the clients
+type ShardDataT struct {
 	ID   string `json:"id"`
 	Size int    `json:"size"`
 }
 
-func GetCollectionShards(collection *Collection) ([]Shard, error) {
+// GetCollectionShardDatas returns the collection's shards information
+func GetCollectionShardDatas(collection *Collection) ([]ShardDataT, error) {
 	db, err := getShardDB(collection.ID)
 	if err != nil {
 		return nil, err
 	}
-	ret := []Shard{}
+	ret := []ShardDataT{}
 	for _, v := range db.GetSizes() {
-		ret = append(ret, Shard(v))
+		ret = append(ret, ShardDataT(v))
 	}
 	return ret, nil
 }
 
+// DeleteCollectionShard deletes a shard from the collection
 func DeleteCollectionShard(collection *Collection, shardID string) error {
 	db, err := getShardDB(collection.ID)
 	if err != nil {
@@ -221,6 +240,7 @@ func DeleteCollectionShard(collection *Collection, shardID string) error {
 	return db.DeleteShard(shardID)
 }
 
+// GetSession returns a session
 func GetSession(collectionID string, key []byte) (*Session, error) {
 	db, err := getShardDB(collectionID)
 	if err != nil {
@@ -235,6 +255,7 @@ func GetSession(collectionID string, key []byte) (*Session, error) {
 	return session, err
 }
 
+// GetPageviewPercent returns the last week versus the before last week difference in percent
 func GetPageviewPercent(collectionID string, dayBefore int) (float32, error) {
 	now := time.Now()
 	n7dAgo := now.AddDate(0, 0, -dayBefore)
@@ -319,14 +340,17 @@ func deleteShardDB(collectionID string) error {
 	return nil
 }
 
+// GetKey returns the databse key based on time and id
 func GetKey(t time.Time, id uint32) []byte {
 	return append(marshalTime(t), marshal(id)...)
 }
 
+// GetKeyFromTime returns a database key based on time
 func GetKeyFromTime(t time.Time) []byte {
 	return marshalTime(t)
 }
 
+// GetTimeFromKey returns the time based on key
 func GetTimeFromKey(key []byte) time.Time {
 	t, err := unmarshalTime(key)
 	if err != nil {
@@ -335,6 +359,7 @@ func GetTimeFromKey(key []byte) time.Time {
 	return t
 }
 
+// GetIDFromKey returns the id based on key
 func GetIDFromKey(key []byte) uint32 {
 	id, err := unmarshal(key[len(key)-4:])
 	if err != nil {
@@ -343,10 +368,12 @@ func GetIDFromKey(key []byte) uint32 {
 	return id
 }
 
+// GetPVKey returns the pageview key based on sessionkey and time
 func GetPVKey(sessionkey []byte, t time.Time) []byte {
 	return append(sessionkey, marshalTime(t)...)
 }
 
+// GetTimeFromPVKey return the time from the pageview key
 func GetTimeFromPVKey(key []byte) time.Time {
 	t, err := unmarshalTime(key[len(key)-8:])
 	if err != nil {
@@ -355,6 +382,7 @@ func GetTimeFromPVKey(key []byte) time.Time {
 	return t
 }
 
+// ShardUpdate runs the fn in a shard
 func ShardUpdate(collectionID string, fn func(tx *shardbolt.MultiTx) error) error {
 	sdb, err := getShardDB(collectionID)
 	if err != nil {
@@ -363,6 +391,7 @@ func ShardUpdate(collectionID string, fn func(tx *shardbolt.MultiTx) error) erro
 	return sdb.Update(fn)
 }
 
+// ShardUpsert upsert a value into shards
 func ShardUpsert(collectionID string, key []byte, v proto.Message) error {
 	sdb, err := getShardDB(collectionID)
 	if err != nil {
@@ -378,6 +407,7 @@ func ShardUpsert(collectionID string, key []byte, v proto.Message) error {
 	})
 }
 
+// ShardUpsertBatch upsert a value into shards, but not in a separated transaction
 func ShardUpsertBatch(collectionID string, key []byte, v proto.Message) error {
 	sdb, err := getShardDB(collectionID)
 	if err != nil {
@@ -391,6 +421,7 @@ func ShardUpsertBatch(collectionID string, key []byte, v proto.Message) error {
 	return sdb.BatchUpsert(bb, key, vb)
 }
 
+// ShardUpsertTx upsert a value into shards in a transaction
 func ShardUpsertTx(tx *shardbolt.MultiTx, key []byte, v proto.Message) error {
 	bb := bucketName(v)
 	vb, err := proto.Marshal(v)
