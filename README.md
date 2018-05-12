@@ -100,6 +100,7 @@ The configuration filename is k20a.yaml (or an another format what the viper lib
 |GeoIPASNFile|/var/lib/GeoIP/GeoLite2-ASN.mmdb|GeoIP2/GeoLite2 ASN file|
 |DataDir|data|Where is the base data dir|
 |EnableRegistration|true|Whether registration enabled or not|
+|UseBundledWebApp|true|Whether the program should use the bundled webapp or use the frontend/dist folder|
 
 ## Limitations
 This software is under initial development (0.x) and the database format may change in the future. In other words, it is not guaranteed that the next version of the software will be able to read the the data stored by the current version.
