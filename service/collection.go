@@ -107,6 +107,7 @@ func DeleteCollection(collection *Collection) error {
 type CollectionSummaryT struct {
 	ID              string  `json:"id"`
 	Name            string  `json:"name"`
+	PageviewCount   int     `json:"pageview_count"`
 	PageviewPercent float32 `json:"pageview_percent"`
 }
 
@@ -118,13 +119,14 @@ func GetCollectionSummariesByUserEmail(email string) ([]CollectionSummaryT, erro
 		return nil, errors.DBError.Wrap(err, email)
 	}
 	for _, v := range collections {
-		percent, err := db.GetPageviewPercent(v.ID, 7)
+		count, percent, err := db.GetPageviewPercent(v.ID, 7)
 		if err != nil {
 			return nil, errors.DBError.Wrap(err, v.ID)
 		}
 		ret = append(ret, CollectionSummaryT{
 			ID:              v.ID,
 			Name:            v.Name,
+			PageviewCount:   count,
 			PageviewPercent: percent,
 		})
 	}

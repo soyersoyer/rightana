@@ -255,8 +255,8 @@ func GetSession(collectionID string, key []byte) (*Session, error) {
 	return session, err
 }
 
-// GetPageviewPercent returns the last week versus the before last week difference in percent
-func GetPageviewPercent(collectionID string, dayBefore int) (float32, error) {
+// GetPageviewPercent returns the last week versus the before last week difference in percent, and the pageview
+func GetPageviewPercent(collectionID string, dayBefore int) (int, float32, error) {
 	now := time.Now()
 	n7dAgo := now.AddDate(0, 0, -dayBefore)
 	n14dAgo := n7dAgo.AddDate(0, 0, -dayBefore)
@@ -267,7 +267,7 @@ func GetPageviewPercent(collectionID string, dayBefore int) (float32, error) {
 
 	sdb, err := getShardDB(collectionID)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	sumFirst := 0
 	sdb.Iterate(BPageview, n14dAgoK, n7dAgoK, func(k []byte, v []byte) {
@@ -282,7 +282,7 @@ func GetPageviewPercent(collectionID string, dayBefore int) (float32, error) {
 	if sumFirst != 0 {
 		percent = float32(sumSecond)/float32(sumFirst) - 1.0
 	}
-	return percent, nil
+	return sumSecond, percent, nil
 }
 
 func getShardDB(collectionID string) (*shardbolt.DB, error) {

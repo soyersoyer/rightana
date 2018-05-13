@@ -11,7 +11,8 @@
             <div class="card-title">
                 <a [routerLink]="[c.id]" routerLinkActive="active">{{c.name}}</a>
             </div>
-            <div class="card-text">
+            <div class="card-text d-flex justify-content-between pr-4">
+              {{c.pageview_count}}
               <k20a-color-percent [percent]="c.pageview_percent"></k20a-color-percent>
             </div>
           </div>

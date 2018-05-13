@@ -25,6 +25,13 @@ export class Collection {
   name: string;
 }
 
+export class CollectionSummary {
+  id: string;
+  name: string;
+  pageview_count: number;
+  pageview_percent: number;
+}
+
 export class Total {
   count: number;
   diff_percent: number;
@@ -184,8 +191,8 @@ export class BackendService {
    return this.http.post<Collection>('/api/collections', JSON.stringify(formData));
   }
 
-  getCollections(): Observable<Collection[]> {
-    return this.http.get<Collection[]>('/api/collections');
+  getCollections(): Observable<CollectionSummary[]> {
+    return this.http.get<CollectionSummary[]>('/api/collections');
   }
 
   getCollection(collectionId: string): Observable<Collection> {

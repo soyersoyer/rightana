@@ -3,14 +3,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { tap } from 'rxjs/operators';
 
-import { BackendService, Collection } from '../backend.service';
+import { BackendService, CollectionSummary } from '../backend.service';
 
 @Component({
   selector: 'k20a-collection',
   templateUrl: './collection.component.html',
 })
 export class CollectionComponent implements OnInit {
-  collections: Collection[];
+  collections: CollectionSummary[];
 
   constructor(
     private backend: BackendService,
@@ -27,7 +27,7 @@ export class CollectionComponent implements OnInit {
       });
   }
 
-  getCollections(): Observable<Collection[]> {
+  getCollections(): Observable<CollectionSummary[]> {
     return this.backend.getCollections()
       .do(collections => this.collections = collections);
   }
