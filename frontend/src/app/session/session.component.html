@@ -1,4 +1,4 @@
-<div class="my-2" *ngIf="sessions">
+<div class="my-2 container" *ngIf="sessions">
   <div class="d-flex justify-content-between align-items-center">
     <h2>Sessions <span class="text-muted">{{sessions.length}}</span></h2>
     <span class="h4 text-muted">{{setup.from | date:"yyyy.MM.dd HH:mm"}} - {{setup.to | date:"yyyy.MM.dd HH:mm"}}</span>
@@ -31,7 +31,7 @@
           <td>{{s.browser_language}}</td>
           <td>{{s.screen_resolution}}</td>
           <td>{{s.window_resolution}}</td>
-          <td>{{s.user_hostname}}</td>
+          <td class="text-long"><span>{{s.user_hostname}}</span></td>
           <td>{{s.country_code}} {{s.city}}</td>
           <td>{{s.as_name}}</td>
           <td>{{s.pageview_count}}</td>

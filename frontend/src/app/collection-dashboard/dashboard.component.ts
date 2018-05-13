@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { BackendService, AuthService, CollectionData, BucketSum } from '../backend.service';
 
@@ -189,6 +189,7 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private backend: BackendService,
     private auth: AuthService,
+    private router: Router,
     private route: ActivatedRoute,
   ) { }
 
@@ -332,6 +333,11 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
     this.data = {labels, datasets};
     this.colorizeBuckets();
   }
+
+  showChart(): boolean {
+    return !this.router.url.endsWith('settings');
+  }
+
 
   keys(o: any): string[] {
     return Object.keys(o);

@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Collection, Shard, BackendService } from '../backend.service';
-
-import { CollectionComponent } from '../collection/collection.component';
 
 @Component({
   selector: 'k20a-collection-settings',
@@ -19,8 +17,8 @@ export class CollectionSettingsComponent implements OnInit {
 
   constructor(
     private backend: BackendService,
+    private router: Router,
     private route: ActivatedRoute,
-    private parent: CollectionComponent,
     private fb: FormBuilder,
   ) { }
 
@@ -29,7 +27,7 @@ export class CollectionSettingsComponent implements OnInit {
       id: [null],
       name: [null, [Validators.required]],
     });
-    this.route.params.forEach((params: Params) => {
+    this.route.parent.params.forEach((params: Params) => {
       const collectionId = params['collectionId'];
       this.getCollection(collectionId);
       this.getCollectionShards(collectionId);
@@ -55,11 +53,13 @@ export class CollectionSettingsComponent implements OnInit {
   }
 
   save() {
-    this.parent.save(this.form.value);
+    this.backend.saveCollection(this.form.value)
+      .subscribe(_ => this.router.navigate(['..'], {relativeTo: this.route}));
   }
 
   delete() {
-    this.parent.delete(this.form.value.id);
+    this.backend.deleteCollection(this.form.value.id)
+      .subscribe(_ => this.router.navigate(['../..'], {relativeTo: this.route}));
   }
 
   deleteShard(shard: Shard) {

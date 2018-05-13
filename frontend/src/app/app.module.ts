@@ -43,14 +43,13 @@ const routes: Routes = [
     { path: 'change-password', component: ChangePasswordComponent},
     { path: 'delete-account', component: DeleteAccountComponent},
   ]},
-  { path: 'collections', component: CollectionComponent, children: [
-    { path: 'create', component: CollectionCreateComponent},
-    { path: ':collectionId', component: CollectionDashboardComponent, children: [
-      { path: '', redirectTo: 'statistics', pathMatch: 'full'},
-      { path: 'statistics', component: CollectionStatComponent},
-      { path: 'sessions', component: SessionComponent},
-    ]},
-    { path: ':collectionId/settings', component: CollectionSettingsComponent},
+  { path: 'collections', component: CollectionComponent},
+  { path: 'collections/create', component: CollectionCreateComponent},
+  { path: 'collections/:collectionId', component: CollectionDashboardComponent, children: [
+    { path: '', redirectTo: 'statistics', pathMatch: 'full'},
+    { path: 'statistics', component: CollectionStatComponent},
+    { path: 'sessions', component: SessionComponent},
+    { path: 'settings', component: CollectionSettingsComponent},
   ]},
 ];
 

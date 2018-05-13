@@ -1,21 +1,25 @@
-<div class="container-fluid">
-  <div class="row min-height-100vh-minus-top">
-    <div class="col-md-2 bg-light">
-      <div class="mt-2">
-        <div class="d-flex align-items-center flex-wrap text-truncate">
-          <h2>Collections</h2>
-          <a role="button" class="btn btn-secondary btn-sm ml-auto" routerLink="create">✚</a>
+<div class="container">
+  <div class="mt-2">
+    <div class="d-flex align-items-center flex-wrap text-truncate">
+      <h3><a routerLink=".">collections</a></h3>
+      <a role="button" class="btn btn-secondary btn-sm ml-auto" routerLink="create">✚</a>
+    </div>
+    <div class="row">
+      <div class="col-sm-3" *ngFor="let c of collections">
+        <div class="card my-2">
+          <div class="card-body" style="width: 18rem">
+            <div class="card-title">
+                <a [routerLink]="[c.id]" routerLinkActive="active">{{c.name}}</a>
+            </div>
+            <div class="card-text">
+              <k20a-color-percent [percent]="c.pageview_percent"></k20a-color-percent>
+            </div>
+          </div>
         </div>
-        <ul class="nav flex-column">
-          <li *ngFor="let c of collections" role="menuitem" routerLinkActive="active" class="d-flex justify-content-between">
-            <a [routerLink]="[c.id]" class="px-3px">{{c.name}}</a>
-            <k20a-color-percent [percent]="c.pageview_percent"></k20a-color-percent>
-          </li>
-        </ul>
       </div>
     </div>
-    <div class="col-md-10">
-      <router-outlet></router-outlet>
-    </div>
   </div>
+</div>
+<div class="container">
+    <router-outlet></router-outlet>
 </div>

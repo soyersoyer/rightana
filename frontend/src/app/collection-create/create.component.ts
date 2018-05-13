@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { CollectionComponent } from '../collection/collection.component';
+import { BackendService } from '../backend.service';
 
 @Component({
   selector: 'k20a-collection-create',
@@ -12,7 +14,9 @@ export class CollectionCreateComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private parent: CollectionComponent,
+    private backend: BackendService,
+    private router: Router,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit() {
@@ -22,7 +26,7 @@ export class CollectionCreateComponent implements OnInit {
   }
 
   create() {
-    this.parent.create(this.form.value);
+    this.backend.createCollection(this.form.value)
+      .subscribe(collection => this.router.navigate(['..', collection.id, 'settings'], {relativeTo: this.route}));
   }
-
 }
