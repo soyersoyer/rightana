@@ -88,7 +88,7 @@ export class Session {
 export class Pageview {
   time: Date;
   path: string;
-  referrer_url: string;
+  query_string: string;
 }
 
 export class Shard {

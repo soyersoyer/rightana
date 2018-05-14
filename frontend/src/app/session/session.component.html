@@ -56,12 +56,14 @@
                 <tr>
                   <th>Time</th>
                   <th>Path</th>
+                  <th>Query String</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let pv of s.pageviews">
                   <td>{{pv.time / 1000000 |date:"yyyy.MM.dd HH:mm:ss"}}</td>
                   <td>{{pv.path}}</td>
+                  <td>{{pv.query_string}}</td>
                 </tr>
               </tbody>
             </table>
