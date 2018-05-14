@@ -5,6 +5,7 @@ message User {
 	string Email = 1;
 	string Password = 2;
 	int64 Created = 3; // unixnano
+	string Name = 4;
 	bool IsAdmin = 10;
 }
 

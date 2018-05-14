@@ -8,6 +8,7 @@ import (
 var (
 	RegistrationDisabled = &Error{"Registration disabled", 403, "", ""}
 	InvalidEmail         = &Error{"Invalid email", 400, "", ""}
+	InvalidUsername      = &Error{"Invalid username", 400, "", ""}
 	PasswordNotMatch     = &Error{"Password not match", 403, "", ""}
 	PasswordTooShort     = &Error{"Password too short", 400, "", ""}
 	UserNotExist         = &Error{"User not exist", 404, "", ""}

@@ -51,10 +51,13 @@ func Seed(trackingID string, count int) {
 }
 
 // RegisterUser registers a new user
-func RegisterUser(email string, password string) {
+func RegisterUser(email string, name string, password string) {
 	inits()
 	config.ActualConfig.EnableRegistration = true
-	user, err := service.CreateUser(email, password)
+	user, err := service.CreateUser(&service.CreateUserT{
+		Email:    email,
+		Name:     name,
+		Password: password})
 	if err != nil {
 		log.Fatalln(err)
 	}

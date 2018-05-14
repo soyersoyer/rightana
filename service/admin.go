@@ -8,6 +8,7 @@ import (
 // UserInfoT is struct for clients, stores the user information
 type UserInfoT struct {
 	Email           string `json:"email"`
+	Name            string `json:"name"`
 	Created         int64  `json:"created"`
 	IsAdmin         bool   `json:"is_admin"`
 	CollectionCount int    `json:"collection_count"`
@@ -25,7 +26,7 @@ func GetUsers() ([]UserInfoT, error) {
 		if err != nil {
 			return nil, errors.DBError.Wrap(err)
 		}
-		userInfos = append(userInfos, UserInfoT{u.Email, u.Created, u.IsAdmin, len(collections)})
+		userInfos = append(userInfos, UserInfoT{u.Email, u.Name, u.Created, u.IsAdmin, len(collections)})
 	}
 	return userInfos, nil
 }
@@ -38,6 +39,7 @@ func GetUserInfo(email string) (*UserInfoT, error) {
 	}
 	return &UserInfoT{
 		user.Email,
+		user.Name,
 		user.Created,
 		user.IsAdmin,
 		0,
@@ -46,6 +48,7 @@ func GetUserInfo(email string) (*UserInfoT, error) {
 
 // UserUpdateT is the struct for updating a user
 type UserUpdateT struct {
+	Name     string `json:"name"`
 	Password string `json:"password"`
 	IsAdmin  bool   `json:"is_admin"`
 }
@@ -56,13 +59,23 @@ func UpdateUser(email string, input *UserUpdateT) error {
 	if err != nil {
 		return errors.UserNotExist.T(email).Wrap(err)
 	}
+
+	if !usernameCheck(input.Name) {
+		return errors.InvalidUsername.T(input.Name)
+	}
+	user.Name = input.Name
+
 	if input.Password != "" {
+		if !passwordCheck(input.Password) {
+			return errors.PasswordTooShort
+		}
 		hashedPass, err := hashPassword(input.Password)
 		if err != nil {
 			return err
 		}
 		user.Password = hashedPass
 	}
+
 	user.IsAdmin = input.IsAdmin
 	if input.IsAdmin == false {
 		admins, err := db.GetAdminUsers()

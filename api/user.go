@@ -11,18 +11,13 @@ import (
 	"github.com/soyersoyer/k20a/service"
 )
 
-type createUserT struct {
-	Email    string
-	Password string
-}
-
 func createUserE(w http.ResponseWriter, r *http.Request) error {
-	var input createUserT
+	var input service.CreateUserT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	user, err := service.CreateUser(input.Email, input.Password)
+	user, err := service.CreateUser(&input)
 	if err != nil {
 		return err
 	}

@@ -23,6 +23,7 @@ export class AdminUsersEditComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
+      name: [null, [Validators.required, Validators.pattern("^[a-z0-9.]+$")]],
       password: [null, [Validators.required]],
       is_admin: [null, [Validators.required]],
     });

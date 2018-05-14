@@ -12,25 +12,36 @@ import (
 )
 
 var (
-	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	emailRegexp    = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	usernameRegexp = regexp.MustCompile("^[a-z0-9.]+$")
 )
 
 // User is the the database user struct
 type User = db.User
 
+// CreateUserT is a struct for the clients to creating a user
+type CreateUserT struct {
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
 // CreateUser can create an user
-func CreateUser(email string, password string) (*User, error) {
+func CreateUser(input *CreateUserT) (*User, error) {
 	if !config.ActualConfig.EnableRegistration {
 		return nil, errors.RegistrationDisabled
 	}
 
-	if !emailCheck(email) {
-		return nil, errors.InvalidEmail.T(email)
+	if !emailCheck(input.Email) {
+		return nil, errors.InvalidEmail.T(input.Email)
 	}
-	if !passwordCheck(password) {
+	if !usernameCheck(input.Name) {
+		return nil, errors.InvalidUsername.T(input.Name)
+	}
+	if !passwordCheck(input.Password) {
 		return nil, errors.PasswordTooShort
 	}
-	hashedPass, err := hashPassword(password)
+	hashedPass, err := hashPassword(input.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -39,14 +50,15 @@ func CreateUser(email string, password string) (*User, error) {
 		return nil, err
 	}
 	user := &db.User{
-		Email:    email,
+		Email:    input.Email,
+		Name:     input.Name,
 		Password: hashedPass,
 		Created:  time.Now().UnixNano(),
 		IsAdmin:  isFirstUser,
 	}
 	if err := db.InsertUser(user); err != nil {
 		if err == db.ErrKeyExists {
-			return nil, errors.UserExist.T(email)
+			return nil, errors.UserExist.T(input.Email)
 		}
 		return nil, errors.DBError.Wrap(err, user)
 	}
@@ -101,6 +113,10 @@ func isFirstUser() (bool, error) {
 		return false, errors.DBError.Wrap(err)
 	}
 	return userCount == 0, nil
+}
+
+func usernameCheck(name string) bool {
+	return usernameRegexp.MatchString(name)
 }
 
 func emailCheck(email string) bool {

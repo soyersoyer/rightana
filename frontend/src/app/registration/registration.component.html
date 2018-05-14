@@ -6,6 +6,10 @@
         <div class="card-body">
           <form [formGroup]="form" (submit)="registrate()">
             <div class="form-group">
+              <label for="name">Username</label>
+              <input id="name" type="email" class="form-control form-control-lg" formControlName="name">
+            </div>
+            <div class="form-group">
               <label for="email">Email address</label>
               <input id="email" type="email" class="form-control form-control-lg" formControlName="email">
             </div>
