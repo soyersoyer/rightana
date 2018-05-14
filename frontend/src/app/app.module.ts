@@ -31,6 +31,11 @@ import { ChartComponent } from './chart/chart.component';
 import { ColorPercentComponent } from './utils/color-percent.component';
 import { BytesPipe } from './utils/bytes.pipe';
 
+import { AdminComponent } from './admin/admin.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
+import { AdminCollectionsComponent } from './admin-collections/admin-collections.component';
+import { AdminUsersEditComponent } from './admin-users-edit/admin-users-edit.component';
+
 
 
 const routes: Routes = [
@@ -51,6 +56,12 @@ const routes: Routes = [
     { path: 'sessions', component: SessionComponent},
     { path: 'settings', component: CollectionSettingsComponent},
   ]},
+  { path: 'admin', component: AdminComponent, children: [
+    { path: '', redirectTo: 'users', pathMatch: 'full'},
+    { path: 'users', component: AdminUsersComponent},
+    { path: 'users/:email', component: AdminUsersEditComponent},
+    { path: 'collections', component: AdminCollectionsComponent},
+  ]}
 ];
 
 @NgModule({
@@ -75,6 +86,10 @@ const routes: Routes = [
     ChartComponent,
     ColorPercentComponent,
     BytesPipe,
+    AdminComponent,
+    AdminUsersComponent,
+    AdminCollectionsComponent,
+    AdminUsersEditComponent,
   ],
   imports: [
     BrowserModule,

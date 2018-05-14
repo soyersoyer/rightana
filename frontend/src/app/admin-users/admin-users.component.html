@@ -1,0 +1,23 @@
+<div class="container mt-2">
+  <h3>Users</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Email</th>
+        <th scope="col">Created</th>
+        <th scope="col">Collections</th>
+        <th scope="col">Admin</th>
+        <th scope="col">Edit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{user.email}}</td>
+        <td>{{user.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>
+        <td>{{user.collection_count}}</td>
+        <td>{{user.is_admin}}</td>
+        <td><a [routerLink]="[user.email]">edit</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

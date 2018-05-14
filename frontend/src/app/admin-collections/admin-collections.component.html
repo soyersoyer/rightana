@@ -1,0 +1,26 @@
+<div class="container mt-2">
+    <h3>Collections</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Owner</th>
+          <th scope="col">Created</th>
+          <th scope="col">Teammate count</th>
+          <th scope="col">Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of collections">
+          <td>{{c.id}}</td>
+          <td>{{c.name}}</td>
+          <td>{{c.owner_email}}</td>
+          <td>{{c.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>
+          <td>{{c.teammate_count}}</td>
+          <td><a [routerLink]="[c.id, 'edit']">edit</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

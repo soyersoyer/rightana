@@ -35,7 +35,7 @@ export class RegistrationComponent implements OnInit {
     this.backend
       .createAuthToken(this.form.value)
       .subscribe(token => {
-        this.auth.set(token.id, this.form.value.email);
+        this.auth.set(token.id, this.form.value.email, token.user_info.is_admin);
         this.router.navigateByUrl('/collections');
       });
   }

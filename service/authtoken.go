@@ -13,22 +13,22 @@ import (
 type AuthToken = db.AuthToken
 
 // CreateAuthToken creates an AuthToken
-func CreateAuthToken(email string, password string) (string, error) {
+func CreateAuthToken(email string, password string) (string, *User, error) {
 	user, err := db.GetUserByEmail(email)
 	if err != nil || user == nil {
-		return "", errors.UserNotExist.T(email)
+		return "", nil, errors.UserNotExist.T(email)
 	}
 	if err := compareHashAndPassword(user.Password, password); err != nil {
-		return "", errors.PasswordNotMatch
+		return "", nil, errors.PasswordNotMatch
 	}
 	token := db.AuthToken{
 		ID:         uuid.Must(uuid.NewV4()).String(),
 		OwnerEmail: email,
 	}
 	if err := db.InsertAuthToken(&token); err != nil {
-		return "", errors.DBError.Wrap(err, token)
+		return "", nil, errors.DBError.Wrap(err, token)
 	}
-	return token.ID, nil
+	return token.ID, user, nil
 }
 
 // DeleteAuthToken deletes an AuthToken

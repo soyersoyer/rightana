@@ -1,0 +1,23 @@
+<div class="container mt-2" *ngIf="user" style="max-width: 500px">
+  <h3>Edit User</h3>
+  <div class="card">
+    <div class="card-body">
+      <form [formGroup]="form" (submit)="update()">
+        <div class="form-group">
+          <label>Email</label>
+          <input id="email" type="email" class="form-control form-control-lg" disabled [value]="user.email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" class="form-control form-control-lg" formControlName="password">
+          <small class="form-text text-muted">Leave it empty to remain unchanged.</small>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="is_admin" formControlName="is_admin">
+            <label class="form-check-label" for="is_admin">This account has administrator permissions</label>
+          </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100">Update</button>
+      </form>
+    </div>
+  </div>
+</div>

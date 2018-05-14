@@ -16,7 +16,8 @@ type createTokenT struct {
 }
 
 type createTokenOutT struct {
-	ID string `json:"id"`
+	ID                string `json:"id"`
+	service.UserInfoT `json:"user_info"`
 }
 
 func createTokenE(w http.ResponseWriter, r *http.Request) error {
@@ -25,12 +26,16 @@ func createTokenE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	tokenID, err := service.CreateAuthToken(input.Email, input.Password)
+	tokenID, user, err := service.CreateAuthToken(input.Email, input.Password)
 	if err != nil {
 		return err
 	}
 
-	return respond(w, createTokenOutT{tokenID})
+	return respond(w, createTokenOutT{tokenID, service.UserInfoT{
+		Email:   user.Email,
+		Created: user.Created,
+		IsAdmin: user.IsAdmin},
+	})
 }
 
 var createToken = handleError(createTokenE)

@@ -67,6 +67,51 @@ func UpsertUser(user *User) error {
 	return cipo.Upsert(user.Email, user)
 }
 
+// GetUsers returns the users
+func GetUsers() ([]User, error) {
+	users := []User{}
+
+	key := ""
+	user := User{}
+	err := cipo.Iterate(&key, &user, func() error {
+		users = append(users, user)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+// GetAdminUsers returns the admin users
+func GetAdminUsers() ([]User, error) {
+	users := []User{}
+
+	key := ""
+	user := User{}
+	err := cipo.Iterate(&key, &user, func() error {
+		if user.IsAdmin {
+			users = append(users, user)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+// CountUsers returns the count of the users
+func CountUsers() (int, error) {
+	key := ""
+	user := User{}
+	count := 0
+	if err := cipo.CountPrefix(key, &user, &count); err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 // GetUserByEmail returns an user with the email parameter
 func GetUserByEmail(email string) (*User, error) {
 	user := &User{}
@@ -185,7 +230,39 @@ func deleteCollectionTx(tx *bolt.Tx, collection *Collection) error {
 	return deleteShardDB(collection.ID)
 }
 
-// GetCollectionsByUserEmail returns collections for the usser with the email address
+// GetCollections returns all the collections
+func GetCollections() ([]Collection, error) {
+	key := ""
+	collection := Collection{}
+	collections := []Collection{}
+	err := cipo.Iterate(&key, &collection, func() error {
+		collections = append(collections, collection)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return collections, nil
+}
+
+// GetCollectionsOwnedByUser returns the collections owned by user
+func GetCollectionsOwnedByUser(email string) ([]Collection, error) {
+	key := ""
+	collection := Collection{}
+	collections := []Collection{}
+	err := cipo.Iterate(&key, &collection, func() error {
+		if collection.OwnerEmail == email {
+			collections = append(collections, collection)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return collections, nil
+}
+
+// GetCollectionsByUserEmail returns collections for the user with the email address
 func GetCollectionsByUserEmail(email string) ([]Collection, error) {
 	key := ""
 	collection := Collection{}

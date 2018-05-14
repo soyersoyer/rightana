@@ -16,7 +16,7 @@ type collectionT struct {
 	Name string `json:"name"`
 }
 
-func getCollectionsE(w http.ResponseWriter, r *http.Request) error {
+func getCollectionSummariesE(w http.ResponseWriter, r *http.Request) error {
 	ownerEmail := getUserEmailCtx(r.Context())
 	summary, err := service.GetCollectionSummariesByUserEmail(ownerEmail)
 	if err != nil {
@@ -25,7 +25,7 @@ func getCollectionsE(w http.ResponseWriter, r *http.Request) error {
 	return respond(w, summary)
 }
 
-var getCollections = handleError(getCollectionsE)
+var getCollectionSummaries = handleError(getCollectionSummariesE)
 
 func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 	var input collectionT

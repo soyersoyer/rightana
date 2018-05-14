@@ -15,14 +15,34 @@ export class User {
   password: string;
 }
 
+export class UserInfo {
+  email: string;
+  created: number;
+  is_admin: boolean;
+  collection_count: number;
+}
+
+export class UserUpdate {
+  password: string;
+  is_admin: string;
+}
+
 export class AuthToken {
   id: string;
+  user_info: UserInfo;
 }
 
 export class Collection {
   id: string;
-  owner_email: number;
   name: string;
+}
+
+export class CollectionInfo {
+  id: string;
+  name: string;
+  owner_email: string;
+  created: number;
+  teammate_count: number;
 }
 
 export class CollectionSummary {
@@ -136,27 +156,35 @@ export class AuthInterceptor implements HttpInterceptor {
 export class AuthService {
   token: string;
   email: string;
+  is_admin: boolean;
 
   constructor(
     private router: Router,
   ) {
     this.token = localStorage.getItem('token');
     this.email = localStorage.getItem('email');
+    this.is_admin = localStorage.getItem('is_admin') === 'true';
   }
 
-  set(token: string, email: string) {
+  set(token: string, email: string, is_admin: boolean) {
     this.token = token;
     this.email = email;
+    this.is_admin = is_admin;
     localStorage.setItem('token', token);
     localStorage.setItem('email', email);
+    localStorage.setItem('is_admin', is_admin?'true':'false');
   }
 
   unset() {
-    this.set('', '');
+    this.set('', '', false);
   }
 
   get loggedIn(): boolean {
     return this.token && this.token !== '';
+  }
+
+  get isAdmin(): boolean {
+    return this.loggedIn && this.is_admin;
   }
 
   goToLogin() {
@@ -191,7 +219,7 @@ export class BackendService {
    return this.http.post<Collection>('/api/collections', JSON.stringify(formData));
   }
 
-  getCollections(): Observable<CollectionSummary[]> {
+  getCollectionSummaries(): Observable<CollectionSummary[]> {
     return this.http.get<CollectionSummary[]>('/api/collections');
   }
 
@@ -249,6 +277,22 @@ export class BackendService {
 
   deleteUser(email: string, password: string): Observable<any> {
    return this.http.post(`/api/users/${email}/delete`, {password});
+  }
+
+  getUsers(): Observable<UserInfo[]> {
+    return this.http.get<UserInfo[]>(`/api/admin/users`);
+  }
+
+  getUserInfo(email: string): Observable<UserInfo> {
+    return this.http.get<UserInfo>(`/api/admin/users/${email}`);
+  }
+
+  updateUser(email: string, user: UserUpdate): Observable<string> {
+    return this.http.patch<string>(`/api/admin/users/${email}`, user);
+  }
+
+  getCollections(): Observable<CollectionInfo[]> {
+    return this.http.get<CollectionInfo[]>(`/api/admin/collections`);
   }
 
 }

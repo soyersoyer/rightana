@@ -2,6 +2,7 @@ package service
 
 import (
 	"regexp"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -33,9 +34,15 @@ func CreateUser(email string, password string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
+	isFirstUser, err := isFirstUser()
+	if err != nil {
+		return nil, err
+	}
 	user := &db.User{
 		Email:    email,
 		Password: hashedPass,
+		Created:  time.Now().UnixNano(),
+		IsAdmin:  isFirstUser,
 	}
 	if err := db.InsertUser(user); err != nil {
 		if err == db.ErrKeyExists {
@@ -86,6 +93,14 @@ func GetUserByEmail(email string) (*User, error) {
 		return nil, errors.UserNotExist.T(email).Wrap(err)
 	}
 	return user, nil
+}
+
+func isFirstUser() (bool, error) {
+	userCount, err := db.CountUsers()
+	if err != nil {
+		return false, errors.DBError.Wrap(err)
+	}
+	return userCount == 0, nil
 }
 
 func emailCheck(email string) bool {

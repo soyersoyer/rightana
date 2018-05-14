@@ -28,7 +28,7 @@ export class CollectionComponent implements OnInit {
   }
 
   getCollections(): Observable<CollectionSummary[]> {
-    return this.backend.getCollections()
+    return this.backend.getCollectionSummaries()
       .do(collections => this.collections = collections);
   }
 

@@ -4,6 +4,8 @@ package db;
 message User {
 	string Email = 1;
 	string Password = 2;
+	int64 Created = 3; // unixnano
+	bool IsAdmin = 10;
 }
 
 message Teammate {
@@ -15,13 +17,14 @@ message Collection {
 	string OwnerEmail = 2;
 	string Name = 3;
 	repeated Teammate Teammates = 4;
+	int64 Created = 5; // unixnano
 }
 
 message AuthToken {
 	string ID = 1;
 	string OwnerEmail = 2;
 	int32 TTL = 3;
-	int64 Created = 4; //unixnano
+	int64 Created = 4; // unixnano
 }
 
 message Session {
