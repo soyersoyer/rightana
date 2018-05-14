@@ -291,15 +291,15 @@ func (db *DB) DeletePrefixTx(tx *bolt.Tx, prefix interface{}, value interface{})
 	return nil
 }
 
-func (db *DB) getBytes(key interface{}, value interface{}) ([]byte, []byte, []byte, error) {
-	bb := db.bucket(value)
-	kb, err := db.encode(key)
+func (db *DB) getBytes(key interface{}, value interface{}) (bb []byte, kb []byte, vb []byte, err error) {
+	bb = db.bucket(value)
+	kb, err = db.encode(key)
 	if err != nil {
-		return nil, nil, nil, err
+		return
 	}
-	vb, err := db.encode(value)
+	vb, err = db.encode(value)
 	if err != nil {
-		return nil, nil, nil, err
+		return
 	}
-	return bb, kb, vb, nil
+	return
 }
