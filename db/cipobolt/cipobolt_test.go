@@ -1,6 +1,7 @@
 package cipobolt
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,11 @@ import (
 )
 
 type Data struct {
+	value string
+}
+
+type DataWithID struct {
+	ID    uint64
 	value string
 }
 
@@ -25,6 +31,10 @@ var (
 			return []byte(v), nil
 		case *Data:
 			return []byte(v.value), nil
+		case *DataWithID:
+			return []byte(v.value), nil
+		case uint64:
+			return itob(v), nil
 		}
 	}
 	decode = func(data []byte, v interface{}) error {
@@ -37,6 +47,9 @@ var (
 		case *Data:
 			v.value = string(data)
 			return nil
+		case *DataWithID:
+			v.value = string(data)
+			return nil
 		}
 	}
 	bucket = func(v interface{}) []byte {
@@ -46,6 +59,8 @@ var (
 			return nil
 		case *Data:
 			return []byte("data")
+		case *DataWithID:
+			return []byte("dataWithID")
 		}
 	}
 	key1 = "hello1"
@@ -54,6 +69,7 @@ var (
 	val1 = &Data{"world1"}
 	val2 = &Data{"world2"}
 	val3 = &Data{"prehello"}
+	val4 = &DataWithID{0, "hey"}
 )
 
 func TestMain(m *testing.M) {
@@ -100,6 +116,33 @@ func TestInsert(t *testing.T) {
 	if err == nil {
 		t.Error("second insert should fail")
 	}
+}
+
+func TestInsertGenKey(t *testing.T) {
+	var err error
+	err = cipo.Insert(nil, val4)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = cipo.Insert(nil, val4)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if val4.ID == 0 {
+		t.Error(val4.ID, "==", 0)
+	}
+
+	v := &DataWithID{}
+	err = cipo.Get(val4.ID, v)
+	if err != nil {
+		t.Error(err)
+	}
+	if v.value != val4.value {
+		t.Error(v, "!=", val4)
+	}
+
 }
 
 func TestUpdate(t *testing.T) {
@@ -205,4 +248,10 @@ func checkValue(t *testing.T, key string, value *Data) {
 	if v.value != value.value {
 		t.Error(v, "!=", value)
 	}
+}
+
+func itob(v uint64) []byte {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, v)
+	return b
 }

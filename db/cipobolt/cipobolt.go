@@ -3,6 +3,7 @@ package cipobolt
 import (
 	"bytes"
 	"errors"
+	"reflect"
 
 	"github.com/boltdb/bolt"
 )
@@ -222,16 +223,35 @@ func (db *DB) UpdateTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 
 // InsertTx inserts an element in a transaction
 func (db *DB) InsertTx(tx *bolt.Tx, key interface{}, value interface{}) error {
-	bb, kb, vb, err := db.getBytes(key, value)
+	kb := []byte{}
+	bb, vb, err := db.getBytesValue(value)
 	if err != nil {
 		return err
 	}
 
 	b, _ := tx.CreateBucketIfNotExists(bb)
 
-	v := b.Get(kb)
-	if v != nil {
-		return ErrKeyExists
+	if key == nil {
+		ukey, _ := b.NextSequence()
+		kb, err = db.encode(ukey)
+		if err != nil {
+			return err
+		}
+
+		dv := reflect.Indirect(reflect.ValueOf(value))
+		dt := dv.Type()
+		if dt.NumField() > 0 && dt.Field(0).Name == "ID" && dt.Field(0).Type.Name() == "uint64" {
+			dv.Field(0).SetUint(ukey)
+		}
+	} else {
+		kb, err = db.encode(key)
+		if err != nil {
+			return err
+		}
+		v := b.Get(kb)
+		if v != nil {
+			return ErrKeyExists
+		}
 	}
 
 	return b.Put(kb, vb)
@@ -297,6 +317,15 @@ func (db *DB) getBytes(key interface{}, value interface{}) (bb []byte, kb []byte
 	if err != nil {
 		return
 	}
+	vb, err = db.encode(value)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (db *DB) getBytesValue(value interface{}) (bb []byte, vb []byte, err error) {
+	bb = db.bucket(value)
 	vb, err = db.encode(value)
 	if err != nil {
 		return
