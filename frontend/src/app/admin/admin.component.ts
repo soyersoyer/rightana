@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'k20a-admin',
+  selector: 'rana-admin',
   templateUrl: './admin.component.html',
 })
 export class AdminComponent implements OnInit {

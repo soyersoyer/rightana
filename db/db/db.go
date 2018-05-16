@@ -12,15 +12,15 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/soyersoyer/k20a/db/cipobolt"
-	"github.com/soyersoyer/k20a/db/shardbolt"
+	"github.com/soyersoyer/rightana/db/cipobolt"
+	"github.com/soyersoyer/rightana/db/shardbolt"
 )
 
 type shardMap map[string]*shardbolt.DB
 
 var (
 	basedir  = "data/"
-	filename = "k20a.bolt"
+	filename = "rightana.bolt"
 
 	cipo     *cipobolt.DB
 	shardDBs = atomic.Value{}

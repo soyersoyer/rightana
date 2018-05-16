@@ -3,7 +3,7 @@ import { Component, Input, ElementRef, OnInit, OnChanges, SimpleChanges } from '
 import { Chart } from 'chart.js';
 
 @Component({
-  selector: 'k20a-chart',
+  selector: 'rana-chart',
   template: '<canvas></canvas>',
   styles: [':host { display: block; }']
 })

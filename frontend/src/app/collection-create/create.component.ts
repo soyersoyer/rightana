@@ -6,7 +6,7 @@ import { CollectionComponent } from '../collection/collection.component';
 import { BackendService } from '../backend.service';
 
 @Component({
-  selector: 'k20a-collection-create',
+  selector: 'rana-collection-create',
   templateUrl: './create.component.html',
 })
 export class CollectionCreateComponent implements OnInit {

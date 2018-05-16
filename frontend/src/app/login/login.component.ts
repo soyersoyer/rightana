@@ -2,15 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { AuthService, BackendService, K20Config } from '../backend.service';
+import { AuthService, BackendService, ServerConfig } from '../backend.service';
 
 @Component({
-  selector: 'k20a-login',
+  selector: 'rana-login',
   templateUrl: './login.component.html',
 })
 export class LoginComponent implements OnInit {
   form: FormGroup;
-  config: K20Config;
+  config: ServerConfig;
 
   constructor(
     private fb: FormBuilder,

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ToastyService } from 'ng2-toasty';
 
 @Component({
-  selector: 'k20a-logout',
+  selector: 'rana-logout',
   templateUrl: './logout.component.html',
 })
 export class LogoutComponent implements OnInit {

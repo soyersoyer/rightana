@@ -7,7 +7,7 @@ import { ToastyService } from 'ng2-toasty';
 import { BackendService, AuthService } from "../../backend.service"
 
 @Component({
-  selector: 'k20a-delete-account',
+  selector: 'rana-delete-account',
   templateUrl: './delete-account.component.html',
 })
 export class DeleteAccountComponent implements OnInit {

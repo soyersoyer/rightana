@@ -1,5 +1,5 @@
 {
-  "name": "k20a-front",
+  "name": "rightana-front",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -7,7 +7,6 @@
     "start": "ng serve --aot --proxy-config proxy.conf.json",
     "build": "ng build",
     "dist": "npm run ng build --prod",
-    "deploy": "scp -P922 dist/* soyer@irl.hu:/var/www/a.k20studio.com/www/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

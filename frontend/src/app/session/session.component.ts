@@ -11,7 +11,7 @@ class SessionD extends Session {
 }
 
 @Component({
-  selector: 'k20a-session',
+  selector: 'rana-session',
   templateUrl: './session.component.html',
 })
 export class SessionComponent implements OnInit, OnDestroy {

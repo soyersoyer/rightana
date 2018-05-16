@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'k20a-color-percent',
+  selector: 'rana-color-percent',
   templateUrl: './color-percent.component.html'
 })
 export class ColorPercentComponent {

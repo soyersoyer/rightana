@@ -7,7 +7,7 @@ import { ToastyService } from 'ng2-toasty';
 import { UserInfo, UserUpdate, BackendService } from '../backend.service';
 
 @Component({
-  selector: 'k20a-admin-users-edit',
+  selector: 'rana-admin-users-edit',
   templateUrl: './admin-users-edit.component.html',
 })
 export class AdminUsersEditComponent implements OnInit {

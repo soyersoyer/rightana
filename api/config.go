@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/soyersoyer/k20a/config"
+	"github.com/soyersoyer/rightana/config"
 )
 
 type publicConfigT struct {

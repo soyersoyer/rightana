@@ -8,75 +8,75 @@
       <div class="bg-light text-center m-3 p-3">
         <div><b>Sessions</b></div>
         <span class="display-4 text-muted">{{sums.session_total.count}}</span>
-        <k20a-color-percent [percent]="sums.session_total.diff_percent"></k20a-color-percent>
+        <rana-color-percent [percent]="sums.session_total.diff_percent"></rana-color-percent>
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
       <div class="bg-light text-center m-3 p-3">
         <div><b>Pageviews</b></div>
         <span class="display-4 text-muted">{{sums.pageview_total.count}}</span>
-        <k20a-color-percent [percent]="sums.pageview_total.diff_percent"></k20a-color-percent>
+        <rana-color-percent [percent]="sums.pageview_total.diff_percent"></rana-color-percent>
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
       <div class="bg-light text-center m-3 p-3">
         <div><b>Average session length</b></div>
         <span class="display-4 text-muted">{{sums.avg_session_length.count/60 | number:"1.0-0"}} m</span>
-        <k20a-color-percent [percent]="sums.avg_session_length.diff_percent"></k20a-color-percent>
+        <rana-color-percent [percent]="sums.avg_session_length.diff_percent"></rana-color-percent>
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
       <div class="bg-light text-center m-3 p-3">
         <div><b>Bounce rate</b></div>
         <span class="display-4 text-muted">{{sums.bounce_rate.percent | percent:"1.1-1"}}</span>
-        <k20a-color-percent [percent]="sums.bounce_rate.diff_percent" [inverse]="true"></k20a-color-percent>
+        <rana-color-percent [percent]="sums.bounce_rate.diff_percent" [inverse]="true"></rana-color-percent>
       </div>
     </div>
   </div>
   <div class="row">
     <div class="col-md-8">
       <h3>Pages</h3>
-      <k20a-table-sum name="Pages" [sums]="sums.page_sums" key="page"></k20a-table-sum>
+      <rana-table-sum name="Pages" [sums]="sums.page_sums" key="page"></rana-table-sum>
       <ng-container *ngIf="setup.in('page') && (sums.query_string_sums.length > 1 || sums.query_string_sums[0].name != '')">
         <h3>Query strings</h3>
-        <k20a-table-sum name="Query string" [sums]="sums.query_string_sums" key="query_string"></k20a-table-sum>
+        <rana-table-sum name="Query string" [sums]="sums.query_string_sums" key="query_string"></rana-table-sum>
       </ng-container>
       <h3>Referrers</h3>
-      <k20a-table-sum name="Referrer" [sums]="sums.referrer_sums" key="referrer"></k20a-table-sum>
+      <rana-table-sum name="Referrer" [sums]="sums.referrer_sums" key="referrer"></rana-table-sum>
       <h3>Hosts</h3>
-      <k20a-table-sum name="Hosts" [sums]="sums.hostname_sums" key="hostname"></k20a-table-sum>
+      <rana-table-sum name="Hosts" [sums]="sums.hostname_sums" key="hostname"></rana-table-sum>
       <div class="row">
         <div class="col-md-6">
           <h3>Pageviews per session</h3>
-          <k20a-table-sum name="Pageviews" [sums]="sums.pageview_count_sums" key="pageview_count"></k20a-table-sum>
+          <rana-table-sum name="Pageviews" [sums]="sums.pageview_count_sums" key="pageview_count"></rana-table-sum>
           <h3>Screen resolutions</h3>
-          <k20a-table-sum name="Resolution" [sums]="sums.screen_resolution_sums" key="screen_resolution"></k20a-table-sum>
+          <rana-table-sum name="Resolution" [sums]="sums.screen_resolution_sums" key="screen_resolution"></rana-table-sum>
           <h3>Window resolutions</h3>
-          <k20a-table-sum name="Resolution" [sums]="sums.window_resolution_sums" key="window_resolution"></k20a-table-sum>
+          <rana-table-sum name="Resolution" [sums]="sums.window_resolution_sums" key="window_resolution"></rana-table-sum>
         </div>
         <div class="col-md-6">
           <h3>Countries</h3>
-          <k20a-table-sum name="Country" [sums]="sums.country_code_sums" key="country_code"></k20a-table-sum>
+          <rana-table-sum name="Country" [sums]="sums.country_code_sums" key="country_code"></rana-table-sum>
           <h3>Cities</h3>
-          <k20a-table-sum name="City" [sums]="sums.city_sums" key="city"></k20a-table-sum>
+          <rana-table-sum name="City" [sums]="sums.city_sums" key="city"></rana-table-sum>
           <h3>AS Names</h3>
-          <k20a-table-sum name="AS Name" [sums]="sums.as_name_sums" key="as_name"></k20a-table-sum>
+          <rana-table-sum name="AS Name" [sums]="sums.as_name_sums" key="as_name"></rana-table-sum>
         </div>
       </div>
     </div>
     <div class="col-md-4">
       <h3>Device Types</h3>
-      <k20a-table-sum name="Type" [sums]="sums.device_type_sums" key="device_type"></k20a-table-sum>
+      <rana-table-sum name="Type" [sums]="sums.device_type_sums" key="device_type"></rana-table-sum>
       <h3>Device OS</h3>
-      <k20a-table-sum name="OS" [sums]="sums.device_os_sums" key="device_os"></k20a-table-sum>
+      <rana-table-sum name="OS" [sums]="sums.device_os_sums" key="device_os"></rana-table-sum>
       <h3>Browsers</h3>
-      <k20a-table-sum name="Browser" [sums]="sums.browser_name_sums" key="browser_name"></k20a-table-sum>
+      <rana-table-sum name="Browser" [sums]="sums.browser_name_sums" key="browser_name"></rana-table-sum>
       <ng-container *ngIf="setup.in('browser_name')">
         <h3>Browser versions</h3>
-        <k20a-table-sum name="Version" [sums]="sums.browser_version_sums" key="browser_version"></k20a-table-sum>
+        <rana-table-sum name="Version" [sums]="sums.browser_version_sums" key="browser_version"></rana-table-sum>
       </ng-container>
       <h3>Browser Languages</h3>
-      <k20a-table-sum name="Language" [sums]="sums.browser_language_sums" key="browser_language"></k20a-table-sum>
+      <rana-table-sum name="Language" [sums]="sums.browser_language_sums" key="browser_language"></rana-table-sum>
     </div>
   </div>
 </div>

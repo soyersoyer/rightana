@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('k20a-front App', () => {
+describe('rana-front App', () => {
   let page: AppPage;
 
   beforeEach(() => {

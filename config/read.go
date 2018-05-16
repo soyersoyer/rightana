@@ -19,15 +19,15 @@ type Config struct {
 var (
 	// ActualConfig stores the last readed config value
 	ActualConfig = Config{}
-	file         = "k20a"
+	file         = "rightana"
 )
 
 // ReadConfig reads the config file from the default locations
 func ReadConfig() Config {
 
-	viper.AddConfigPath("/etc/k20a/")
-	viper.AddConfigPath("$HOME/.k20a/")
-	viper.AddConfigPath("$HOME/.config/k20a/")
+	viper.AddConfigPath("/etc/rightana/")
+	viper.AddConfigPath("$HOME/.rightana/")
+	viper.AddConfigPath("$HOME/.config/rightana/")
 	viper.AddConfigPath("data")
 	viper.AddConfigPath(".")
 	viper.SetConfigName(file)

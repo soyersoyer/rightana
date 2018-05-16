@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService, BackendService } from '../backend.service';
 
 @Component({
-  selector: 'k20a-registration',
+  selector: 'rana-registration',
   templateUrl: './registration.component.html',
 })
 export class RegistrationComponent implements OnInit {

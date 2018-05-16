@@ -8,11 +8,11 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	"github.com/soyersoyer/k20a/api"
-	"github.com/soyersoyer/k20a/config"
-	"github.com/soyersoyer/k20a/db/db"
-	"github.com/soyersoyer/k20a/geoip"
-	"github.com/soyersoyer/k20a/service"
+	"github.com/soyersoyer/rightana/api"
+	"github.com/soyersoyer/rightana/config"
+	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/geoip"
+	"github.com/soyersoyer/rightana/service"
 )
 
 func inits() {

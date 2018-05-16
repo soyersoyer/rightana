@@ -4,7 +4,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Collection, BackendService } from '../backend.service';
 
 @Component({
-  selector: 'k20a-collection-tracking',
+  selector: 'rana-collection-tracking',
   templateUrl: './tracking.component.html',
 })
 export class CollectionTrackingComponent implements OnInit {
@@ -25,7 +25,7 @@ export class CollectionTrackingComponent implements OnInit {
   }
 
   getTrackingCode(): string {
-    return `<!-- k20a tracker -->
+    return `<!-- rana tracker -->
 <script>
   (function(d, w, u, o){
     w[o]=w[o]||function(){
@@ -35,11 +35,11 @@ export class CollectionTrackingComponent implements OnInit {
     m=d.getElementsByTagName('script')[0];
     a.async=1; a.src=u;
     m.parentNode.insertBefore(a,m)
-  })(document, window, '${this.getOrigin()}/tracker.js', 'k20a');
-  k20a('setup', '${this.getOrigin()}/api', '${this.collection.id}');
-  k20a('trackPageview');
+  })(document, window, '${this.getOrigin()}/tracker.js', 'rana');
+  rana('setup', '${this.getOrigin()}/api', '${this.collection.id}');
+  rana('trackPageview');
 </script>
-<!-- k20a tracker -->
+<!-- rana tracker -->
 `;
   }
 

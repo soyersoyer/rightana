@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Collection, Shard, BackendService } from '../backend.service';
 
 @Component({
-  selector: 'k20a-collection-settings',
+  selector: 'rana-collection-settings',
   templateUrl: './settings.component.html',
 })
 export class CollectionSettingsComponent implements OnInit {

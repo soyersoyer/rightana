@@ -1,7 +1,7 @@
 'use strict';
 
-window.k20a = function() {
-  var sessionStorageKey = 'k20a-session-key',
+window.rightana = function() {
+  var sessionStorageKey = 'rightana-session-key',
   trackerUrl = '',
   collectionId = '',
   debug = false,
@@ -133,7 +133,7 @@ window.k20a = function() {
     updateSessionEnd();
   });
 
-  (window.k20a.q || []).forEach(function(i) {
+  (window.rightana.q || []).forEach(function(i) {
     processCommands.apply(this, i);
   });
 

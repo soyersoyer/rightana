@@ -15,15 +15,15 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/soyersoyer/k20a/config"
-	"github.com/soyersoyer/k20a/db/db"
-	"github.com/soyersoyer/k20a/service"
+	"github.com/soyersoyer/rightana/config"
+	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/service"
 )
 
 type kv map[string]string
 
 var (
-	testDbName       = "k20a_test"
+	testDbName       = "rightana_test"
 	userData         = service.CreateUserT{Email: "admin@irl.hu", Name: "admin", Password: "adminlong"}
 	userSameNameData = service.CreateUserT{Email: "adminsame@irl.hu", Name: "admin", Password: "adminlong"}
 	user2Data        = service.CreateUserT{Email: "admin2@irl.hu", Name: "admin2", Password: "adminlong2"}

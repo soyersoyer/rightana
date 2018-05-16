@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CollectionInfo, BackendService } from '../backend.service';
 
 @Component({
-  selector: 'k20a-admin-collections',
+  selector: 'rana-admin-collections',
   templateUrl: './admin-collections.component.html',
 })
 export class AdminCollectionsComponent implements OnInit {

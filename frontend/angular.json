@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "k20a-front": {
+    "rightana-front": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -51,18 +51,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "k20a-front:build"
+            "browserTarget": "rightana-front:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "k20a-front:build:production"
+              "browserTarget": "rightana-front:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "k20a-front:build"
+            "browserTarget": "rightana-front:build"
           }
         },
         "test": {
@@ -99,7 +99,7 @@
         }
       }
     },
-    "k20a-front-e2e": {
+    "rana-front-e2e": {
       "root": "",
       "sourceRoot": "",
       "projectType": "application",
@@ -108,7 +108,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "k20a-front:serve"
+            "devServerTarget": "rightana-front:serve"
           }
         },
         "lint": {
@@ -125,14 +125,14 @@
       }
     }
   },
-  "defaultProject": "k20a-front",
+  "defaultProject": "rightana-front",
   "schematics": {
     "@schematics/angular:component": {
-      "prefix": "k20a",
+      "prefix": "rana",
       "styleext": "css"
     },
     "@schematics/angular:directive": {
-      "prefix": "k20a"
+      "prefix": "rana"
     }
   }
 }

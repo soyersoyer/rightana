@@ -9,7 +9,7 @@ import (
 
 	"github.com/mssola/user_agent"
 
-	"github.com/soyersoyer/k20a/geoip"
+	"github.com/soyersoyer/rightana/geoip"
 )
 
 var userAgents = []string{

@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 import { CollectionStatComponent } from './stat.component';
 
 @Component({
-  selector: 'k20a-table-sum',
+  selector: 'rana-table-sum',
   templateUrl: './table-sum.component.html'
 })
 export class TableSumComponent {

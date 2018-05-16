@@ -95,7 +95,7 @@ export class Setup {
 }
 
 @Component({
-  selector: 'k20a-collection-dashboard',
+  selector: 'rana-collection-dashboard',
   templateUrl: './dashboard.component.html',
 })
 export class CollectionDashboardComponent implements OnInit, OnDestroy {

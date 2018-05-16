@@ -10,7 +10,7 @@ import (
 var (
 	dir          = "data"
 	email        = "soyer@irl.hu"
-	collectionID = "K20A-AAAA"
+	collectionID = "AAAA"
 	from         = time.Now()
 	to           = from.Add(time.Duration(10000) * time.Hour)
 	collection   = Collection{

@@ -6,7 +6,7 @@ import { ToastyService } from 'ng2-toasty';
 import { BackendService, AuthService } from "../../backend.service"
 
 @Component({
-  selector: 'k20a-change-password',
+  selector: 'rana-change-password',
   templateUrl: './change-password.component.html',
 })
 export class ChangePasswordComponent implements OnInit {

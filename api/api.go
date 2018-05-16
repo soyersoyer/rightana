@@ -14,9 +14,9 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/rakyll/statik/fs"
 
-	_ "github.com/soyersoyer/k20a/api/statik" //the embedded statik fs data
-	"github.com/soyersoyer/k20a/config"
-	"github.com/soyersoyer/k20a/errors"
+	_ "github.com/soyersoyer/rightana/api/statik" //the embedded statik fs data
+	"github.com/soyersoyer/rightana/config"
+	"github.com/soyersoyer/rightana/errors"
 )
 
 type ctxKey int

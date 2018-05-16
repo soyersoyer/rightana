@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/soyersoyer/k20a/errors"
-	"github.com/soyersoyer/k20a/service"
+	"github.com/soyersoyer/rightana/errors"
+	"github.com/soyersoyer/rightana/service"
 )
 
 func createUserE(w http.ResponseWriter, r *http.Request) error {

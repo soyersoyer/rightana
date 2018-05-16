@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/soyersoyer/k20a/service"
+	"github.com/soyersoyer/rightana/service"
 )
 
 func getUserIDCtx(ctx context.Context) uint64 {

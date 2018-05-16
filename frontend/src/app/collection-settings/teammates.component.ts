@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Collection, BackendService, Teammate } from '../backend.service';
 
 @Component({
-  selector: 'k20a-collection-teammates',
+  selector: 'rana-collection-teammates',
   templateUrl: './teammates.component.html',
 })
 export class TeammatesComponent implements OnInit {

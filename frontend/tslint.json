@@ -117,13 +117,13 @@
     "directive-selector": [
       true,
       "attribute",
-      "k20a",
+      "rana",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "k20a",
+      "rana",
       "kebab-case"
     ],
     "use-input-property-decorator": true,

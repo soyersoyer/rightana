@@ -6,7 +6,7 @@ import { tap } from 'rxjs/operators';
 import { BackendService, CollectionSummary } from '../backend.service';
 
 @Component({
-  selector: 'k20a-collection',
+  selector: 'rana-collection',
   templateUrl: './collection.component.html',
 })
 export class CollectionComponent implements OnInit {

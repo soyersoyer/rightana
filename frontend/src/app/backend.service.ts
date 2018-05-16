@@ -6,7 +6,7 @@ import 'rxjs/add/operator/do';
 
 import { ToastyService } from 'ng2-toasty';
 
-export class K20Config {
+export class ServerConfig {
   enable_registration: boolean;
 }
 
@@ -201,8 +201,8 @@ export class BackendService {
     private http: HttpClient
   ) {}
 
-  getConfig(): Observable<K20Config> {
-    return this.http.get<K20Config>('/api/config');
+  getConfig(): Observable<ServerConfig> {
+    return this.http.get<ServerConfig>('/api/config');
   }
 
   createUser(formData: any): Observable<User> {

@@ -9,9 +9,9 @@ import (
 
 	"github.com/mssola/user_agent"
 
-	"github.com/soyersoyer/k20a/db/db"
-	"github.com/soyersoyer/k20a/errors"
-	"github.com/soyersoyer/k20a/geoip"
+	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/errors"
+	"github.com/soyersoyer/rightana/geoip"
 )
 
 // CreateSessionInputT is the struct for creating a session

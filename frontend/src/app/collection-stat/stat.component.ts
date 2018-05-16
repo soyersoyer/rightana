@@ -5,7 +5,7 @@ import { BackendService, CollectionSumData } from '../backend.service';
 import { CollectionDashboardComponent, Setup } from '../collection-dashboard/dashboard.component';
 
 @Component({
-  selector: 'k20a-collection-stat',
+  selector: 'rana-collection-stat',
   templateUrl: './stat.component.html',
 })
 export class CollectionStatComponent implements OnInit, OnDestroy {

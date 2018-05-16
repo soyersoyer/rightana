@@ -5,11 +5,11 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/soyersoyer/k20a/cmd"
+	"github.com/soyersoyer/rightana/cmd"
 )
 
 var (
-	app                   = kingpin.New("k20a", "K20 Studio's open source web analytics.")
+	app                   = kingpin.New("rightana", "Rightana - open source web analytics.")
 	serve                 = app.Command("serve", "Serve")
 	seed                  = app.Command("seed", "Seed")
 	seedCollectionID      = seed.Arg("id", "Collection's ID").Required().String()

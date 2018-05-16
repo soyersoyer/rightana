@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserInfo, BackendService } from '../backend.service';
 
 @Component({
-  selector: 'k20a-admin-users',
+  selector: 'rana-admin-users',
   templateUrl: './admin-users.component.html',
 })
 export class AdminUsersComponent implements OnInit {

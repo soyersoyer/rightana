@@ -1,10 +1,10 @@
-# K20a
-[![Build Status](https://travis-ci.org/soyersoyer/k20a.svg?branch=master)](https://travis-ci.org/soyersoyer/k20a) 
-[![Go Report Card](https://goreportcard.com/badge/github.com/soyersoyer/k20a?)](https://goreportcard.com/report/github.com/soyersoyer/k20a)
+# RightAna
+[![Build Status](https://travis-ci.org/soyersoyer/rightana.svg?branch=master)](https://travis-ci.org/soyersoyer/rightana) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/soyersoyer/rightana?)](https://goreportcard.com/report/github.com/soyersoyer/rightana)
 
 Carefree web analytics on your server
 
-## What is K20a?
+## What is RightAna?
 
 Its a self hosted web analytics software.
 
@@ -17,7 +17,7 @@ From the user's perspective it is very similar to GA
 - include it to your webpage
 - View the reports
 
-## Who uses K20a?
+## Who uses RightAna?
 
 We use it to track our and our client's websites.
 
@@ -77,20 +77,20 @@ We use it to track our and our client's websites.
 
 ### From binary
 
-1. Download the latest version from the [Releases](https://github.com/soyersoyer/k20a/releases) section (currently only x64 linux versions)
+1. Download the latest version from the [Releases](https://github.com/soyersoyer/rightana/releases) section (currently only x64 linux versions)
 1. Start it and/or add to your service starter
 
 ### From source
 
 1. Get a working go environment
 1. Get a working node environment (for building the Angular frontend)
-1. go get -u github.com/soyersoyer/k20a
-1. cd ~/go/src/github.com/soyersoyer/k20a
+1. go get -u github.com/soyersoyer/rightana
+1. cd ~/go/src/github.com/soyersoyer/rightana
 1. ./build.sh
 1. Start it and/or add to your service starter
 
 ## Configuration
-The configuration filename is k20a.yaml (or an another format what the viper library support)
+The configuration filename is rightana.yaml (or an another format what the viper library support)
 ### Options
 
 |Option|Default|Description|

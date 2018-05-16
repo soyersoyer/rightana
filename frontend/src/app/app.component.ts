@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { AuthService } from './backend.service';
 
 @Component({
-  selector: 'k20a-root',
+  selector: 'rana-root',
   templateUrl: './app.component.html',
 })
 export class AppComponent {

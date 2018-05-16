@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/soyersoyer/k20a/db/shardbolt"
+	"github.com/soyersoyer/rightana/db/shardbolt"
 )
 
 type empty struct{}

@@ -5,8 +5,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/soyersoyer/k20a/db/db"
-	"github.com/soyersoyer/k20a/errors"
+	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/errors"
 )
 
 // Collection is the db's collection struct
