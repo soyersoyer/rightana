@@ -138,7 +138,7 @@ func (db *DB) CountPrefixTx(tx *bolt.Tx, prefix interface{}, value interface{}, 
 	bb := db.bucket(value)
 	b := tx.Bucket(bb)
 	if b == nil {
-		return ErrKeyNotExists
+		return nil
 	}
 
 	pb, err := db.encode(prefix)
