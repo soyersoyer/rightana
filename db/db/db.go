@@ -12,7 +12,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/soyersoyer/rightana/db/cipobolt"
+	"github.com/soyersoyer/cipobolt"
 	"github.com/soyersoyer/rightana/db/shardbolt"
 )
 
