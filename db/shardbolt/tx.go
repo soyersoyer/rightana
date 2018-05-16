@@ -3,7 +3,7 @@ package shardbolt
 import (
 	"log"
 
-	"github.com/boltdb/bolt"
+	"github.com/coreos/bbolt"
 )
 
 type MultiTx struct {

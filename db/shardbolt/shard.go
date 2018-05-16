@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/boltdb/bolt"
+	"github.com/coreos/bbolt"
 )
 
 type shard struct {
