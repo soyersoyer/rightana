@@ -67,7 +67,7 @@ export class BucketSum {
 export class CollectionData {
   id: string;
   name: string;
-  owner_id: number;
+  owner_name: string;
   session_sums: BucketSum[];
   pageview_sums: BucketSum[];
 }
