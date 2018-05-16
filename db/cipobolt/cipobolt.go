@@ -223,11 +223,9 @@ func (db *DB) UpdateTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 
 // InsertTx inserts an element in a transaction
 func (db *DB) InsertTx(tx *bolt.Tx, key interface{}, value interface{}) error {
+	var err error
 	kb := []byte{}
-	bb, vb, err := db.getBytesValue(value)
-	if err != nil {
-		return err
-	}
+	bb := db.bucket(value)
 
 	b, _ := tx.CreateBucketIfNotExists(bb)
 
@@ -253,7 +251,10 @@ func (db *DB) InsertTx(tx *bolt.Tx, key interface{}, value interface{}) error {
 			return ErrKeyExists
 		}
 	}
-
+	vb, err := db.encode(value)
+	if err != nil {
+		return err
+	}
 	return b.Put(kb, vb)
 }
 
@@ -317,15 +318,6 @@ func (db *DB) getBytes(key interface{}, value interface{}) (bb []byte, kb []byte
 	if err != nil {
 		return
 	}
-	vb, err = db.encode(value)
-	if err != nil {
-		return
-	}
-	return
-}
-
-func (db *DB) getBytesValue(value interface{}) (bb []byte, vb []byte, err error) {
-	bb = db.bucket(value)
 	vb, err = db.encode(value)
 	if err != nil {
 		return
