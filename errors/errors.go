@@ -12,7 +12,8 @@ var (
 	PasswordNotMatch     = &Error{"Password not match", 403, "", ""}
 	PasswordTooShort     = &Error{"Password too short", 400, "", ""}
 	UserNotExist         = &Error{"User not exist", 404, "", ""}
-	UserExist            = &Error{"User exist", 403, "", ""}
+	UserNameExist        = &Error{"User Name exist", 403, "", ""}
+	UserEmailExist       = &Error{"User Email exist", 403, "", ""}
 	AccessDenied         = &Error{"Access denied", 403, "", ""}
 	InputDecodeFailed    = &Error{"Input decode failed", 400, "", ""}
 	AuthtokenNotExist    = &Error{"Authtoken not exist", 403, "", ""}

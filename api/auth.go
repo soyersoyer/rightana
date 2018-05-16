@@ -7,12 +7,12 @@ import (
 	"github.com/soyersoyer/k20a/service"
 )
 
-func getUserEmailCtx(ctx context.Context) string {
-	return ctx.Value(keyUserEmail).(string)
+func getUserIDCtx(ctx context.Context) uint64 {
+	return ctx.Value(keyUserID).(uint64)
 }
 
-func setUserEmailCtx(ctx context.Context, userEmail string) context.Context {
-	return context.WithValue(ctx, keyUserEmail, userEmail)
+func setUserIDCtx(ctx context.Context, ID uint64) context.Context {
+	return context.WithValue(ctx, keyUserID, ID)
 }
 
 func loggedOnlyHandler(next http.Handler) http.Handler {
@@ -20,12 +20,12 @@ func loggedOnlyHandler(next http.Handler) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) error {
 			authToken := r.Header.Get("Authorization")
 
-			userEmail, err := service.CheckAuthToken(authToken)
+			userID, err := service.CheckAuthToken(authToken)
 			if err != nil {
 				return err
 			}
 
-			ctx := setUserEmailCtx(r.Context(), userEmail)
+			ctx := setUserIDCtx(r.Context(), userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return nil
 		}))

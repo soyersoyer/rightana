@@ -14,9 +14,9 @@ var (
 	from         = time.Now()
 	to           = from.Add(time.Duration(10000) * time.Hour)
 	collection   = Collection{
-		ID:         collectionID,
-		Name:       "test.org",
-		OwnerEmail: email,
+		ID:      collectionID,
+		Name:    "test.org",
+		OwnerID: 1,
 	}
 )
 
@@ -46,7 +46,7 @@ func TestUserCreate(t *testing.T) {
 		Password: "e!",
 	}
 
-	if err := UpsertUser(&user); err != nil {
+	if err := InsertUser(&user); err != nil {
 		t.Error(err)
 	}
 

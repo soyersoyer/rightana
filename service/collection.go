@@ -16,13 +16,18 @@ type Collection = db.Collection
 type CollectionDataInputT = db.CollectionDataInputT
 
 // CreateCollection creates a collection
-func CreateCollection(ownerEmail string, name string) (*Collection, error) {
-	collection := &Collection{
-		ID:         "K20A-" + randStringBytes(8),
-		OwnerEmail: ownerEmail,
-		Name:       name,
+func CreateCollection(ownerID uint64, name string) (*Collection, error) {
+	user, err := db.GetUserByID(ownerID)
+	if err != nil {
+		return nil, errors.UserNotExist.T(string(ownerID)).Wrap(err)
 	}
-	err := db.InsertCollection(collection)
+	collection := &Collection{
+		ID:      randStringBytes(8),
+		OwnerID: user.ID,
+		Name:    name,
+		Created: time.Now().UnixNano(),
+	}
+	err = db.InsertCollection(collection)
 	if err != nil {
 		return nil, errors.DBError.Wrap(err, collection)
 	}
@@ -36,9 +41,9 @@ func CreateCollectionByID(id string, name string, ownerEmail string) (*Collectio
 		return nil, err
 	}
 	collection := &Collection{
-		ID:         id,
-		OwnerEmail: user.Email,
-		Name:       name,
+		ID:      id,
+		OwnerID: user.ID,
+		Name:    name,
 	}
 	if err := db.InsertCollection(collection); err != nil {
 		if err != nil {
@@ -62,16 +67,16 @@ func randStringBytes(n int) string {
 }
 
 // CollectionReadAccessCheck checks the read access
-func CollectionReadAccessCheck(collection *Collection, userEmail string) error {
-	if collection.OwnerEmail != userEmail && !db.UserIsTeammate(collection, userEmail) {
+func CollectionReadAccessCheck(collection *Collection, userID uint64) error {
+	if collection.OwnerID != userID && !db.UserIsTeammate(collection, userID) {
 		return errors.AccessDenied
 	}
 	return nil
 }
 
 // CollectionWriteAccessCheck checks the write access
-func CollectionWriteAccessCheck(collection *Collection, userEmail string) error {
-	if collection.OwnerEmail != userEmail {
+func CollectionWriteAccessCheck(collection *Collection, userID uint64) error {
+	if collection.OwnerID != userID {
 		return errors.AccessDenied
 	}
 	return nil
@@ -111,12 +116,12 @@ type CollectionSummaryT struct {
 	PageviewPercent float32 `json:"pageview_percent"`
 }
 
-// GetCollectionSummariesByUserEmail returns the collection summaries for the user
-func GetCollectionSummariesByUserEmail(email string) ([]CollectionSummaryT, error) {
+// GetCollectionSummariesByUserID returns the collection summaries for the user
+func GetCollectionSummariesByUserID(ID uint64) ([]CollectionSummaryT, error) {
 	ret := []CollectionSummaryT{}
-	collections, err := db.GetCollectionsByUserEmail(email)
+	collections, err := db.GetCollectionsByUserID(ID)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, email)
+		return nil, errors.DBError.Wrap(err, ID)
 	}
 	for _, v := range collections {
 		count, percent, err := db.GetPageviewPercent(v.ID, 7)
@@ -153,30 +158,52 @@ func DeleteCollectionShard(collection *Collection, shardID string) error {
 	return nil
 }
 
+// TeammateT contains the teammates information for the client
+type TeammateT struct {
+	Email string `json:"email"`
+}
+
 // AddTeammate adds a teammate to the collection
-func AddTeammate(collection *Collection, email string) error {
-	user, err := db.GetUserByEmail(email)
+func AddTeammate(collection *Collection, input TeammateT) error {
+	user, err := db.GetUserByEmail(input.Email)
 	if err != nil {
-		return errors.UserNotExist.T(email).Wrap(err)
+		return errors.UserNotExist.T(input.Email).Wrap(err)
 	}
-	if coll := db.GetTeammate(collection, email); coll != nil {
-		return errors.TeammateExist.T(email)
+	if coll := db.GetTeammate(collection, user.ID); coll != nil {
+		return errors.TeammateExist.T(input.Email)
 	}
 	if err := db.AddTeammate(collection, user); err != nil {
-		return errors.DBError.Wrap(err, collection.ID, email)
+		return errors.DBError.Wrap(err, collection.ID, input.Email)
 	}
 	return nil
 }
 
 // RemoveTeammate removes the teammate from the collection
 func RemoveTeammate(collection *Collection, email string) error {
-	if coll := db.GetTeammate(collection, email); coll == nil {
+	user, err := db.GetUserByEmail(email)
+	if err != nil {
+		return errors.UserNotExist.T(email).Wrap(err)
+	}
+	if coll := db.GetTeammate(collection, user.ID); coll == nil {
 		return errors.UserNotExist.T(email)
 	}
-	if err := db.RemoveTeammate(collection, email); err != nil {
+	if err := db.RemoveTeammate(collection, user.ID); err != nil {
 		return errors.DBError.Wrap(err, collection, email)
 	}
 	return nil
+}
+
+// GetCollectionTeammates returns the teammates emails
+func GetCollectionTeammates(collection *Collection) ([]TeammateT, error) {
+	tms := []TeammateT{}
+	for _, v := range collection.Teammates {
+		user, err := GetUserByID(v.ID)
+		if err != nil {
+			return nil, errors.DBError.T(string(v.ID)).Wrap(err)
+		}
+		tms = append(tms, TeammateT{user.Email})
+	}
+	return tms, nil
 }
 
 // GetCollectionData returns the collection data

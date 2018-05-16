@@ -22,7 +22,7 @@ import (
 type ctxKey int
 
 const (
-	keyUserEmail ctxKey = iota
+	keyUserID ctxKey = iota
 	keyCollection
 	keyUser
 )
@@ -87,13 +87,16 @@ func Wire(r *chi.Mux) {
 func userRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", createUser)
-	r.Route("/{email}", func(r chi.Router) {
-		r.Use(loggedOnlyHandler)
-		r.Use(userBaseHandler)
-		r.Use(userAccessHandler)
-		r.Patch("/password", updateUserPassword)
-		r.Post("/delete", deleteUser)
+	r.Route("/{name}", func(r chi.Router) {
+		r.Route("/settings", func(r chi.Router) {
+			r.Use(loggedOnlyHandler)
+			r.Use(userBaseHandler)
+			r.Use(userAccessHandler)
+			r.Patch("/password", updateUserPassword)
+			r.Post("/delete", deleteUser)
+		})
 	})
+
 	return r
 }
 

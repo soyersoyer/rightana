@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
     this.backend
       .createAuthToken(this.form.value)
       .subscribe(token => {
-        this.auth.set(token.id, this.form.value.email, token.user_info.is_admin);
+        this.auth.set(token.id, token.user_info.name, token.user_info.is_admin);
         this.router.navigateByUrl('/collections');
       });
   }

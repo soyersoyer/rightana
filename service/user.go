@@ -41,6 +41,23 @@ func CreateUser(input *CreateUserT) (*User, error) {
 	if !passwordCheck(input.Password) {
 		return nil, errors.PasswordTooShort
 	}
+
+	_, err := db.GetUserByEmail(input.Email)
+	if err != nil && err != db.ErrKeyNotExists {
+		return nil, errors.DBError.T(input.Email).Wrap(err)
+	}
+	if err == nil {
+		return nil, errors.UserEmailExist.T(input.Email)
+	}
+
+	_, err = db.GetUserByName(input.Name)
+	if err != nil && err != db.ErrKeyNotExists {
+		return nil, errors.DBError.T(input.Name).Wrap(err)
+	}
+	if err == nil {
+		return nil, errors.UserNameExist.T(input.Name)
+	}
+
 	hashedPass, err := hashPassword(input.Password)
 	if err != nil {
 		return nil, err
@@ -49,6 +66,7 @@ func CreateUser(input *CreateUserT) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	user := &db.User{
 		Email:    input.Email,
 		Name:     input.Name,
@@ -56,10 +74,8 @@ func CreateUser(input *CreateUserT) (*User, error) {
 		Created:  time.Now().UnixNano(),
 		IsAdmin:  isFirstUser,
 	}
+
 	if err := db.InsertUser(user); err != nil {
-		if err == db.ErrKeyExists {
-			return nil, errors.UserExist.T(input.Email)
-		}
 		return nil, errors.DBError.Wrap(err, user)
 	}
 
@@ -103,6 +119,24 @@ func GetUserByEmail(email string) (*User, error) {
 	user, err := db.GetUserByEmail(email)
 	if err != nil {
 		return nil, errors.UserNotExist.T(email).Wrap(err)
+	}
+	return user, nil
+}
+
+// GetUserByName fetch an user by the user's name
+func GetUserByName(name string) (*User, error) {
+	user, err := db.GetUserByName(name)
+	if err != nil {
+		return nil, errors.UserNotExist.T(name).Wrap(err)
+	}
+	return user, nil
+}
+
+// GetUserByID fetch an user by the user's email
+func GetUserByID(ID uint64) (*User, error) {
+	user, err := db.GetUserByID(ID)
+	if err != nil {
+		return nil, errors.UserNotExist.T(string(ID)).Wrap(err)
 	}
 	return user, nil
 }

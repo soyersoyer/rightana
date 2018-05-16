@@ -29,7 +29,7 @@ export class DeleteAccountComponent implements OnInit {
 
   deleteAccount() {
     this.backend
-      .deleteUser(this.auth.email, this.form.value.password)
+      .deleteUser(this.auth.name, this.form.value.password)
       .subscribe(_ => {
         this.toasty.success('Account delete success');
         this.auth.unset();

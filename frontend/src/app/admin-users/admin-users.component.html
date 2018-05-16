@@ -3,6 +3,7 @@
   <table class="table">
     <thead>
       <tr>
+        <th scope="col">ID</th>
         <th scope="col">Name</th>
         <th scope="col">Email</th>
         <th scope="col">Created</th>
@@ -13,6 +14,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let user of users">
+        <th scope="row">{{user.id}}</th>
         <td>{{user.name}}</td>
         <td>{{user.email}}</td>
         <td>{{user.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>

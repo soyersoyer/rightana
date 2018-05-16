@@ -22,8 +22,8 @@ func CreateAuthToken(email string, password string) (string, *User, error) {
 		return "", nil, errors.PasswordNotMatch
 	}
 	token := db.AuthToken{
-		ID:         uuid.Must(uuid.NewV4()).String(),
-		OwnerEmail: email,
+		ID:      uuid.Must(uuid.NewV4()).String(),
+		OwnerID: user.ID,
 	}
 	if err := db.InsertAuthToken(&token); err != nil {
 		return "", nil, errors.DBError.Wrap(err, token)
@@ -43,18 +43,18 @@ func DeleteAuthToken(tokenID string) error {
 }
 
 // CheckAuthToken check whether the AuthToken is valid
-func CheckAuthToken(tokenID string) (string, error) {
+func CheckAuthToken(tokenID string) (uint64, error) {
 	token, err := getAuthToken(tokenID)
 	if err != nil {
-		return "", errors.AuthtokenExpired
+		return 0, errors.AuthtokenExpired
 	}
 
 	expiryTime := time.Unix(0, token.Created).Add(time.Duration(token.TTL) * time.Second)
 	if expiryTime.Before(time.Now()) {
 		DeleteAuthToken(tokenID)
-		return "", errors.AuthtokenExpired
+		return 0, errors.AuthtokenExpired
 	}
-	return token.OwnerEmail, nil
+	return token.OwnerID, nil
 }
 
 func getAuthToken(tokenID string) (*AuthToken, error) {

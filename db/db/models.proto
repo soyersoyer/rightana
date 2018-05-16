@@ -2,20 +2,21 @@ syntax = "proto3";
 package db;
 
 message User {
-	string Email = 1;
-	string Password = 2;
-	int64 Created = 3; // unixnano
-	string Name = 4;
+	uint64 ID = 1;
+	string Email = 2;
+	string Password = 3;
+	int64 Created = 4; // unixnano
+	string Name = 5;
 	bool IsAdmin = 10;
 }
 
 message Teammate {
-	string Email = 1;
+	uint64 ID = 1;
 }
 
 message Collection {
 	string ID = 1;
-	string OwnerEmail = 2;
+	uint64 OwnerID = 2;
 	string Name = 3;
 	repeated Teammate Teammates = 4;
 	int64 Created = 5; // unixnano
@@ -23,7 +24,7 @@ message Collection {
 
 message AuthToken {
 	string ID = 1;
-	string OwnerEmail = 2;
+	uint64 OwnerID = 2;
 	int32 TTL = 3;
 	int64 Created = 4; // unixnano
 }

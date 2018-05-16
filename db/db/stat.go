@@ -36,7 +36,7 @@ type CollectionDataInputT struct {
 type CollectionDataT struct {
 	ID           string        `json:"id"`
 	Name         string        `json:"name"`
-	OwnerEmail   string        `json:"owner_email"`
+	OwnerID      uint64        `json:"owner_id"`
 	SessionSums  []*bucketSumT `json:"session_sums"`
 	PageviewSums []*bucketSumT `json:"pageview_sums"`
 }
@@ -208,7 +208,7 @@ func GetBucketSums(collection *Collection, input *CollectionDataInputT) (*Collec
 	output := &CollectionDataT{
 		Name:         collection.Name,
 		ID:           collection.ID,
-		OwnerEmail:   collection.OwnerEmail,
+		OwnerID:      collection.OwnerID,
 		SessionSums:  nil,
 		PageviewSums: nil,
 	}

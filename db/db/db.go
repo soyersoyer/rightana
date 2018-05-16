@@ -54,26 +54,20 @@ func InitDatabase(basedirParam string) {
 
 // UpdateUser updates an user
 func UpdateUser(user *User) error {
-	return cipo.Update(user.Email, user)
+	return cipo.Update(user.ID, user)
 }
 
 // InsertUser inserts an user
 func InsertUser(user *User) error {
-	return cipo.Insert(user.Email, user)
-}
-
-// UpsertUser upserts an user
-func UpsertUser(user *User) error {
-	return cipo.Upsert(user.Email, user)
+	return cipo.Insert(nil, user)
 }
 
 // GetUsers returns the users
 func GetUsers() ([]User, error) {
 	users := []User{}
 
-	key := ""
 	user := User{}
-	err := cipo.Iterate(&key, &user, func() error {
+	err := cipo.Iterate(&user.ID, &user, func() error {
 		users = append(users, user)
 		return nil
 	})
@@ -87,9 +81,8 @@ func GetUsers() ([]User, error) {
 func GetAdminUsers() ([]User, error) {
 	users := []User{}
 
-	key := ""
 	user := User{}
-	err := cipo.Iterate(&key, &user, func() error {
+	err := cipo.Iterate(&user.ID, &user, func() error {
 		if user.IsAdmin {
 			users = append(users, user)
 		}
@@ -103,66 +96,103 @@ func GetAdminUsers() ([]User, error) {
 
 // CountUsers returns the count of the users
 func CountUsers() (int, error) {
-	key := ""
 	user := User{}
 	count := 0
-	if err := cipo.CountPrefix(key, &user, &count); err != nil {
+	if err := cipo.CountPrefix("", &user, &count); err != nil {
 		return 0, err
 	}
 	return count, nil
 }
 
+// GetUserByID returns an user with the email parameter
+func GetUserByID(ID uint64) (*User, error) {
+	user := &User{}
+	err := cipo.Get(ID, user)
+	return user, err
+}
+
 // GetUserByEmail returns an user with the email parameter
 func GetUserByEmail(email string) (*User, error) {
-	user := &User{}
-	err := cipo.Get(email, user)
-	return user, err
+	user := User{}
+	ret := User{}
+	err := cipo.Iterate(&user.ID, &user, func() error {
+		if user.Email == email {
+			ret = user
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if ret.ID == 0 {
+		return nil, ErrKeyNotExists
+	}
+	return &ret, err
+}
+
+// GetUserByName returns an user with the name parameter
+func GetUserByName(name string) (*User, error) {
+	user := User{}
+	ret := User{}
+	err := cipo.Iterate(&user.ID, &user, func() error {
+		if user.Name == name {
+			ret = user
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if ret.ID == 0 {
+		return nil, ErrKeyNotExists
+	}
+	return &ret, err
 }
 
 // DeleteUser deletes an user
 func DeleteUser(user *User) error {
 	return cipo.Bolt().Update(func(tx *bolt.Tx) error {
-		if err := cipo.DeleteTx(tx, user.Email, user); err != nil {
+		if err := cipo.DeleteTx(tx, user.ID, user); err != nil {
 			return err
 		}
 
-		if err := deleteAuthTokensByUserEmailTx(tx, user.Email); err != nil {
+		if err := deleteAuthTokensByUserIDTx(tx, user.ID); err != nil {
 			return err
 		}
-		if err := deleteCollectionsByUserEmailTx(tx, user.Email); err != nil {
+		if err := deleteCollectionsByUserIDTx(tx, user.ID); err != nil {
 			return err
 		}
-		return deleteTeammateByUserEmailTx(tx, user.Email)
+		return deleteTeammateByUserIDTx(tx, user.ID)
 	})
 }
 
-func deleteAuthTokensByUserEmailTx(tx *bolt.Tx, email string) error {
+func deleteAuthTokensByUserIDTx(tx *bolt.Tx, ID uint64) error {
 	key := ""
 	v := AuthToken{}
 	return cipo.IterateTx(tx, &key, &v, func() error {
-		if v.OwnerEmail == email {
+		if v.OwnerID == ID {
 			return cipo.DeleteTx(tx, key, &v)
 		}
 		return nil
 	})
 }
 
-func deleteCollectionsByUserEmailTx(tx *bolt.Tx, email string) error {
+func deleteCollectionsByUserIDTx(tx *bolt.Tx, ID uint64) error {
 	key := ""
 	v := Collection{}
 	return cipo.IterateTx(tx, &key, &v, func() error {
-		if v.OwnerEmail == email {
+		if v.OwnerID == ID {
 			return deleteCollectionTx(tx, &v)
 		}
 		return nil
 	})
 }
 
-func deleteTeammateByUserEmailTx(tx *bolt.Tx, email string) error {
+func deleteTeammateByUserIDTx(tx *bolt.Tx, ID uint64) error {
 	key := ""
 	v := Collection{}
 	return cipo.IterateTx(tx, &key, &v, func() error {
-		idx := findTeammate(&v, email)
+		idx := findTeammate(&v, ID)
 		if idx == -1 {
 			return nil
 		}
@@ -246,12 +276,12 @@ func GetCollections() ([]Collection, error) {
 }
 
 // GetCollectionsOwnedByUser returns the collections owned by user
-func GetCollectionsOwnedByUser(email string) ([]Collection, error) {
+func GetCollectionsOwnedByUser(ID uint64) ([]Collection, error) {
 	key := ""
 	collection := Collection{}
 	collections := []Collection{}
 	err := cipo.Iterate(&key, &collection, func() error {
-		if collection.OwnerEmail == email {
+		if collection.OwnerID == ID {
 			collections = append(collections, collection)
 		}
 		return nil
@@ -262,13 +292,13 @@ func GetCollectionsOwnedByUser(email string) ([]Collection, error) {
 	return collections, nil
 }
 
-// GetCollectionsByUserEmail returns collections for the user with the email address
-func GetCollectionsByUserEmail(email string) ([]Collection, error) {
+// GetCollectionsByUserID returns collections for the user with the email address
+func GetCollectionsByUserID(ID uint64) ([]Collection, error) {
 	key := ""
 	collection := Collection{}
 	collections := []Collection{}
 	err := cipo.Iterate(&key, &collection, func() error {
-		if collection.OwnerEmail == email || UserIsTeammate(&collection, email) {
+		if collection.OwnerID == ID || UserIsTeammate(&collection, ID) {
 			collections = append(collections, collection)
 		}
 		return nil
@@ -280,9 +310,9 @@ func GetCollectionsByUserEmail(email string) ([]Collection, error) {
 }
 
 // UserIsTeammate check whether the User inside the collection's team
-func UserIsTeammate(collection *Collection, email string) bool {
+func UserIsTeammate(collection *Collection, ID uint64) bool {
 	for _, v := range collection.Teammates {
-		if v.Email == email {
+		if v.ID == ID {
 			return true
 		}
 	}

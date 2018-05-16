@@ -38,8 +38,8 @@ func getUserCtx(ctx context.Context) *service.User {
 func userBaseHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			email := chi.URLParam(r, "email")
-			user, err := service.GetUserByEmail(email)
+			name := chi.URLParam(r, "name")
+			user, err := service.GetUserByName(name)
 			if err != nil {
 				return err
 			}
@@ -52,9 +52,9 @@ func userBaseHandler(next http.Handler) http.Handler {
 func userAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userEmail := getUserEmailCtx(r.Context())
+			userID := getUserIDCtx(r.Context())
 			user := getUserCtx(r.Context())
-			if user.Email != userEmail {
+			if user.ID != userID {
 				return errors.AccessDenied
 			}
 			next.ServeHTTP(w, r)
@@ -78,7 +78,7 @@ func updateUserPasswordE(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	return respond(w, user.Email)
+	return respond(w, "")
 }
 
 var updateUserPassword = handleError(updateUserPasswordE)

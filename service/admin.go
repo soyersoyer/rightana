@@ -7,6 +7,7 @@ import (
 
 // UserInfoT is struct for clients, stores the user information
 type UserInfoT struct {
+	ID              uint64 `json:"id"`
 	Email           string `json:"email"`
 	Name            string `json:"name"`
 	Created         int64  `json:"created"`
@@ -22,11 +23,11 @@ func GetUsers() ([]UserInfoT, error) {
 	}
 	userInfos := []UserInfoT{}
 	for _, u := range users {
-		collections, err := db.GetCollectionsOwnedByUser(u.Email)
+		collections, err := db.GetCollectionsOwnedByUser(u.ID)
 		if err != nil {
 			return nil, errors.DBError.Wrap(err)
 		}
-		userInfos = append(userInfos, UserInfoT{u.Email, u.Name, u.Created, u.IsAdmin, len(collections)})
+		userInfos = append(userInfos, UserInfoT{u.ID, u.Email, u.Name, u.Created, u.IsAdmin, len(collections)})
 	}
 	return userInfos, nil
 }
@@ -38,6 +39,7 @@ func GetUserInfo(email string) (*UserInfoT, error) {
 		return nil, errors.UserNotExist.T(email).Wrap(err)
 	}
 	return &UserInfoT{
+		user.ID,
 		user.Email,
 		user.Name,
 		user.Created,
@@ -97,7 +99,7 @@ func UpdateUser(email string, input *UserUpdateT) error {
 type CollectionInfoT struct {
 	ID            string `json:"id"`
 	Name          string `json:"name"`
-	OwnerEmail    string `json:"owner_email"`
+	OwnerName     string `json:"owner_name"`
 	Created       int64  `json:"created"`
 	TeammateCount int    `json:"teammate_count"`
 }
@@ -110,10 +112,14 @@ func GetCollections() ([]CollectionInfoT, error) {
 	}
 	collectionInfos := []CollectionInfoT{}
 	for _, c := range collections {
+		user, err := db.GetUserByID(c.OwnerID)
+		if err != nil {
+			return nil, errors.DBError.T(string(c.OwnerID)).Wrap(err)
+		}
 		collectionInfos = append(collectionInfos, CollectionInfoT{
 			c.ID,
 			c.Name,
-			c.OwnerEmail,
+			user.Name,
 			c.Created,
 			len(c.Teammates)})
 	}

@@ -16,7 +16,9 @@ export class User {
 }
 
 export class UserInfo {
+  id: number
   email: string;
+  name: string;
   created: number;
   is_admin: boolean;
   collection_count: number;
@@ -40,7 +42,7 @@ export class Collection {
 export class CollectionInfo {
   id: string;
   name: string;
-  owner_email: string;
+  owner_name: string;
   created: number;
   teammate_count: number;
 }
@@ -65,7 +67,7 @@ export class BucketSum {
 export class CollectionData {
   id: string;
   name: string;
-  owner_email: string;
+  owner_id: number;
   session_sums: BucketSum[];
   pageview_sums: BucketSum[];
 }
@@ -155,23 +157,23 @@ export class AuthInterceptor implements HttpInterceptor {
 @Injectable()
 export class AuthService {
   token: string;
-  email: string;
+  name: string;
   is_admin: boolean;
 
   constructor(
     private router: Router,
   ) {
     this.token = localStorage.getItem('token');
-    this.email = localStorage.getItem('email');
+    this.name = localStorage.getItem('name');
     this.is_admin = localStorage.getItem('is_admin') === 'true';
   }
 
-  set(token: string, email: string, is_admin: boolean) {
+  set(token: string, name: string, is_admin: boolean) {
     this.token = token;
-    this.email = email;
+    this.name = name;
     this.is_admin = is_admin;
     localStorage.setItem('token', token);
-    localStorage.setItem('email', email);
+    localStorage.setItem('name', name);
     localStorage.setItem('is_admin', is_admin?'true':'false');
   }
 
@@ -271,12 +273,12 @@ export class BackendService {
    return this.http.post<Pageview[]>(`/api/collections/${collectionId}/pageviews`, JSON.stringify({session_key: sessionKey}));
   }
 
-  updateUserPassword(email: string, currentPassword: string, password: string): Observable<any> {
-    return this.http.patch(`/api/users/${email}/password`, {currentPassword, password});
+  updateUserPassword(name: string, currentPassword: string, password: string): Observable<any> {
+    return this.http.patch(`/api/users/${name}/settings/password`, {currentPassword, password});
   }
 
-  deleteUser(email: string, password: string): Observable<any> {
-   return this.http.post(`/api/users/${email}/delete`, {password});
+  deleteUser(name: string, password: string): Observable<any> {
+   return this.http.post(`/api/users/${name}/settings/delete`, {password});
   }
 
   getUsers(): Observable<UserInfo[]> {

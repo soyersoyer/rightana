@@ -17,8 +17,8 @@ type collectionT struct {
 }
 
 func getCollectionSummariesE(w http.ResponseWriter, r *http.Request) error {
-	ownerEmail := getUserEmailCtx(r.Context())
-	summary, err := service.GetCollectionSummariesByUserEmail(ownerEmail)
+	ownerID := getUserIDCtx(r.Context())
+	summary, err := service.GetCollectionSummariesByUserID(ownerID)
 	if err != nil {
 		return err
 	}
@@ -33,8 +33,8 @@ func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	ownerEmail := getUserEmailCtx(r.Context())
-	collection, err := service.CreateCollection(ownerEmail, input.Name)
+	ownerID := getUserIDCtx(r.Context())
+	collection, err := service.CreateCollection(ownerID, input.Name)
 	if err != nil {
 		return err
 	}
@@ -71,9 +71,9 @@ func collectionBaseHandler(next http.Handler) http.Handler {
 func collectionReadAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userEmail := getUserEmailCtx(r.Context())
+			userID := getUserIDCtx(r.Context())
 			collection := getCollectionCtx(r.Context())
-			if err := service.CollectionReadAccessCheck(collection, userEmail); err != nil {
+			if err := service.CollectionReadAccessCheck(collection, userID); err != nil {
 				return err
 			}
 			next.ServeHTTP(w, r)
@@ -84,9 +84,9 @@ func collectionReadAccessHandler(next http.Handler) http.Handler {
 func collectionWriteAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userEmail := getUserEmailCtx(r.Context())
+			userID := getUserIDCtx(r.Context())
 			collection := getCollectionCtx(r.Context())
-			if err := service.CollectionWriteAccessCheck(collection, userEmail); err != nil {
+			if err := service.CollectionWriteAccessCheck(collection, userID); err != nil {
 				return err
 			}
 			next.ServeHTTP(w, r)
@@ -155,15 +155,11 @@ func deleteCollectionShardE(w http.ResponseWriter, r *http.Request) error {
 
 var deleteCollectionShard = handleError(deleteCollectionShardE)
 
-type teammateT struct {
-	Email string `json:"email"`
-}
-
 func getTeammatesE(w http.ResponseWriter, r *http.Request) error {
 	collection := getCollectionCtx(r.Context())
-	teammates := []*teammateT{}
-	for _, v := range collection.Teammates {
-		teammates = append(teammates, &teammateT{v.Email})
+	teammates, err := service.GetCollectionTeammates(collection)
+	if err != nil {
+		return err
 	}
 	return respond(w, teammates)
 }
@@ -172,11 +168,11 @@ var getTeammates = handleError(getTeammatesE)
 
 func addTeammateE(w http.ResponseWriter, r *http.Request) error {
 	collection := getCollectionCtx(r.Context())
-	var input teammateT
+	var input service.TeammateT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
-	if err := service.AddTeammate(collection, input.Email); err != nil {
+	if err := service.AddTeammate(collection, input); err != nil {
 		return err
 	}
 	return respond(w, input)

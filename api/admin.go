@@ -12,8 +12,8 @@ import (
 func adminAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userEmail := getUserEmailCtx(r.Context())
-			user, err := service.GetUserByEmail(userEmail)
+			userID := getUserIDCtx(r.Context())
+			user, err := service.GetUserByID(userID)
 			if err != nil {
 				return err
 			}

@@ -32,7 +32,9 @@ func createTokenE(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return respond(w, createTokenOutT{tokenID, service.UserInfoT{
+		ID:      user.ID,
 		Email:   user.Email,
+		Name:    user.Name,
 		Created: user.Created,
 		IsAdmin: user.IsAdmin},
 	})

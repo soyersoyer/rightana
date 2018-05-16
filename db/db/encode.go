@@ -37,11 +37,13 @@ func bucketName(value interface{}) []byte {
 func protoEncode(value interface{}) ([]byte, error) {
 	switch value := value.(type) {
 	default:
-		return nil, fmt.Errorf("protoEncode: invalid type: %T", value)
+		return nil, fmt.Errorf("protoEncode: invalid type: %T %v", value, value)
 	case string:
 		return []byte(value), nil
 	case uint32:
 		return marshal(value), nil
+	case uint64:
+		return marshaluint64(value), nil
 	case proto.Message:
 		return proto.Marshal(value)
 	}
@@ -58,6 +60,10 @@ func protoDecode(data []byte, value interface{}) error {
 		var err error
 		*value, err = unmarshal(data)
 		return err
+	case *uint64:
+		var err error
+		*value, err = unmarshaluint64(data)
+		return err
 	case proto.Message:
 		return proto.Unmarshal(data, value)
 	}
@@ -72,11 +78,38 @@ func marshal(id uint32) []byte {
 	}
 }
 
+func marshaluint64(id uint64) []byte {
+	return []byte{
+		byte(id >> 56),
+		byte(id >> 48),
+		byte(id >> 40),
+		byte(id >> 32),
+		byte(id >> 24),
+		byte(id >> 16),
+		byte(id >> 8),
+		byte(id),
+	}
+}
+
 func unmarshal(b []byte) (uint32, error) {
 	if len(b) != 4 {
 		return 0, errors.New("unmarshal uint32 invalid length")
 	}
 	return uint32(b[3]) | uint32(b[2])<<8 | uint32(b[1])<<16 | uint32(b[0])<<24, nil
+}
+
+func unmarshaluint64(b []byte) (uint64, error) {
+	if len(b) != 8 {
+		return 0, errors.New("unmarshal uint64 invalid length")
+	}
+	return uint64(b[7]) |
+		uint64(b[6])<<8 |
+		uint64(b[5])<<16 |
+		uint64(b[4])<<24 |
+		uint64(b[3])<<32 |
+		uint64(b[2])<<40 |
+		uint64(b[1])<<48 |
+		uint64(b[0])<<56, nil
 }
 
 func marshalTime(t time.Time) []byte {

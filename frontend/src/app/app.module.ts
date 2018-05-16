@@ -48,20 +48,20 @@ const routes: Routes = [
     { path: 'change-password', component: ChangePasswordComponent},
     { path: 'delete-account', component: DeleteAccountComponent},
   ]},
-  { path: 'collections', component: CollectionComponent},
-  { path: 'collections/create', component: CollectionCreateComponent},
-  { path: 'collections/:collectionId', component: CollectionDashboardComponent, children: [
-    { path: '', redirectTo: 'statistics', pathMatch: 'full'},
-    { path: 'statistics', component: CollectionStatComponent},
-    { path: 'sessions', component: SessionComponent},
-    { path: 'settings', component: CollectionSettingsComponent},
-  ]},
   { path: 'admin', component: AdminComponent, children: [
     { path: '', redirectTo: 'users', pathMatch: 'full'},
     { path: 'users', component: AdminUsersComponent},
     { path: 'users/:email', component: AdminUsersEditComponent},
     { path: 'collections', component: AdminCollectionsComponent},
-  ]}
+  ]},
+  { path: ':user', component: CollectionComponent},
+  { path: ':user/create', component: CollectionCreateComponent},
+  { path: ':user/:collectionId', component: CollectionDashboardComponent, children: [
+    { path: '', redirectTo: 'statistics', pathMatch: 'full'},
+    { path: 'statistics', component: CollectionStatComponent},
+    { path: 'sessions', component: SessionComponent},
+    { path: 'settings', component: CollectionSettingsComponent},
+  ]},
 ];
 
 @NgModule({
