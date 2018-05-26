@@ -30,7 +30,7 @@ export class ChangePasswordComponent implements OnInit {
   changePassword() {
     const v = this.form.value
     this.backend
-      .updateUserPassword(this.auth.name, v.currentPassword, v.password)
+      .updateUserPassword(this.auth.user, v.currentPassword, v.password)
       .subscribe(_ => {
         this.form.reset();
         this.toasty.success("Password change success");

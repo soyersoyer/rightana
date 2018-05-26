@@ -20,12 +20,6 @@
       </div>
     </div>
     <rana-collection-teammates [collection]="collection"></rana-collection-teammates>
-    <h2 class="mt-5">Delete collection</h2>
-    <div class="card">
-      <div class="card-body">
-        <button type="submit" class="btn btn-danger btn-lg w-100" (click)="delete()">Delete</button>
-      </div>
-    </div>
     <ng-container *ngIf="shards">
       <h2 class="mt-5">Storage</h2>
       <div class="card">
@@ -45,5 +39,11 @@
         </div>
       </div>
     </ng-container>
+    <h2 class="mt-5">Delete collection</h2>
+    <div class="card">
+      <div class="card-body">
+        <button type="submit" class="btn btn-danger btn-lg w-100" (click)="delete()">Delete</button>
+      </div>
+    </div>
   </div>
 </div>

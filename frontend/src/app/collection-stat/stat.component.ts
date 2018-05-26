@@ -31,7 +31,7 @@ export class CollectionStatComponent implements OnInit, OnDestroy {
 
   getSums(setup: Setup) {
     this.backend
-      .getCollectionStatData(setup.collectionId, setup.from, setup.to, setup.filter)
+      .getCollectionStatData(this.dashboard.user, setup.collectionId, setup.from, setup.to, setup.filter)
       .subscribe(sums => {
         this.sums = sums;
         this.setup.set(setup);

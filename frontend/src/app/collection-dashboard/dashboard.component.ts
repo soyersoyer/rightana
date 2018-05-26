@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { BackendService, AuthService, CollectionData, BucketSum } from '../backend.service';
+import { UserComponent } from '../user/user.component';
 
 class Interval {
   day: number;
@@ -191,6 +192,7 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private router: Router,
     private route: ActivatedRoute,
+    private userComp: UserComponent,
   ) { }
 
   chartClick(c, i) {
@@ -283,7 +285,7 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
     if (this.setup.chartLock) {
       return;
     }
-    this.backend.getCollectionData(this.setup.collectionId, this.setup.chartFrom, this.setup.chartTo, this.selectedBucket.name,
+    this.backend.getCollectionData(this.user, this.setup.collectionId, this.setup.chartFrom, this.setup.chartTo, this.selectedBucket.name,
       this.timezone, this.setup.filter)
       .subscribe(collection => {
         this.collection = collection;
@@ -291,7 +293,9 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-
+  get user(): string {
+    return this.userComp.user;
+  }
 
   padNumber(n: number): string {
     return n<10?"0"+n:""+n

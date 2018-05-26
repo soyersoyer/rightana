@@ -13,7 +13,7 @@
     </ul>
     <ul *ngIf="loggedIn" class="navbar-nav ml-auto">
       <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/collections">Collections</a>
+        <a class="nav-link" [routerLink]="user">Collections</a>
       </li>
       <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" routerLink="/settings">Settings</a>

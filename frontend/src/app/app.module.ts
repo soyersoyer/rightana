@@ -35,6 +35,7 @@ import { AdminComponent } from './admin/admin.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminCollectionsComponent } from './admin-collections/admin-collections.component';
 import { AdminUsersEditComponent } from './admin-users-edit/admin-users-edit.component';
+import { UserComponent } from './user/user.component';
 
 
 
@@ -54,14 +55,17 @@ const routes: Routes = [
     { path: 'users/:email', component: AdminUsersEditComponent},
     { path: 'collections', component: AdminCollectionsComponent},
   ]},
-  { path: ':user', component: CollectionComponent},
-  { path: ':user/create', component: CollectionCreateComponent},
-  { path: ':user/:collectionId', component: CollectionDashboardComponent, children: [
-    { path: '', redirectTo: 'statistics', pathMatch: 'full'},
-    { path: 'statistics', component: CollectionStatComponent},
-    { path: 'sessions', component: SessionComponent},
-    { path: 'settings', component: CollectionSettingsComponent},
+  { path: ':user', component: UserComponent, children: [
+    { path: "", component: CollectionComponent},
+    { path: 'create', component: CollectionCreateComponent},
+    { path: ':collectionId', component: CollectionDashboardComponent, children: [
+      { path: '', redirectTo: 'statistics', pathMatch: 'full'},
+      { path: 'statistics', component: CollectionStatComponent},
+      { path: 'sessions', component: SessionComponent},
+      { path: 'settings', component: CollectionSettingsComponent},
+    ]},
   ]},
+
 ];
 
 @NgModule({
@@ -90,6 +94,7 @@ const routes: Routes = [
     AdminUsersComponent,
     AdminCollectionsComponent,
     AdminUsersEditComponent,
+    UserComponent,
   ],
   imports: [
     BrowserModule,

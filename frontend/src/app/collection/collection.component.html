@@ -1,7 +1,7 @@
 <div class="container">
   <div class="mt-2">
     <div class="d-flex align-items-center flex-wrap text-truncate">
-      <h3><a routerLink=".">collections</a></h3>
+      <h3><a routerLink=".">{{user}}</a></h3>
       <a role="button" class="btn btn-secondary btn-sm ml-auto" routerLink="create">✚</a>
     </div>
     <div class="row">
@@ -9,7 +9,8 @@
         <div class="card my-2">
           <div class="card-body" style="width: 18rem">
             <div class="card-title">
-                <a [routerLink]="[c.id]" routerLinkActive="active">{{c.name}}</a>
+                <a *ngIf="c.user !== user" [routerLink]="['..', c.user, c.id]" routerLinkActive="active">{{c.user}} / {{c.name}}</a>
+                <a *ngIf="c.user === user" [routerLink]="['..', c.user, c.id]" routerLinkActive="active">{{c.name}}</a>
             </div>
             <div class="card-text d-flex justify-content-between pr-4">
               {{c.pageview_count}}

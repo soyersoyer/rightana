@@ -16,6 +16,10 @@ export class AppComponent {
     return this.auth.loggedIn;
   }
 
+  get user(): string {
+    return this.auth.user;
+  }
+
   get isAdmin(): boolean {
     return this.auth.isAdmin;
   }

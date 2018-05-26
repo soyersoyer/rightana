@@ -1,7 +1,7 @@
 <div class="mt-2 container" *ngIf="collection">
   <div>
     <div>
-      <h3><a routerLink="..">collections</a> / <a routerLink="."><b>{{collection.name}}</b></a></h3>
+      <h3><a routerLink="..">{{user}}</a> / <a routerLink="."><b>{{collection.name}}</b></a></h3>
     </div>
     <ul class="nav nav-tabs mt-3">
       <li class="nav-item">
@@ -11,7 +11,7 @@
         <a class="nav-link" routerLink="sessions" routerLinkActive="active">Sessions</a>
       </li>
       <li class="nav-item">
-        <a *ngIf="collection.owner_name == auth.name" class="nav-link" routerLink="settings" routerLinkActive="active">Settings</a>
+        <a *ngIf="collection.owner_name == auth.user" class="nav-link" routerLink="settings" routerLinkActive="active">Settings</a>
       </li>
     </ul>
   </div>

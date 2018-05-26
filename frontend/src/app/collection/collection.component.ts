@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { tap } from 'rxjs/operators';
 
+import { UserComponent } from '../user/user.component';
 import { BackendService, CollectionSummary } from '../backend.service';
 
 @Component({
@@ -16,19 +17,26 @@ export class CollectionComponent implements OnInit {
     private backend: BackendService,
     private route: ActivatedRoute,
     private router: Router,
+    private userComp: UserComponent,
   ) { }
 
   ngOnInit() {
-    this.getCollections()
+    this.route.params.forEach((params: Params) => {
+      this.getCollections(this.user)
       .subscribe(_ => {
         if (this.route.snapshot.children.length === 0) {
           this.navigateToCreateIfEmpty();
         };
       });
+    })
   }
 
-  getCollections(): Observable<CollectionSummary[]> {
-    return this.backend.getCollectionSummaries()
+  get user(): string {
+    return this.userComp.user;
+  }
+
+  getCollections(user: string): Observable<CollectionSummary[]> {
+    return this.backend.getCollectionSummaries(user)
       .do(collections => this.collections = collections);
   }
 

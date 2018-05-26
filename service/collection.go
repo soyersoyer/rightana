@@ -111,6 +111,7 @@ func DeleteCollection(collection *Collection) error {
 // CollectionSummaryT the struct for the Collection's summary
 type CollectionSummaryT struct {
 	ID              string  `json:"id"`
+	User            string  `json:"user"`
 	Name            string  `json:"name"`
 	PageviewCount   int     `json:"pageview_count"`
 	PageviewPercent float32 `json:"pageview_percent"`
@@ -128,8 +129,13 @@ func GetCollectionSummariesByUserID(ID uint64) ([]CollectionSummaryT, error) {
 		if err != nil {
 			return nil, errors.DBError.Wrap(err, v.ID)
 		}
+		user, err := db.GetUserByID(v.OwnerID)
+		if err != nil {
+			return nil, errors.DBError.Wrap(err, "can't get user", v.OwnerID)
+		}
 		ret = append(ret, CollectionSummaryT{
 			ID:              v.ID,
+			User:            user.Name,
 			Name:            v.Name,
 			PageviewCount:   count,
 			PageviewPercent: percent,

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { CollectionComponent } from '../collection/collection.component';
+import { UserComponent } from '../user/user.component';
 import { BackendService } from '../backend.service';
 
 @Component({
@@ -17,6 +17,7 @@ export class CollectionCreateComponent implements OnInit {
     private backend: BackendService,
     private router: Router,
     private route: ActivatedRoute,
+    private user: UserComponent,
   ) { }
 
   ngOnInit() {
@@ -26,7 +27,7 @@ export class CollectionCreateComponent implements OnInit {
   }
 
   create() {
-    this.backend.createCollection(this.form.value)
+    this.backend.createCollection(this.user.user, this.form.value)
       .subscribe(collection => this.router.navigate(['..', collection.id, 'settings'], {relativeTo: this.route}));
   }
 }

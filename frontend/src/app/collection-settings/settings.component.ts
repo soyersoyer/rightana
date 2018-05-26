@@ -3,6 +3,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Collection, Shard, BackendService } from '../backend.service';
+import { UserComponent } from '../user/user.component';
 
 @Component({
   selector: 'rana-collection-settings',
@@ -20,6 +21,7 @@ export class CollectionSettingsComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
+    private user: UserComponent,
   ) { }
 
   ngOnInit() {
@@ -36,7 +38,7 @@ export class CollectionSettingsComponent implements OnInit {
 
   getCollection(collectionId: string) {
     this.backend
-      .getCollection(collectionId)
+      .getCollection(this.user.user, collectionId)
       .subscribe(collection => {
         this.form.setValue(collection);
         this.collection = collection;
@@ -45,7 +47,7 @@ export class CollectionSettingsComponent implements OnInit {
 
   getCollectionShards(collectionId: string) {
    this.backend
-      .getCollectionShards(collectionId)
+      .getCollectionShards(this.user.user, collectionId)
       .subscribe(shards => {
         this.shards = shards;
         this.allSize = shards.reduce((a, b) => a + b.size, 0);
@@ -53,18 +55,18 @@ export class CollectionSettingsComponent implements OnInit {
   }
 
   save() {
-    this.backend.saveCollection(this.form.value)
+    this.backend.saveCollection(this.user.user, this.form.value)
       .subscribe(_ => this.router.navigate(['..'], {relativeTo: this.route}));
   }
 
   delete() {
-    this.backend.deleteCollection(this.form.value.id)
+    this.backend.deleteCollection(this.user.user, this.form.value.id)
       .subscribe(_ => this.router.navigate(['../..'], {relativeTo: this.route}));
   }
 
   deleteShard(shard: Shard) {
     this.backend
-      .deleteCollectionShard(this.collection.id, shard.id)
+      .deleteCollectionShard(this.user.user, this.collection.id, shard.id)
       .subscribe(_ => {
         this.getCollectionShards(this.collection.id);
       })

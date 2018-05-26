@@ -49,6 +49,7 @@ export class CollectionInfo {
 
 export class CollectionSummary {
   id: string;
+  user: string;
   name: string;
   pageview_count: number;
   pageview_percent: number;
@@ -157,23 +158,23 @@ export class AuthInterceptor implements HttpInterceptor {
 @Injectable()
 export class AuthService {
   token: string;
-  name: string;
+  user: string;
   is_admin: boolean;
 
   constructor(
     private router: Router,
   ) {
     this.token = localStorage.getItem('token');
-    this.name = localStorage.getItem('name');
+    this.user = localStorage.getItem('user');
     this.is_admin = localStorage.getItem('is_admin') === 'true';
   }
 
-  set(token: string, name: string, is_admin: boolean) {
+  set(token: string, user: string, is_admin: boolean) {
     this.token = token;
-    this.name = name;
+    this.user = user;
     this.is_admin = is_admin;
     localStorage.setItem('token', token);
-    localStorage.setItem('name', name);
+    localStorage.setItem('user', user);
     localStorage.setItem('is_admin', is_admin?'true':'false');
   }
 
@@ -217,68 +218,68 @@ export class BackendService {
     return this.http.delete(`api/authtokens/${authToken}`);
   }
 
-  createCollection(formData: any): Observable<Collection> {
-   return this.http.post<Collection>('/api/collections', JSON.stringify(formData));
+  createCollection(user: string, formData: any): Observable<Collection> {
+   return this.http.post<Collection>(`/api/users/${user}/collections`, JSON.stringify(formData));
   }
 
-  getCollectionSummaries(): Observable<CollectionSummary[]> {
-    return this.http.get<CollectionSummary[]>('/api/collections');
+  getCollectionSummaries(user: string): Observable<CollectionSummary[]> {
+    return this.http.get<CollectionSummary[]>(`/api/users/${user}/collections`);
   }
 
-  getCollection(collectionId: string): Observable<Collection> {
-   return this.http.get<Collection>(`/api/collections/${collectionId}`);
+  getCollection(user: string, collectionId: string): Observable<Collection> {
+   return this.http.get<Collection>(`/api/users/${user}/collections/${collectionId}`);
   }
 
-  saveCollection(formData: any): Observable<Collection> {
-    return this.http.put<Collection>(`/api/collections/${formData.id}`, JSON.stringify(formData));
+  saveCollection(user: string, formData: any): Observable<Collection> {
+    return this.http.put<Collection>(`/api/users/${user}/collections/${formData.id}`, JSON.stringify(formData));
   }
 
-  deleteCollection(collectionId: string): Observable<any> {
-    return this.http.delete(`/api/collections/${collectionId}`);
+  deleteCollection(user: string, collectionId: string): Observable<any> {
+    return this.http.delete(`/api/users/${user}/collections/${collectionId}`);
   }
 
-  getCollectionShards(collectionId: string): Observable<Shard[]> {
-    return this.http.get<Shard[]>(`/api/collections/${collectionId}/shards`);
+  getCollectionShards(user: string, collectionId: string): Observable<Shard[]> {
+    return this.http.get<Shard[]>(`/api/users/${user}/collections/${collectionId}/shards`);
   }
 
-  deleteCollectionShard(collectionId: string, shardId: string): Observable<any> {
-    return this.http.delete(`/api/collections/${collectionId}/shards/${shardId}`);
+  deleteCollectionShard(user: string, collectionId: string, shardId: string): Observable<any> {
+    return this.http.delete(`/api/users/${user}/collections/${collectionId}/shards/${shardId}`);
   }
 
-  getTeammates(collectionId: string): Observable<Teammate[]> {
-    return this.http.get<Teammate[]>(`/api/collections/${collectionId}/teammates`);
+  getTeammates(user: string, collectionId: string): Observable<Teammate[]> {
+    return this.http.get<Teammate[]>(`/api/users/${user}/collections/${collectionId}/teammates`);
   }
 
-  addTeammate(collectionId: string, email: string): Observable<Teammate> {
-    return this.http.post<Teammate>(`/api/collections/${collectionId}/teammates`, JSON.stringify({email}));
+  addTeammate(user: string, collectionId: string, email: string): Observable<Teammate> {
+    return this.http.post<Teammate>(`/api/users/${user}/collections/${collectionId}/teammates`, JSON.stringify({email}));
   }
 
-  removeTeammate(collectionId: string, email: string): Observable<Teammate> {
-    return this.http.delete<Teammate>(`/api/collections/${collectionId}/teammates/${email}`);
+  removeTeammate(user: string, collectionId: string, email: string): Observable<Teammate> {
+    return this.http.delete<Teammate>(`/api/users/${user}/collections/${collectionId}/teammates/${email}`);
   }
 
-  getCollectionData(collectionId: string, from: Date, to: Date, bucket: string, timezone: string, filter: any): Observable<CollectionData> {
-    return this.http.post<CollectionData>(`/api/collections/${collectionId}/data`, JSON.stringify({from, to, bucket, timezone, filter}));
+  getCollectionData(user: string, collectionId: string, from: Date, to: Date, bucket: string, timezone: string, filter: any): Observable<CollectionData> {
+    return this.http.post<CollectionData>(`/api/users/${user}/collections/${collectionId}/data`, JSON.stringify({from, to, bucket, timezone, filter}));
   }
 
-  getCollectionStatData(collectionId: string, from: Date, to: Date, filter: any): Observable<CollectionSumData> {
-    return this.http.post<CollectionSumData>(`/api/collections/${collectionId}/stat`, JSON.stringify({from, to, filter}));
+  getCollectionStatData(user: string, collectionId: string, from: Date, to: Date, filter: any): Observable<CollectionSumData> {
+    return this.http.post<CollectionSumData>(`/api/users/${user}/collections/${collectionId}/stat`, JSON.stringify({from, to, filter}));
   }
 
-  getSessions(collectionId: string, from: Date, to: Date, filter: any): Observable<Session[]> {
-   return this.http.post<Session[]>(`/api/collections/${collectionId}/sessions`, JSON.stringify({from, to, filter}));
+  getSessions(user: string, collectionId: string, from: Date, to: Date, filter: any): Observable<Session[]> {
+   return this.http.post<Session[]>(`/api/users/${user}/collections/${collectionId}/sessions`, JSON.stringify({from, to, filter}));
   }
 
-  getPageviews(collectionId: string, sessionKey: string): Observable<Pageview[]> {
-   return this.http.post<Pageview[]>(`/api/collections/${collectionId}/pageviews`, JSON.stringify({session_key: sessionKey}));
+  getPageviews(user: string, collectionId: string, sessionKey: string): Observable<Pageview[]> {
+   return this.http.post<Pageview[]>(`/api/users/${user}/collections/${collectionId}/pageviews`, JSON.stringify({session_key: sessionKey}));
   }
 
-  updateUserPassword(name: string, currentPassword: string, password: string): Observable<any> {
-    return this.http.patch(`/api/users/${name}/settings/password`, {currentPassword, password});
+  updateUserPassword(user: string, currentPassword: string, password: string): Observable<any> {
+    return this.http.patch(`/api/users/${user}/settings/password`, {currentPassword, password});
   }
 
-  deleteUser(name: string, password: string): Observable<any> {
-   return this.http.post(`/api/users/${name}/settings/delete`, {password});
+  deleteUser(user: string, password: string): Observable<any> {
+   return this.http.post(`/api/users/${user}/settings/delete`, {password});
   }
 
   getUsers(): Observable<UserInfo[]> {

@@ -41,7 +41,7 @@ export class SessionComponent implements OnInit, OnDestroy {
 
   getSessions(setup: Setup) {
     this.backend
-      .getSessions(setup.collectionId, setup.from, setup.to, setup.filter)
+      .getSessions(this.dashboard.user, setup.collectionId, setup.from, setup.to, setup.filter)
       .subscribe(sessions => {
         this.sessions = sessions;
         this.actual = 50;
@@ -60,7 +60,7 @@ export class SessionComponent implements OnInit, OnDestroy {
 
   getPageviews(session: SessionD) {
     this.backend
-      .getPageviews(this.setup.collectionId, session.key)
+      .getPageviews(this.dashboard.user, this.setup.collectionId, session.key)
       .subscribe(pageviews => session.pageviews = pageviews);
   }
 
