@@ -9,8 +9,8 @@
         <div class="card my-2">
           <div class="card-body" style="width: 18rem">
             <div class="card-title">
-                <a *ngIf="c.user !== user" [routerLink]="['..', c.user, c.id]" routerLinkActive="active">{{c.user}} / {{c.name}}</a>
-                <a *ngIf="c.user === user" [routerLink]="['..', c.user, c.id]" routerLinkActive="active">{{c.name}}</a>
+                <a *ngIf="c.user !== user" [routerLink]="['..', c.user, c.name]" routerLinkActive="active">{{c.user}} / {{c.name}}</a>
+                <a *ngIf="c.user === user" [routerLink]="['..', c.user, c.name]" routerLinkActive="active">{{c.name}}</a>
             </div>
             <div class="card-text d-flex justify-content-between pr-4">
               {{c.pageview_count}}

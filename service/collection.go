@@ -91,6 +91,15 @@ func GetCollection(id string) (*Collection, error) {
 	return collection, nil
 }
 
+// GetCollectionByName fetch a collection by name
+func GetCollectionByName(user *db.User, name string) (*Collection, error) {
+	collection, err := db.GetCollectionByName(user.ID, name)
+	if err != nil {
+		return nil, errors.CollectionNotExist.T(user.Name + "/" + name)
+	}
+	return collection, nil
+}
+
 // UpdateCollection updates the collection's name
 func UpdateCollection(collection *Collection, name string) error {
 	collection.Name = name

@@ -57,8 +57,9 @@ func getCollectionCtx(ctx context.Context) *service.Collection {
 func collectionBaseHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			collectionID := chi.URLParam(r, "collectionID")
-			collection, err := service.GetCollection(collectionID)
+			collectionName := chi.URLParam(r, "collectionName")
+			user := getUserCtx(r.Context())
+			collection, err := service.GetCollectionByName(user, collectionName)
 			if err != nil {
 				return err
 			}

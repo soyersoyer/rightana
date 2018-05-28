@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -70,7 +71,6 @@ var (
 	}
 	pageviewInput = pageviewInputT{}
 	sessionKey    = ""
-	collectionID  = ""
 )
 
 func TestPublicConfig(t *testing.T) {
@@ -291,15 +291,15 @@ func TestUpdateUserPassword(t *testing.T) {
 	}
 }
 
-func createCollectionSuccess(t *testing.T, name string, collection *collectionT) {
-	collname := collection.Name
+func createCollectionSuccess(t *testing.T, username string, collection *collectionT) {
+	collName := collection.Name
 	w, r := postJSON(collection)
-	user := getDbUserByName(name)
+	user := getDbUserByName(username)
 	r = setUserIDReq(r, user.ID)
 	createCollection(w, r)
 	testCode(t, w, 200)
 	testJSONBody(t, w, &collection)
-	if collection.Name != collname {
+	if collection.Name != collName {
 		t.Error(collection)
 	}
 }
@@ -421,29 +421,29 @@ func TestGetCollectionsOne(t *testing.T) {
 	if collection.PageviewPercent != 0.0 {
 		t.Error(collection)
 	}
-	collectionID = collection.ID
 }
 
 func TestGetCollection(t *testing.T) {
 	w, r := postJSON(nil)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(getCollection)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(getCollection))).ServeHTTP(w, r)
 	var collection collectionT
 	testJSONBody(t, w, &collection)
-	if collection.Name != collectionData.Name || collection.ID != collectionID {
+	if collection.Name != collectionData.Name {
 		t.Error(collection)
 	}
 }
 
 func TestUpdateCollection(t *testing.T) {
+	collName := "NewName"
 	collection := collectionT{
-		Name: "NewName",
+		Name: collName,
 	}
 	createCollectionSuccess(t, userData.Name, &collection)
 	collection.Name = "NewName2"
 	w, r := postJSON(collection)
-	r = setCollectionID(r, collection.ID)
-	collectionBaseHandler(http.HandlerFunc(updateCollection)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collName)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(updateCollection))).ServeHTTP(w, r)
 	var updated collectionT
 	testCode(t, w, 200)
 	testJSONBody(t, w, &updated)
@@ -458,8 +458,8 @@ func TestDeleteCollection(t *testing.T) {
 	}
 	createCollectionSuccess(t, userData.Name, &collection)
 	w, r := postJSON(nil)
-	r = setCollectionID(r, collection.ID)
-	collectionBaseHandler(http.HandlerFunc(deleteCollection)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collection.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(deleteCollection))).ServeHTTP(w, r)
 	var collectionID string
 	testJSONBody(t, w, &collectionID)
 	if collectionID != collection.ID {
@@ -468,7 +468,7 @@ func TestDeleteCollection(t *testing.T) {
 }
 
 func TestCreateSession(t *testing.T) {
-	sessionData.CollectionID = collectionID
+	sessionData.CollectionID = collectionData.ID
 	w, r := postJSON(sessionData)
 	r.Header.Set("User-Agent", userAgent)
 	createSession(w, r)
@@ -477,21 +477,22 @@ func TestCreateSession(t *testing.T) {
 
 func TestCollectionBaseHandler(t *testing.T) {
 	w, r := postJSON(nil)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		collection := getCollectionCtx(r.Context())
-		if collection.ID != collectionID {
+		if collection.ID != collectionData.ID {
 			t.Error("Bad collection id")
 		}
-	})).ServeHTTP(w, r)
+	}))).ServeHTTP(w, r)
 }
 
 func TestCollectionReadAccessHandler(t *testing.T) {
+	log.Println(userData)
 	w, r := postJSON(nil)
 	user := getDbUserByName(userData.Name)
 	r = setUserIDReq(r, user.ID)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(collectionReadAccessHandler(getNullHandler())).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(collectionReadAccessHandler(getNullHandler()))).ServeHTTP(w, r)
 	testCode(t, w, 200)
 }
 
@@ -499,8 +500,8 @@ func TestCollectionWriteAccessHandler(t *testing.T) {
 	w, r := postJSON(nil)
 	user := getDbUserByName(userData.Name)
 	r = setUserIDReq(r, user.ID)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(collectionWriteAccessHandler(getNullHandler())).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(collectionWriteAccessHandler(getNullHandler()))).ServeHTTP(w, r)
 	testCode(t, w, 200)
 }
 
@@ -508,8 +509,8 @@ func TestCollectionReadAccessHandlerNoRight(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUserByName(user2Data.Name)
 	r = setUserIDReq(r, user2.ID)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(collectionReadAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(collectionReadAccessHandler(getNoHandler(t)))).ServeHTTP(w, r)
 	testCode(t, w, 403)
 }
 
@@ -517,8 +518,8 @@ func TestCollectionWriteAccessHandlerNoRight(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUserByName(user2Data.Name)
 	r = setUserIDReq(r, user2.ID)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t)))).ServeHTTP(w, r)
 	testCode(t, w, 403)
 }
 
@@ -527,31 +528,31 @@ func TestAddTeammate(t *testing.T) {
 	teammate := service.TeammateT{Email: user2Data.Email}
 
 	w, r := postJSON(notfoundTeammate)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(addTeammate)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(addTeammate))).ServeHTTP(w, r)
 	testCode(t, w, 404)
 	testBody(t, w, "User not exist ("+notfoundTeammate.Email+")\n")
 
-	addTeammateSuccess(t, collectionID, &teammate)
+	addTeammateSuccess(t, userData.Name, collectionData.Name, &teammate)
 
 	w, r = postJSON(teammate)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(addTeammate)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(addTeammate))).ServeHTTP(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Teammate exist ("+user2Data.Email+")\n")
 }
 
-func addTeammateSuccess(t *testing.T, collectionID string, teammate *service.TeammateT) {
+func addTeammateSuccess(t *testing.T, userName, collectionName string, teammate *service.TeammateT) {
 	w, r := postJSON(teammate)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(addTeammate)).ServeHTTP(w, r)
+	r = setCollectionName(r, userName, collectionName)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(addTeammate))).ServeHTTP(w, r)
 	testCode(t, w, 200)
 }
 
 func TestGetCollaborators(t *testing.T) {
 	w, r := postJSON(nil)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(getTeammates)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(getTeammates))).ServeHTTP(w, r)
 
 	var teammates []*service.TeammateT
 	testJSONBody(t, w, &teammates)
@@ -567,8 +568,8 @@ func TestTeammateCollectionReadAccess(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUserByName(user2Data.Name)
 	r = setUserIDReq(r, user2.ID)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(collectionReadAccessHandler(getNullHandler())).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(collectionReadAccessHandler(getNullHandler()))).ServeHTTP(w, r)
 	testCode(t, w, 200)
 }
 
@@ -576,26 +577,26 @@ func TestTeammateCollectionWriteAccessNoRight(t *testing.T) {
 	w, r := postJSON(nil)
 	user2 := getDbUserByName(user2Data.Name)
 	r = setUserIDReq(r, user2.ID)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t)))).ServeHTTP(w, r)
 	testCode(t, w, 403)
 }
 
 func TestRemoveTeammate(t *testing.T) {
 	w, r := postJSON(nil)
-	r = getReqWithRouteContext(r, kv{"email": user2Data.Email, "collectionID": collectionID})
-	collectionBaseHandler(http.HandlerFunc(removeTeammate)).ServeHTTP(w, r)
+	r = getReqWithRouteContext(r, kv{"email": user2Data.Email, "name": userData.Name, "collectionName": collectionData.Name})
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(removeTeammate))).ServeHTTP(w, r)
 	testCode(t, w, 200)
 
 	w, r = postJSON(nil)
-	r = getReqWithRouteContext(r, kv{"email": user2Data.Email, "collectionID": collectionID})
-	collectionBaseHandler(http.HandlerFunc(removeTeammate)).ServeHTTP(w, r)
+	r = getReqWithRouteContext(r, kv{"email": user2Data.Email, "name": userData.Name, "collectionName": collectionData.Name})
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(removeTeammate))).ServeHTTP(w, r)
 	testCode(t, w, 404)
 	testBody(t, w, "User not exist ("+user2Data.Email+")\n")
 
 	w, r = postJSON(nil)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(getTeammates)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(getTeammates))).ServeHTTP(w, r)
 
 	var teammates []*service.TeammateT
 	testJSONBody(t, w, &teammates)
@@ -624,7 +625,7 @@ func TestDeleteUserAndTeammate(t *testing.T) {
 	createCollectionSuccess(t, user1.Name, &collection)
 
 	teammate := service.TeammateT{Email: user2.Email}
-	addTeammateSuccess(t, collection.ID, &teammate)
+	addTeammateSuccess(t, user1.Name, collection.Name, &teammate)
 
 	input := deleteUserInputT{Password: user2.Password}
 	w, r := postJSON(input)
@@ -649,8 +650,8 @@ func TestDeleteUserAndTeammate(t *testing.T) {
 
 func TestGetSessions(t *testing.T) {
 	w, r := postJSON(collectionInput)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(getSessions)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(getSessions))).ServeHTTP(w, r)
 	testCode(t, w, 200)
 	sessions := []db.SessionDataT{}
 	testJSONBody(t, w, &sessions)
@@ -674,7 +675,7 @@ func TestGetSessions(t *testing.T) {
 }
 
 func TestCreatePageView(t *testing.T) {
-	pageViewData.CollectionID = collectionID
+	pageViewData.CollectionID = collectionData.ID
 	pageViewData.SessionKey = sessionKey
 	w, r := postJSON(pageViewData)
 	r.Header.Set("User-Agent", userAgent)
@@ -683,7 +684,7 @@ func TestCreatePageView(t *testing.T) {
 }
 
 func TestUpdateSession(t *testing.T) {
-	sessionUpdateData.CollectionID = collectionID
+	sessionUpdateData.CollectionID = collectionData.ID
 	sessionUpdateData.SessionKey = sessionKey
 	w, r := postJSON(sessionUpdateData)
 	updateSession(w, r)
@@ -693,8 +694,8 @@ func TestUpdateSession(t *testing.T) {
 func TestGetPageViews(t *testing.T) {
 	pageviewInput.SessionKey = sessionKey
 	w, r := postJSON(pageviewInput)
-	r = setCollectionID(r, collectionID)
-	collectionBaseHandler(http.HandlerFunc(getPageviews)).ServeHTTP(w, r)
+	r = setCollectionName(r, userData.Name, collectionData.Name)
+	userBaseHandler(collectionBaseHandler(http.HandlerFunc(getPageviews))).ServeHTTP(w, r)
 	testCode(t, w, 200)
 	pageViews := []db.PageviewDataT{}
 	testJSONBody(t, w, &pageViews)
@@ -884,8 +885,8 @@ func getNoHandler(t *testing.T) http.Handler {
 	})
 }
 
-func setCollectionID(r *http.Request, collectionID string) *http.Request {
-	return getReqWithRouteContext(r, kv{"collectionID": collectionID})
+func setCollectionName(r *http.Request, userName, collectionName string) *http.Request {
+	return getReqWithRouteContext(r, kv{"name": userName, "collectionName": collectionName})
 }
 
 func setUserName(r *http.Request, name string) *http.Request {

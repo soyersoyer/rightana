@@ -58,7 +58,7 @@ const routes: Routes = [
   { path: ':user', component: UserComponent, children: [
     { path: "", component: CollectionComponent},
     { path: 'create', component: CollectionCreateComponent},
-    { path: ':collectionId', component: CollectionDashboardComponent, children: [
+    { path: ':collectionName', component: CollectionDashboardComponent, children: [
       { path: '', redirectTo: 'statistics', pathMatch: 'full'},
       { path: 'statistics', component: CollectionStatComponent},
       { path: 'sessions', component: SessionComponent},

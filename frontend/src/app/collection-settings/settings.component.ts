@@ -30,24 +30,24 @@ export class CollectionSettingsComponent implements OnInit {
       name: [null, [Validators.required]],
     });
     this.route.parent.params.forEach((params: Params) => {
-      const collectionId = params['collectionId'];
-      this.getCollection(collectionId);
-      this.getCollectionShards(collectionId);
+      const collectionName = params['collectionName'];
+      this.getCollection(collectionName);
+      this.getCollectionShards(collectionName);
     });
   }
 
-  getCollection(collectionId: string) {
+  getCollection(collectionName: string) {
     this.backend
-      .getCollection(this.user.user, collectionId)
+      .getCollection(this.user.user, collectionName)
       .subscribe(collection => {
         this.form.setValue(collection);
         this.collection = collection;
       });
   }
 
-  getCollectionShards(collectionId: string) {
+  getCollectionShards(collectionName: string) {
    this.backend
-      .getCollectionShards(this.user.user, collectionId)
+      .getCollectionShards(this.user.user, collectionName)
       .subscribe(shards => {
         this.shards = shards;
         this.allSize = shards.reduce((a, b) => a + b.size, 0);
@@ -55,20 +55,20 @@ export class CollectionSettingsComponent implements OnInit {
   }
 
   save() {
-    this.backend.saveCollection(this.user.user, this.form.value)
-      .subscribe(_ => this.router.navigate(['..'], {relativeTo: this.route}));
+    this.backend.saveCollection(this.user.user, this.collection.name, this.form.value)
+      .subscribe(_ => this.router.navigate(['../..', this.form.value.name], {relativeTo: this.route}));
   }
 
   delete() {
-    this.backend.deleteCollection(this.user.user, this.form.value.id)
+    this.backend.deleteCollection(this.user.user, this.collection.name)
       .subscribe(_ => this.router.navigate(['../..'], {relativeTo: this.route}));
   }
 
   deleteShard(shard: Shard) {
     this.backend
-      .deleteCollectionShard(this.user.user, this.collection.id, shard.id)
+      .deleteCollectionShard(this.user.user, this.collection.name, shard.id)
       .subscribe(_ => {
-        this.getCollectionShards(this.collection.id);
+        this.getCollectionShards(this.collection.name);
       })
   }
 

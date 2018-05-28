@@ -28,13 +28,13 @@ export class TeammatesComponent implements OnInit {
 
   getTeammates() {
     this.backend
-      .getTeammates(this.user.user, this.collection.id)
+      .getTeammates(this.user.user, this.collection.name)
       .subscribe(teammates => this.teammates = teammates);
   }
 
   add() {
     this.backend
-      .addTeammate(this.user.user, this.collection.id, this.form.value.email)
+      .addTeammate(this.user.user, this.collection.name, this.form.value.email)
       .subscribe(_ => {
         this.getTeammates();
         this.form.reset();
@@ -43,7 +43,7 @@ export class TeammatesComponent implements OnInit {
 
   remove(email: string) {
     this.backend
-      .removeTeammate(this.user.user, this.collection.id, email)
+      .removeTeammate(this.user.user, this.collection.name, email)
       .subscribe(_ => this.getTeammates());
   }
 }

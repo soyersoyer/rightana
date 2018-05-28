@@ -246,6 +246,27 @@ func GetCollection(id string) (*Collection, error) {
 	return &collection, err
 }
 
+// TODO: adding indexes
+
+// GetCollectionByName returns a collection
+func GetCollectionByName(ownerID uint64, name string) (*Collection, error) {
+	collection := Collection{}
+	ret := Collection{}
+	err := cipo.Iterate(&collection.ID, &collection, func() error {
+		if collection.OwnerID == ownerID && collection.Name == name {
+			ret = collection
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if ret.OwnerID == 0 {
+		return nil, ErrKeyNotExists
+	}
+	return &ret, err
+}
+
 // DeleteCollection deletes a collection
 func DeleteCollection(collection *Collection) error {
 	return cipo.Bolt().Update(func(tx *bolt.Tx) error {

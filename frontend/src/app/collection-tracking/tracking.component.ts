@@ -25,7 +25,7 @@ export class CollectionTrackingComponent implements OnInit {
   }
 
   getTrackingCode(): string {
-    return `<!-- rana tracker -->
+    return `<!-- rightana -->
 <script>
   (function(d, w, u, o){
     w[o]=w[o]||function(){
@@ -39,7 +39,7 @@ export class CollectionTrackingComponent implements OnInit {
   rana('setup', '${this.getOrigin()}/api', '${this.collection.id}');
   rana('trackPageview');
 </script>
-<!-- rana tracker -->
+<!-- rightana -->
 `;
   }
 

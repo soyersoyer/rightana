@@ -65,6 +65,18 @@ func TestCollectionCreate(t *testing.T) {
 	}
 }
 
+func TestCollectionGetByID(t *testing.T) {
+	if _, err := GetCollection(collection.ID); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCollectionGetByName(t *testing.T) {
+	if _, err := GetCollectionByName(collection.OwnerID, collection.Name); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestSeed(t *testing.T) {
 	Seed(from, to, collection.ID, 100000)
 }

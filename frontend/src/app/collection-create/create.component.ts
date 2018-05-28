@@ -28,6 +28,6 @@ export class CollectionCreateComponent implements OnInit {
 
   create() {
     this.backend.createCollection(this.user.user, this.form.value)
-      .subscribe(collection => this.router.navigate(['..', collection.id, 'settings'], {relativeTo: this.route}));
+      .subscribe(collection => this.router.navigate(['..', collection.name, 'settings'], {relativeTo: this.route}));
   }
 }

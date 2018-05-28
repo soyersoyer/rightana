@@ -24,7 +24,7 @@ class DatePair {
 }
 
 export class Setup {
-  collectionId: string;
+  collectionName: string;
   from: Date;
   to: Date;
   filter = {};
@@ -40,7 +40,7 @@ export class Setup {
   }
 
   set(setup: Setup) {
-    this.collectionId = setup.collectionId;
+    this.collectionName = setup.collectionName;
     this.from = setup.from;
     this.to = setup.to;
     this.chartFrom = setup.chartFrom;
@@ -50,8 +50,8 @@ export class Setup {
     this.filter = Object.assign({}, setup.filter);
   }
 
-  setCollectionId(collectionId: string) {
-    this.collectionId = collectionId;
+  setCollectionName(collectionName: string) {
+    this.collectionName = collectionName;
   }
 
   setDates(from: Date, to: Date) {
@@ -217,7 +217,7 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
       this.getCollectionData();
     });
     this.route.params.forEach((params: Params) => {
-      this.setup.setCollectionId(params['collectionId']);
+      this.setup.setCollectionName(params['collectionName']);
       this.today();
     });
   }
@@ -285,7 +285,7 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
     if (this.setup.chartLock) {
       return;
     }
-    this.backend.getCollectionData(this.user, this.setup.collectionId, this.setup.chartFrom, this.setup.chartTo, this.selectedBucket.name,
+    this.backend.getCollectionData(this.user, this.setup.collectionName, this.setup.chartFrom, this.setup.chartTo, this.selectedBucket.name,
       this.timezone, this.setup.filter)
       .subscribe(collection => {
         this.collection = collection;
