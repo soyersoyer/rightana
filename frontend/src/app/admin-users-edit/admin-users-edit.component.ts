@@ -26,6 +26,7 @@ export class AdminUsersEditComponent implements OnInit {
       name: [null, [Validators.required, Validators.pattern("^[a-z0-9.]+$")]],
       password: [null, [Validators.required]],
       is_admin: [null, [Validators.required]],
+      disable_pw_change: [null, [Validators.required]],
     });
     this.route.params.forEach((params: Params) => {
       this.getUser(params['email']);

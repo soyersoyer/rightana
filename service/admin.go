@@ -12,6 +12,7 @@ type UserInfoT struct {
 	Name            string `json:"name"`
 	Created         int64  `json:"created"`
 	IsAdmin         bool   `json:"is_admin"`
+	DisablePwChange bool   `json:"disable_pw_change"`
 	CollectionCount int    `json:"collection_count"`
 }
 
@@ -27,7 +28,7 @@ func GetUsers() ([]UserInfoT, error) {
 		if err != nil {
 			return nil, errors.DBError.Wrap(err)
 		}
-		userInfos = append(userInfos, UserInfoT{u.ID, u.Email, u.Name, u.Created, u.IsAdmin, len(collections)})
+		userInfos = append(userInfos, UserInfoT{u.ID, u.Email, u.Name, u.Created, u.IsAdmin, u.DisablePwChange, len(collections)})
 	}
 	return userInfos, nil
 }
@@ -44,15 +45,17 @@ func GetUserInfo(email string) (*UserInfoT, error) {
 		user.Name,
 		user.Created,
 		user.IsAdmin,
+		user.DisablePwChange,
 		0,
 	}, nil
 }
 
 // UserUpdateT is the struct for updating a user
 type UserUpdateT struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-	IsAdmin  bool   `json:"is_admin"`
+	Name            string `json:"name"`
+	Password        string `json:"password"`
+	IsAdmin         bool   `json:"is_admin"`
+	DisablePwChange bool   `json:"disable_pw_change"`
 }
 
 // UpdateUser updates a user with UserUpdateT struct
@@ -88,6 +91,9 @@ func UpdateUser(email string, input *UserUpdateT) error {
 			return errors.AccessDenied
 		}
 	}
+
+	user.DisablePwChange = input.DisablePwChange
+
 	err = db.UpdateUser(user)
 	if err != nil {
 		return errors.DBError.Wrap(err)

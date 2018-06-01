@@ -87,6 +87,9 @@ func ChangePassword(user *User, currentPassword string, password string) error {
 	if !passwordCheck(password) {
 		return errors.PasswordTooShort
 	}
+	if user.DisablePwChange {
+		return errors.PasswordChangeDisabled
+	}
 	if err := compareHashAndPassword(user.Password, currentPassword); err != nil {
 		return errors.PasswordNotMatch
 	}

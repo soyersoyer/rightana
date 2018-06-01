@@ -8,6 +8,7 @@ message User {
 	int64 Created = 4; // unixnano
 	string Name = 5;
 	bool IsAdmin = 10;
+	bool DisablePwChange = 11;
 }
 
 message Teammate {

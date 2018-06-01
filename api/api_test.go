@@ -291,6 +291,36 @@ func TestUpdateUserPassword(t *testing.T) {
 	}
 }
 
+func TestPWChangeDisabled(t *testing.T) {
+
+	newUser := service.CreateUserT{
+		Name:     "pwchangedisabled",
+		Email:    "a@a.com",
+		Password: "pwchangedisabled",
+	}
+
+	testCreateUserSuccess(t, newUser)
+
+	updateUserData := service.UserUpdateT{
+		Name:            newUser.Name,
+		Email:           newUser.Email,
+		DisablePwChange: true,
+	}
+
+	w, r := postJSON(updateUserData)
+	r = setUserName(r, newUser.Name)
+	userBaseHandler(http.HandlerFunc(updateUser)).ServeHTTP(w, r)
+	testCode(t, w, 200)
+
+	updateUserPw := updateUserPasswordT{newUser.Password, newUser.Password}
+
+	w, r = postJSON(updateUserPw)
+	r = setUserName(r, newUser.Name)
+	userBaseHandler(http.HandlerFunc(updateUserPassword)).ServeHTTP(w, r)
+	testCode(t, w, 403)
+	testBody(t, w, "Password change disabled for this account\n")
+}
+
 func createCollectionSuccess(t *testing.T, username string, collection *collectionT) {
 	collName := collection.Name
 	w, r := postJSON(collection)
