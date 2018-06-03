@@ -320,6 +320,39 @@ func TestPWChangeDisabled(t *testing.T) {
 	testBody(t, w, "Password change disabled for this account\n")
 }
 
+func TestUserDeletionDisabled(t *testing.T) {
+	newUser := service.CreateUserT{
+		Name:     "userdeletiondisabled",
+		Email:    "ud@ud.com",
+		Password: "userdeletiondisabled",
+	}
+
+	testCreateUserSuccess(t, newUser)
+
+	updateUserData := service.UserUpdateT{
+		Name:                newUser.Name,
+		Email:               newUser.Email,
+		DisableUserDeletion: true,
+	}
+
+	w, r := postJSON(updateUserData)
+	r = setUserName(r, newUser.Name)
+	userBaseHandler(http.HandlerFunc(updateUser)).ServeHTTP(w, r)
+	testCode(t, w, 200)
+
+	input := deleteUserInputT{
+		Password: newUser.Password,
+	}
+
+	w, r = postJSON(input)
+	r = setUserName(r, newUser.Name)
+	userBaseHandler(http.HandlerFunc(deleteUser)).ServeHTTP(w, r)
+	testCode(t, w, 403)
+	testBody(t, w, "User deletion disabled for this account\n")
+}
+
+// TODO check last admin too
+
 func TestCollectionLimit(t *testing.T) {
 	newUser := service.CreateUserT{
 		Name:     "collectionlimit",

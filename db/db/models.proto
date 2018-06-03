@@ -11,6 +11,7 @@ message User {
 	bool DisablePwChange = 11;
 	bool LimitCollections = 12;
 	uint32 CollectionLimit = 13;
+	bool DisableUserDeletion = 14;
 }
 
 message Teammate {

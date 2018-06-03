@@ -7,15 +7,16 @@ import (
 
 // UserInfoT is struct for clients, stores the user information
 type UserInfoT struct {
-	ID               uint64 `json:"id"`
-	Email            string `json:"email"`
-	Name             string `json:"name"`
-	Created          int64  `json:"created"`
-	IsAdmin          bool   `json:"is_admin"`
-	DisablePwChange  bool   `json:"disable_pw_change"`
-	LimitCollections bool   `json:"limit_collections"`
-	CollectionLimit  uint32 `json:"collection_limit"`
-	CollectionCount  int    `json:"collection_count"`
+	ID                  uint64 `json:"id"`
+	Email               string `json:"email"`
+	Name                string `json:"name"`
+	Created             int64  `json:"created"`
+	IsAdmin             bool   `json:"is_admin"`
+	DisablePwChange     bool   `json:"disable_pw_change"`
+	LimitCollections    bool   `json:"limit_collections"`
+	CollectionLimit     uint32 `json:"collection_limit"`
+	DisableUserDeletion bool   `json:"disable_user_deletion"`
+	CollectionCount     int    `json:"collection_count"`
 }
 
 // GetUsers returns all user
@@ -39,6 +40,7 @@ func GetUsers() ([]UserInfoT, error) {
 			u.DisablePwChange,
 			u.LimitCollections,
 			u.CollectionLimit,
+			u.DisableUserDeletion,
 			len(collections),
 		})
 	}
@@ -60,19 +62,21 @@ func GetUserInfo(name string) (*UserInfoT, error) {
 		user.DisablePwChange,
 		user.LimitCollections,
 		user.CollectionLimit,
+		user.DisableUserDeletion,
 		0,
 	}, nil
 }
 
 // UserUpdateT is the struct for updating a user
 type UserUpdateT struct {
-	Name             string `json:"name"`
-	Email            string `json:"email"`
-	Password         string `json:"password"`
-	IsAdmin          bool   `json:"is_admin"`
-	DisablePwChange  bool   `json:"disable_pw_change"`
-	LimitCollections bool   `json:"limit_collections"`
-	CollectionLimit  uint32 `json:"collection_limit"`
+	Name                string `json:"name"`
+	Email               string `json:"email"`
+	Password            string `json:"password"`
+	IsAdmin             bool   `json:"is_admin"`
+	DisablePwChange     bool   `json:"disable_pw_change"`
+	LimitCollections    bool   `json:"limit_collections"`
+	CollectionLimit     uint32 `json:"collection_limit"`
+	DisableUserDeletion bool   `json:"disable_user_deletion"`
 }
 
 // UpdateUser updates a user with UserUpdateT struct
@@ -120,7 +124,7 @@ func UpdateUser(name string, input *UserUpdateT) error {
 			return err
 		}
 		if len(admins) == 1 && admins[0].Email == user.Email {
-			return errors.AccessDenied
+			return errors.UserIsTheLastAdmin
 		}
 	}
 
@@ -128,6 +132,8 @@ func UpdateUser(name string, input *UserUpdateT) error {
 
 	user.LimitCollections = input.LimitCollections
 	user.CollectionLimit = input.CollectionLimit
+
+	user.DisableUserDeletion = input.DisableUserDeletion
 
 	err = db.UpdateUser(user)
 	if err != nil {

@@ -15,6 +15,8 @@ var (
 	UserNotExist            = &Error{"User not exist", 404, "", ""}
 	UserNameExist           = &Error{"User Name exist", 403, "", ""}
 	UserEmailExist          = &Error{"User Email exist", 403, "", ""}
+	UserDeletionDisabled    = &Error{"User deletion disabled for this account", 403, "", ""}
+	UserIsTheLastAdmin      = &Error{"User is the last admin", 403, "", ""}
 	AccessDenied            = &Error{"Access denied", 403, "", ""}
 	InputDecodeFailed       = &Error{"Input decode failed", 400, "", ""}
 	AuthtokenNotExist       = &Error{"Authtoken not exist", 403, "", ""}

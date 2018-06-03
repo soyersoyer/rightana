@@ -108,6 +108,18 @@ func ChangePassword(user *User, currentPassword string, password string) error {
 
 // DeleteUser deletes a user when the password patch
 func DeleteUser(user *User, password string) error {
+	if user.DisableUserDeletion {
+		return errors.UserDeletionDisabled
+	}
+	if user.IsAdmin {
+		admins, err := db.GetAdminUsers()
+		if err != nil {
+			return err
+		}
+		if len(admins) == 1 && admins[0].Email == user.Email {
+			return errors.UserIsTheLastAdmin
+		}
+	}
 	if err := compareHashAndPassword(user.Password, password); err != nil {
 		return errors.PasswordNotMatch
 	}
