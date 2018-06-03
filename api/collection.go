@@ -18,7 +18,8 @@ type collectionT struct {
 
 func getCollectionSummariesE(w http.ResponseWriter, r *http.Request) error {
 	user := getUserCtx(r.Context())
-	summary, err := service.GetCollectionSummariesByUserID(user.ID)
+	reader := getUserIDCtx(r.Context())
+	summary, err := service.GetCollectionSummariesByUserID(user.ID, reader)
 	if err != nil {
 		return err
 	}

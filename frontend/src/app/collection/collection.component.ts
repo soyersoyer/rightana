@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { tap } from 'rxjs/operators';
 
 import { UserComponent } from '../user/user.component';
-import { BackendService, CollectionSummary } from '../backend.service';
+import { BackendService, CollectionSummary, AuthService } from '../backend.service';
 
 @Component({
   selector: 'rana-collection',
@@ -18,16 +18,12 @@ export class CollectionComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private userComp: UserComponent,
+    private auth: AuthService,
   ) { }
 
   ngOnInit() {
     this.route.params.forEach((params: Params) => {
-      this.getCollections(this.user)
-      .subscribe(_ => {
-        if (this.route.snapshot.children.length === 0) {
-          this.navigateToCreateIfEmpty();
-        };
-      });
+      this.getCollections(this.user);
     })
   }
 
@@ -35,15 +31,13 @@ export class CollectionComponent implements OnInit {
     return this.userComp.user;
   }
 
-  getCollections(user: string): Observable<CollectionSummary[]> {
-    return this.backend.getCollectionSummaries(user)
-      .do(collections => this.collections = collections);
+  get selfPage(): boolean {
+    return this.user === this.auth.user
+  }
+
+  getCollections(user: string) {
+    this.backend.getCollectionSummaries(user).subscribe(collections => this.collections = collections);
   }
 
 
-  navigateToCreateIfEmpty() {
-    if (this.collections && this.collections.length === 0) {
-     this.router.navigate(['create'], {relativeTo: this.route});
-    }
-  }
 }

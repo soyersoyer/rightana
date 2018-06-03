@@ -137,13 +137,16 @@ type CollectionSummaryT struct {
 }
 
 // GetCollectionSummariesByUserID returns the collection summaries for the user
-func GetCollectionSummariesByUserID(ID uint64) ([]CollectionSummaryT, error) {
+func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSummaryT, error) {
 	ret := []CollectionSummaryT{}
 	collections, err := db.GetCollectionsByUserID(ID)
 	if err != nil {
 		return nil, errors.DBError.Wrap(err, ID)
 	}
 	for _, v := range collections {
+		if err := CollectionReadAccessCheck(&v, readerID); err != nil {
+			continue
+		}
 		count, percent, err := db.GetPageviewPercent(v.ID, 7)
 		if err != nil {
 			return nil, errors.DBError.Wrap(err, v.ID)

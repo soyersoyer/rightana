@@ -1,8 +1,8 @@
-<div class="container">
+<div class="container" *ngIf="collections">
   <div class="mt-2">
     <div class="d-flex align-items-center flex-wrap text-truncate">
       <h3><a routerLink=".">{{user}}</a></h3>
-      <a role="button" class="btn btn-secondary btn-sm ml-auto" routerLink="create">✚</a>
+      <a *ngIf="selfPage" role="button" class="btn btn-secondary btn-sm ml-auto" routerLink="create">✚</a>
     </div>
     <div class="row">
       <div class="col-sm-3" *ngFor="let c of collections">
@@ -15,6 +15,18 @@
             <div class="card-text d-flex justify-content-between pr-4">
               {{c.pageview_count}}
               <rana-color-percent [percent]="c.pageview_percent"></rana-color-percent>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3" *ngIf="collections.length === 0 && selfPage">
+        <div class="card my-2">
+          <div class="card-body" style="width: 18rem">
+            <div class="card-title">
+              You have {{collections.length}} collection
+            </div>
+            <div class="card-text">
+              <a routerLink="create">Create new</a>
             </div>
           </div>
         </div>
