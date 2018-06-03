@@ -24,6 +24,16 @@
           <input type="checkbox" class="form-check-input" id="disable_pw_change" formControlName="disable_pw_change">
           <label class="form-check-label" for="disable_pw_change">Disable password change for this account</label>
         </div>
+        <div class="form-group my-4">
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="limit_collections" formControlName="limit_collections">
+            <label class="form-check-label" for="limit_collections">Limit Collection creation</label>
+          </div>
+          <div class="form-group">
+            <label for="collection_limit">Collection Limit</label>
+            <input id="collection_limit" type="number" min="0" class="form-control form-control-lg" formControlName="collection_limit">
+          </div>
+        </div>
         <button type="submit" class="btn btn-primary btn-lg w-100">Update</button>
       </form>
     </div>

@@ -3,6 +3,7 @@ package service
 import (
 	"math/rand"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/soyersoyer/rightana/db/db"
@@ -20,6 +21,15 @@ func CreateCollection(ownerID uint64, name string) (*Collection, error) {
 	user, err := db.GetUserByID(ownerID)
 	if err != nil {
 		return nil, errors.UserNotExist.T(string(ownerID)).Wrap(err)
+	}
+	if user.LimitCollections {
+		collections, err := db.GetCollectionsByUserID(user.ID)
+		if err != nil {
+			return nil, errors.DBError.Wrap(err, user.ID)
+		}
+		if len(collections) >= int(user.CollectionLimit) {
+			return nil, errors.CollectionLimitExceeded.T(strconv.Itoa(int(user.CollectionLimit)))
+		}
 	}
 	collection := &Collection{
 		ID:      randStringBytes(8),

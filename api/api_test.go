@@ -292,7 +292,6 @@ func TestUpdateUserPassword(t *testing.T) {
 }
 
 func TestPWChangeDisabled(t *testing.T) {
-
 	newUser := service.CreateUserT{
 		Name:     "pwchangedisabled",
 		Email:    "a@a.com",
@@ -319,6 +318,38 @@ func TestPWChangeDisabled(t *testing.T) {
 	userBaseHandler(http.HandlerFunc(updateUserPassword)).ServeHTTP(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Password change disabled for this account\n")
+}
+
+func TestCollectionLimit(t *testing.T) {
+	newUser := service.CreateUserT{
+		Name:     "collectionlimit",
+		Email:    "c@c.com",
+		Password: "collectionlimit",
+	}
+
+	testCreateUserSuccess(t, newUser)
+
+	updateUserData := service.UserUpdateT{
+		Name:             newUser.Name,
+		Email:            newUser.Email,
+		LimitCollections: true,
+		CollectionLimit:  0,
+	}
+
+	w, r := postJSON(updateUserData)
+	r = setUserName(r, newUser.Name)
+	userBaseHandler(http.HandlerFunc(updateUser)).ServeHTTP(w, r)
+	testCode(t, w, 200)
+
+	collection := collectionT{
+		Name: "azaz.org",
+	}
+	w, r = postJSON(collection)
+	user := getDbUserByName(newUser.Name)
+	r = setUserIDReq(r, user.ID)
+	createCollection(w, r)
+	testCode(t, w, 403)
+	testBody(t, w, "Collection limit exceeded (0)\n")
 }
 
 func createCollectionSuccess(t *testing.T, username string, collection *collectionT) {

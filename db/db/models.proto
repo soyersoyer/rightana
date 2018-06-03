@@ -9,6 +9,8 @@ message User {
 	string Name = 5;
 	bool IsAdmin = 10;
 	bool DisablePwChange = 11;
+	bool LimitCollections = 12;
+	uint32 CollectionLimit = 13;
 }
 
 message Teammate {
