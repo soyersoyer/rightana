@@ -20,7 +20,7 @@
         <td>{{user.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>
         <td>{{user.collection_count}}</td>
         <td>{{user.is_admin}}</td>
-        <td><a [routerLink]="[user.email]">edit</a></td>
+        <td><a [routerLink]="[user.name]">edit</a></td>
       </tr>
     </tbody>
   </table>

@@ -18,23 +18,25 @@ export class AdminUsersEditComponent implements OnInit {
   	private fb: FormBuilder,
     private backend: BackendService,
     private route: ActivatedRoute,
+    private router: Router,
     private toasty: ToastyService,
   ) { }
 
   ngOnInit() {
     this.form = this.fb.group({
       name: [null, [Validators.required, Validators.pattern("^[a-z0-9.]+$")]],
+      email: [null, [Validators.required, Validators.email]],
       password: [null, [Validators.required]],
       is_admin: [null, [Validators.required]],
       disable_pw_change: [null, [Validators.required]],
     });
     this.route.params.forEach((params: Params) => {
-      this.getUser(params['email']);
+      this.getUser(params['name']);
     });
   }
 
-  getUser(email: string) {
-    this.backend.getUserInfo(email)
+  getUser(name: string) {
+    this.backend.getUserInfo(name)
       .subscribe(user => {
         this.user = user;
         this.form.patchValue(user);
@@ -42,9 +44,10 @@ export class AdminUsersEditComponent implements OnInit {
   }
 
   update() {
-    this.backend.updateUser(this.user.email, this.form.value)
+    this.backend.updateUser(this.user.name, this.form.value)
     .subscribe(_ => {
       this.toasty.success("Update success");
+      this.router.navigate(["..", this.form.value.name], {relativeTo: this.route});
     });
   }
 }

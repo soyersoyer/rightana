@@ -34,10 +34,10 @@ func GetUsers() ([]UserInfoT, error) {
 }
 
 // GetUserInfo fetch an user by the user's email
-func GetUserInfo(email string) (*UserInfoT, error) {
-	user, err := db.GetUserByEmail(email)
+func GetUserInfo(name string) (*UserInfoT, error) {
+	user, err := db.GetUserByName(name)
 	if err != nil {
-		return nil, errors.UserNotExist.T(email).Wrap(err)
+		return nil, errors.UserNotExist.T(name).Wrap(err)
 	}
 	return &UserInfoT{
 		user.ID,
@@ -53,22 +53,38 @@ func GetUserInfo(email string) (*UserInfoT, error) {
 // UserUpdateT is the struct for updating a user
 type UserUpdateT struct {
 	Name            string `json:"name"`
+	Email           string `json:"email"`
 	Password        string `json:"password"`
 	IsAdmin         bool   `json:"is_admin"`
 	DisablePwChange bool   `json:"disable_pw_change"`
 }
 
 // UpdateUser updates a user with UserUpdateT struct
-func UpdateUser(email string, input *UserUpdateT) error {
-	user, err := db.GetUserByEmail(email)
+func UpdateUser(name string, input *UserUpdateT) error {
+	user, err := db.GetUserByName(name)
 	if err != nil {
-		return errors.UserNotExist.T(email).Wrap(err)
+		return errors.UserNotExist.T(name).Wrap(err)
 	}
 
-	if !usernameCheck(input.Name) {
-		return errors.InvalidUsername.T(input.Name)
+	if name != input.Name {
+		if !usernameCheck(input.Name) {
+			return errors.InvalidUsername.T(input.Name)
+		}
+		_, err = db.GetUserByName(input.Name)
+		if err != nil && err != db.ErrKeyNotExists {
+			return errors.DBError.T(input.Name).Wrap(err)
+		}
+		if err == nil {
+			return errors.UserNameExist.T(input.Name)
+		}
+
+		user.Name = input.Name
 	}
-	user.Name = input.Name
+
+	if !emailCheck(input.Email) {
+		return errors.InvalidEmail.T(input.Email)
+	}
+	user.Email = input.Email
 
 	if input.Password != "" {
 		if !passwordCheck(input.Password) {

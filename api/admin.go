@@ -37,8 +37,8 @@ func getUsersE(w http.ResponseWriter, r *http.Request) error {
 var getUsers = handleError(getUsersE)
 
 func getUserInfoE(w http.ResponseWriter, r *http.Request) error {
-	email := chi.URLParam(r, "email")
-	user, err := service.GetUserInfo(email)
+	name := chi.URLParam(r, "name")
+	user, err := service.GetUserInfo(name)
 	if err != nil {
 		return err
 	}
@@ -53,12 +53,12 @@ func updateUserE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	email := chi.URLParam(r, "email")
-	if err := service.UpdateUser(email, &input); err != nil {
+	name := chi.URLParam(r, "name")
+	if err := service.UpdateUser(name, &input); err != nil {
 		return err
 	}
 
-	return respond(w, email)
+	return respond(w, name)
 }
 
 var updateUser = handleError(updateUserE)

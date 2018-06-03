@@ -52,7 +52,7 @@ const routes: Routes = [
   { path: 'admin', component: AdminComponent, children: [
     { path: '', redirectTo: 'users', pathMatch: 'full'},
     { path: 'users', component: AdminUsersComponent},
-    { path: 'users/:email', component: AdminUsersEditComponent},
+    { path: 'users/:name', component: AdminUsersEditComponent},
     { path: 'collections', component: AdminCollectionsComponent},
   ]},
   { path: ':user', component: UserComponent, children: [

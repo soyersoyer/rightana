@@ -129,8 +129,8 @@ func adminRouter() http.Handler {
 	r.Use(loggedOnlyHandler)
 	r.Use(adminAccessHandler)
 	r.Get("/users", getUsers)
-	r.Get("/users/{email}", getUserInfo)
-	r.Patch("/users/{email}", updateUser)
+	r.Get("/users/{name}", getUserInfo)
+	r.Patch("/users/{name}", updateUser)
 	r.Get("/collections", getCollections)
 	return r
 }
