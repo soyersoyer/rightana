@@ -72,7 +72,7 @@ func (db *DB) createActualShard(key []byte) (*shard, error) {
 	}
 	shards := db.getShardArray()
 
-	newShards := shardArray{}
+	newShards := make(shardArray, len(shards), len(shards)+1)
 	copy(newShards, shards)
 	newShards = append(newShards, newShard)
 	sortShards(newShards)
