@@ -35,7 +35,7 @@ export class RegistrationComponent implements OnInit {
 
   login() {
     this.backend
-      .createAuthToken(this.form.value)
+      .createAuthToken(this.form.value.name, this.form.value.password)
       .subscribe(token => {
         this.auth.set(token.id, token.user_info.name, token.user_info.is_admin);
         this.router.navigateByUrl(token.user_info.name);

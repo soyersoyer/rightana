@@ -24,14 +24,15 @@ import (
 type kv map[string]string
 
 var (
-	testDbName       = "rightana_test"
-	userData         = service.CreateUserT{Email: "admin@irl.hu", Name: "admin", Password: "adminlong"}
-	userSameNameData = service.CreateUserT{Email: "adminsame@irl.hu", Name: "admin", Password: "adminlong"}
-	user2Data        = service.CreateUserT{Email: "admin2@irl.hu", Name: "admin2", Password: "adminlong2"}
-	tokenData        = createTokenT{"admin@irl.hu", "adminlong"}
-	badTokenUserData = createTokenT{"adminn@irl.hu", "adminlong"}
-	badTokenPwData   = createTokenT{"admin@irl.hu", "adminnlong"}
-	collectionData   = collectionT{
+	testDbName        = "rightana_test"
+	userData          = service.CreateUserT{Email: "admin@irl.hu", Name: "admin", Password: "adminlong"}
+	userSameNameData  = service.CreateUserT{Email: "adminsame@irl.hu", Name: "admin", Password: "adminlong"}
+	user2Data         = service.CreateUserT{Email: "admin2@irl.hu", Name: "admin2", Password: "adminlong2"}
+	tokenData         = createTokenT{"admin@irl.hu", "adminlong"}
+	tokenDataUserName = createTokenT{"admin", "adminlong"}
+	badTokenUserData  = createTokenT{"adminn@irl.hu", "adminlong"}
+	badTokenPwData    = createTokenT{"admin@irl.hu", "adminnlong"}
+	collectionData    = collectionT{
 		Name: "newcollection.org",
 	}
 	userAgent        = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:56.0) Gecko/20100101 Firefox/56.0"
@@ -187,6 +188,10 @@ func testCreateTokenSuccess(t *testing.T, tokenData createTokenT) string {
 
 func TestCreateTokenSuccess(t *testing.T) {
 	testCreateTokenSuccess(t, tokenData)
+}
+
+func TestCreateTokenSuccessUserName(t *testing.T) {
+	testCreateTokenSuccess(t, tokenDataUserName)
 }
 
 func TestDeleteToken(t *testing.T) {

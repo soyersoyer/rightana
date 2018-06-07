@@ -1,6 +1,7 @@
 package service
 
 import (
+	"strings"
 	"time"
 
 	"github.com/satori/go.uuid"
@@ -13,10 +14,16 @@ import (
 type AuthToken = db.AuthToken
 
 // CreateAuthToken creates an AuthToken
-func CreateAuthToken(email string, password string) (string, *User, error) {
-	user, err := db.GetUserByEmail(email)
+func CreateAuthToken(nameOrEmail string, password string) (string, *User, error) {
+	var user *User
+	var err error
+	if strings.Contains(nameOrEmail, "@") {
+		user, err = db.GetUserByEmail(nameOrEmail)
+	} else {
+		user, err = db.GetUserByName(nameOrEmail)
+	}
 	if err != nil || user == nil {
-		return "", nil, errors.UserNotExist.T(email)
+		return "", nil, errors.UserNotExist.T(nameOrEmail)
 	}
 	if err := compareHashAndPassword(user.Password, password); err != nil {
 		return "", nil, errors.PasswordNotMatch

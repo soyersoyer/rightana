@@ -11,8 +11,8 @@ import (
 )
 
 type createTokenT struct {
-	Email    string
-	Password string
+	NameOrEmail string `json:"name_or_email"`
+	Password    string `json:"password"`
 }
 
 type createTokenOutT struct {
@@ -26,7 +26,7 @@ func createTokenE(w http.ResponseWriter, r *http.Request) error {
 		return errors.InputDecodeFailed.Wrap(err)
 	}
 
-	tokenID, user, err := service.CreateAuthToken(input.Email, input.Password)
+	tokenID, user, err := service.CreateAuthToken(input.NameOrEmail, input.Password)
 	if err != nil {
 		return err
 	}

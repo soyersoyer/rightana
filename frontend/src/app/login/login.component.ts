@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      email: [null, RValidators.email],
+      name_or_email: [null, Validators.required],
       password: [null, RValidators.password]
     });
     this.getConfig();
@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
 
   login() {
     this.backend
-      .createAuthToken(this.form.value)
+      .createAuthToken(this.form.value.name_or_email, this.form.value.password)
       .subscribe(token => {
         this.auth.set(token.id, token.user_info.name, token.user_info.is_admin);
         this.router.navigateByUrl(token.user_info.name);

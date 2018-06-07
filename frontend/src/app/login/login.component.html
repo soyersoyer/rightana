@@ -6,11 +6,8 @@
         <div class="card-body">
           <form [formGroup]="form" mark-as-touched (submit)="login()">
             <div class="form-group">
-              <label for="email">Email address</label>
-              <input id="email" type="email" class="form-control form-control-lg" formControlName="email">
-              <div class="invalid-feedback">
-                <rana-invalid-email></rana-invalid-email>
-              </div>
+              <label for="name_or_email">Username or email address</label>
+              <input id="name_or_email" type="text" class="form-control form-control-lg" formControlName="name_or_email">
             </div>
             <div class="form-group">
               <label for="password">Password</label>

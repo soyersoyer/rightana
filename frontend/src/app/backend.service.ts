@@ -207,11 +207,11 @@ export class BackendService {
   }
 
   createUser(formData: any): Observable<User> {
-    return this.http.post<User>('/api/users', JSON.stringify(formData));
+    return this.http.post<User>('/api/users', formData);
   }
 
-  createAuthToken(formData: any): Observable<AuthToken> {
-    return this.http.post<AuthToken>('/api/authtokens', JSON.stringify(formData));
+  createAuthToken(name_or_email: string, password: string): Observable<AuthToken> {
+    return this.http.post<AuthToken>('/api/authtokens', {name_or_email, password});
   }
 
   deleteAuthToken(authToken: string): Observable<any> {
@@ -219,7 +219,7 @@ export class BackendService {
   }
 
   createCollection(user: string, formData: any): Observable<Collection> {
-   return this.http.post<Collection>(`/api/users/${user}/collections`, JSON.stringify(formData));
+   return this.http.post<Collection>(`/api/users/${user}/collections`, formData);
   }
 
   getCollectionSummaries(user: string): Observable<CollectionSummary[]> {
@@ -231,7 +231,7 @@ export class BackendService {
   }
 
   saveCollection(user: string, collectionName: string, formData: any): Observable<Collection> {
-    return this.http.put<Collection>(`/api/users/${user}/collections/${collectionName}`, JSON.stringify(formData));
+    return this.http.put<Collection>(`/api/users/${user}/collections/${collectionName}`, formData);
   }
 
   deleteCollection(user: string, collectionName: string): Observable<any> {
@@ -251,7 +251,7 @@ export class BackendService {
   }
 
   addTeammate(user: string, collectionName: string, email: string): Observable<Teammate> {
-    return this.http.post<Teammate>(`/api/users/${user}/collections/${collectionName}/teammates`, JSON.stringify({email}));
+    return this.http.post<Teammate>(`/api/users/${user}/collections/${collectionName}/teammates`, {email});
   }
 
   removeTeammate(user: string, collectionName: string, email: string): Observable<Teammate> {
@@ -259,19 +259,19 @@ export class BackendService {
   }
 
   getCollectionData(user: string, collectionName: string, from: Date, to: Date, bucket: string, timezone: string, filter: any): Observable<CollectionData> {
-    return this.http.post<CollectionData>(`/api/users/${user}/collections/${collectionName}/data`, JSON.stringify({from, to, bucket, timezone, filter}));
+    return this.http.post<CollectionData>(`/api/users/${user}/collections/${collectionName}/data`, {from, to, bucket, timezone, filter});
   }
 
   getCollectionStatData(user: string, collectionName: string, from: Date, to: Date, filter: any): Observable<CollectionSumData> {
-    return this.http.post<CollectionSumData>(`/api/users/${user}/collections/${collectionName}/stat`, JSON.stringify({from, to, filter}));
+    return this.http.post<CollectionSumData>(`/api/users/${user}/collections/${collectionName}/stat`, {from, to, filter});
   }
 
   getSessions(user: string, collectionName: string, from: Date, to: Date, filter: any): Observable<Session[]> {
-   return this.http.post<Session[]>(`/api/users/${user}/collections/${collectionName}/sessions`, JSON.stringify({from, to, filter}));
+   return this.http.post<Session[]>(`/api/users/${user}/collections/${collectionName}/sessions`, {from, to, filter});
   }
 
   getPageviews(user: string, collectionName: string, sessionKey: string): Observable<Pageview[]> {
-   return this.http.post<Pageview[]>(`/api/users/${user}/collections/${collectionName}/pageviews`, JSON.stringify({session_key: sessionKey}));
+   return this.http.post<Pageview[]>(`/api/users/${user}/collections/${collectionName}/pageviews`, {session_key: sessionKey});
   }
 
   updateUserPassword(user: string, currentPassword: string, password: string): Observable<any> {
