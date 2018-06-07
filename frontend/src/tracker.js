@@ -139,3 +139,11 @@ window.rightana = function() {
 
   return processCommands;
 }();
+
+// for compatibility
+window.k20a = function() {
+  (window.k20a && window.k20a.q || []).forEach(function(i) {
+    window.rightana.apply(this, i);
+  });
+  return window.rightana;
+}();
