@@ -3,12 +3,14 @@ import { HttpClient, HttpEvent, HttpErrorResponse, HttpInterceptor, HttpHandler,
 import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/observable/of';
 
 import { ToastyService } from './toasty/toasty.module';
 
 export class ServerConfig {
   enable_registration: boolean;
   tracking_id: string;
+  server_announce: string;
 }
 
 export class User {
@@ -203,8 +205,12 @@ export class BackendService {
     private http: HttpClient
   ) {}
 
+  config: ServerConfig;
   getConfig(): Observable<ServerConfig> {
-    return this.http.get<ServerConfig>('/api/config');
+    if(!this.config) {
+      return this.http.get<ServerConfig>('/api/config').do(config => this.config = config);
+    }
+    return Observable.of(this.config);
   }
 
   createUser(formData: any): Observable<User> {

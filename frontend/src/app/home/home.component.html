@@ -5,9 +5,14 @@
     </a>
   </div>
   <div class="jumbotron">
-    <h1 class="display-3">RightAna</h1>
+    <h1 class="display-2 d-none d-sm-block">RightAna</h1>
+    <h1 class="display-4 d-sm-none">RightAna</h1>
     <p class="lead">Carefree web analytics on your server!</p>
     <hr class="my-4">
+    <ng-container *ngIf="serverAnnounce">
+      <b>{{serverAnnounce}}</b>
+      <hr class="my-4">
+    </ng-container>
     <div class="row my-2">
       <div class="col-sm-6">
         <ul>
