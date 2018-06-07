@@ -45,8 +45,8 @@ func CreateCollection(ownerID uint64, name string) (*Collection, error) {
 }
 
 // CreateCollectionByID creates a collection with a fixed ID
-func CreateCollectionByID(id string, name string, ownerEmail string) (*Collection, error) {
-	user, err := GetUserByEmail(ownerEmail)
+func CreateCollectionByID(id string, name string, username string) (*Collection, error) {
+	user, err := GetUserByName(username)
 	if err != nil {
 		return nil, err
 	}

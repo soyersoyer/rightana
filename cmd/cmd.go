@@ -92,10 +92,10 @@ func ChangePassword(name string) {
 	}
 }
 
-// CreateCollection creates a collection with name and the owner's email
-func CreateCollection(collectionID string, name string, email string) {
+// CreateCollection creates a collection with name and the owner's username
+func CreateCollection(collectionID string, name string, user string) {
 	inits()
-	collection, err := service.CreateCollectionByID(collectionID, name, email)
+	collection, err := service.CreateCollectionByID(collectionID, name, user)
 	if err != nil {
 		log.Fatalln(err)
 	}

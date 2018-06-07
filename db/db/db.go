@@ -313,7 +313,7 @@ func GetCollectionsOwnedByUser(ID uint64) ([]Collection, error) {
 	return collections, nil
 }
 
-// GetCollectionsByUserID returns collections for the user with the email address
+// GetCollectionsByUserID returns collections accessible by the user
 func GetCollectionsByUserID(ID uint64) ([]Collection, error) {
 	key := ""
 	collection := Collection{}
