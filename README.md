@@ -28,10 +28,10 @@ We use it to track our and our client's websites.
 - Easy to upgrade (guaranteed after version 1.0)
 - One binary distribution
 - Space efficient, fast, embedded database
-- Visitor friendly
+- Visitor friendly (no popups, no cookie consent bar, no nonsense)
 - You don't have to sell your visitor's data to a company
 - Tracks sessions, not users
-
+- GDPR compliant without any annoying popup
 
 ### Screenshots
 
@@ -110,3 +110,4 @@ This software is under initial development (0.x) and the database format may cha
 - Demo server
 - Backup solution
 - Realtime views
+- Clustering
