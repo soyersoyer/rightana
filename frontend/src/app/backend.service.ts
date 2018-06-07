@@ -8,6 +8,7 @@ import { ToastyService } from './toasty/toasty.module';
 
 export class ServerConfig {
   enable_registration: boolean;
+  tracking_id: string;
 }
 
 export class User {

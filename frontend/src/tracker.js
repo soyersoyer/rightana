@@ -133,7 +133,7 @@ window.rightana = function() {
     updateSessionEnd();
   });
 
-  (window.rightana.q || []).forEach(function(i) {
+  (window.rightana && window.rightana.q || []).forEach(function(i) {
     processCommands.apply(this, i);
   });
 

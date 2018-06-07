@@ -37,7 +37,7 @@
           <td>{{s.pageview_count}}</td>
         </tr>
         <tr *ngIf="s.showDetails">
-          <td colspan="11">
+          <td colspan="12">
             <div><b>Begin</b>: {{s.begin / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
             <div><b>End</b>: {{s.begin / 1000000 + s.duration*1000 | date:"yyyy.MM.dd HH:mm:ss"}}</div>
             <div><b>User IP</b>: {{s.user_ip}}</div>
@@ -50,7 +50,7 @@
           </td>
         </tr>
         <tr *ngIf="s.showDetails && s.pageviews">
-          <td colspan="11">
+          <td colspan="12">
             <table class="m-3 table table-sm table-responsive">
               <thead>
                 <tr>

@@ -14,6 +14,7 @@ type Config struct {
 	DataDir            string
 	EnableRegistration bool
 	UseBundledWebApp   bool
+	TrackingID         string
 }
 
 var (
@@ -38,6 +39,7 @@ func ReadConfig() Config {
 	viper.SetDefault("DataDir", "data")
 	viper.SetDefault("EnableRegistration", true)
 	viper.SetDefault("UseBundledWebApp", true)
+	viper.SetDefault("TrackingID", "")
 
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -49,6 +51,7 @@ func ReadConfig() Config {
 	ActualConfig.DataDir = viper.GetString("DataDir")
 	ActualConfig.EnableRegistration = viper.GetBool("EnableRegistration")
 	ActualConfig.UseBundledWebApp = viper.GetBool("UseBundledWebApp")
+	ActualConfig.TrackingID = viper.GetString("TrackingID")
 
 	log.Printf("using config: %+v", ActualConfig)
 	return ActualConfig
