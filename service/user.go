@@ -32,11 +32,11 @@ func CreateUser(input *CreateUserT) (*User, error) {
 		return nil, errors.RegistrationDisabled
 	}
 
-	if !emailCheck(input.Email) {
-		return nil, errors.InvalidEmail.T(input.Email)
-	}
 	if !usernameCheck(input.Name) {
 		return nil, errors.InvalidUsername.T(input.Name)
+	}
+	if !emailCheck(input.Email) {
+		return nil, errors.InvalidEmail.T(input.Email)
 	}
 	if !passwordCheck(input.Password) {
 		return nil, errors.PasswordTooShort
@@ -92,6 +92,24 @@ func ChangePassword(user *User, currentPassword string, password string) error {
 	}
 	if err := compareHashAndPassword(user.Password, currentPassword); err != nil {
 		return errors.PasswordNotMatch
+	}
+	hashedPass, err := hashPassword(password)
+	if err != nil {
+		return err
+	}
+	user.Password = hashedPass
+
+	if err := db.UpdateUser(user); err != nil {
+		return errors.DBError.Wrap(err, user)
+	}
+
+	return nil
+}
+
+// ChangePasswordForce change a user's password
+func ChangePasswordForce(user *User, password string) error {
+	if !passwordCheck(password) {
+		return errors.PasswordTooShort
 	}
 	hashedPass, err := hashPassword(password)
 	if err != nil {

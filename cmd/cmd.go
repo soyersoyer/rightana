@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/soyersoyer/rightana/api"
 	"github.com/soyersoyer/rightana/config"
@@ -51,17 +54,42 @@ func Seed(trackingID string, count int) {
 }
 
 // RegisterUser registers a new user
-func RegisterUser(email string, name string, password string) {
+func RegisterUser(email string, name string) {
 	inits()
 	config.ActualConfig.EnableRegistration = true
-	user, err := service.CreateUser(&service.CreateUserT{
-		Email:    email,
-		Name:     name,
-		Password: password})
+	fmt.Print("Password: ")
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println("user created:", user.Email)
+	fmt.Println("")
+	user, err := service.CreateUser(&service.CreateUserT{
+		Email:    email,
+		Name:     name,
+		Password: string(password)})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Println("user created:", user.Name)
+}
+
+// ChangePassword changes a user's password
+func ChangePassword(name string) {
+	inits()
+	user, err := service.GetUserByName(name)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Print("Password: ")
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("")
+	err = service.ChangePasswordForce(user, string(password))
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 // CreateCollection creates a collection with name and the owner's email

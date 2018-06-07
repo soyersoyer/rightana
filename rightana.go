@@ -21,7 +21,8 @@ var (
 	register              = app.Command("register", "Register a new user.")
 	registerEmail         = register.Arg("email", "Email for user.").Required().String()
 	registerName          = register.Arg("name", "Username for user.").Required().String()
-	registerPassword      = register.Arg("password", "Password for user.").Required().String()
+	passwd                = app.Command("passwd", "Change user password")
+	passwdName            = passwd.Arg("name", "username for user.").Required().String()
 	createCollection      = app.Command("create-collection", "Create a collection")
 	createCollectionID    = createCollection.Arg("id", "Collection's ID").Required().String()
 	createCollectionName  = createCollection.Arg("name", "Collection's name").Required().String()
@@ -40,7 +41,9 @@ func main() {
 	case "netseed":
 		cmd.NetSeed(*netseedServer, *netseedCollectionID, *netseedCount)
 	case "register":
-		cmd.RegisterUser(*registerEmail, *registerName, *registerPassword)
+		cmd.RegisterUser(*registerEmail, *registerName)
+	case "passwd":
+		cmd.ChangePassword(*passwdName)
 	case "create-collection":
 		cmd.CreateCollection(*createCollectionID, *createCollectionName, *createCollectionEmail)
 	}
