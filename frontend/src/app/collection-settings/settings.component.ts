@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Collection, Shard, BackendService } from '../backend.service';
 import { UserComponent } from '../user/user.component';
 import { RValidators } from '../forms/rvalidators';
+import { ToastyService } from '../toasty/toasty.service';
 
 @Component({
   selector: 'rana-collection-settings',
@@ -23,6 +24,7 @@ export class CollectionSettingsComponent implements OnInit {
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private user: UserComponent,
+    private toasty: ToastyService,
   ) { }
 
   ngOnInit() {
@@ -57,12 +59,18 @@ export class CollectionSettingsComponent implements OnInit {
 
   save() {
     this.backend.saveCollection(this.user.user, this.collection.name, this.form.value)
-      .subscribe(_ => this.router.navigate(['../..', this.form.value.name], {relativeTo: this.route}));
+      .subscribe(_ => {
+        this.toasty.success('Save success');
+        this.router.navigate(['../..', this.form.value.name, 'settings'], {relativeTo: this.route});
+      });
   }
 
   delete() {
     this.backend.deleteCollection(this.user.user, this.collection.name)
-      .subscribe(_ => this.router.navigate(['../..'], {relativeTo: this.route}));
+      .subscribe(_ => {
+        this.toasty.success('Delete success');
+        this.router.navigate(['../..'], {relativeTo: this.route});
+      });
   }
 
   deleteShard(shard: Shard) {

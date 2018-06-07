@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { ToastyService } from 'ng2-toasty';
 
 import { BackendService, AuthService } from "../../backend.service"
 import { RValidators } from '../../forms/rvalidators';
+import { ToastyService } from '../../toasty/toasty.module';
 
 @Component({
   selector: 'rana-delete-account',

@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { ToastyService } from 'ng2-toasty';
 
 import { UserInfo, UserUpdate, BackendService } from '../backend.service';
 import { RValidators } from '../forms/rvalidators';
+import { ToastyService } from '../toasty/toasty.module';
 
 @Component({
   selector: 'rana-admin-users-edit',

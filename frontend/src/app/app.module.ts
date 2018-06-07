@@ -4,7 +4,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ToastyModule, ToastyService } from 'ng2-toasty';
+import { ToastyModule, ToastyService } from './toasty/toasty.module';
 
 import { AppComponent } from './app.component';
 import { AuthService, BackendService, AuthInterceptor, ErrorInterceptor } from './backend.service';
@@ -109,7 +109,7 @@ const routes: Routes = [
     HttpClientModule,
     ReactiveFormsModule,
     RouterModule.forRoot(routes),
-    ToastyModule.forRoot(),
+    ToastyModule,
   ],
   providers: [
     BackendService,

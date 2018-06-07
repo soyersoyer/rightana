@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService, BackendService } from '../backend.service';
 import { Router } from '@angular/router';
 
-import { ToastyService } from 'ng2-toasty';
+import { ToastyService } from '../toasty/toasty.module';
 
 @Component({
   selector: 'rana-logout',

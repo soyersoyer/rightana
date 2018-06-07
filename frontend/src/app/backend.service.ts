@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/do';
 
-import { ToastyService } from 'ng2-toasty';
+import { ToastyService } from './toasty/toasty.module';
 
 export class ServerConfig {
   enable_registration: boolean;
