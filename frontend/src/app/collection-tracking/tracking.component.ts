@@ -35,9 +35,9 @@ export class CollectionTrackingComponent implements OnInit {
     m=d.getElementsByTagName('script')[0];
     a.async=1; a.src=u;
     m.parentNode.insertBefore(a,m)
-  })(document, window, '${this.getOrigin()}/tracker.js', 'rana');
-  rana('setup', '${this.getOrigin()}/api', '${this.collection.id}');
-  rana('trackPageview');
+  })(document, window, '${this.getOrigin()}/tracker.js', 'rightana');
+  rightana('setup', '${this.getOrigin()}/api', '${this.collection.id}');
+  rightana('trackPageview');
 </script>
 <!-- rightana -->
 `;
