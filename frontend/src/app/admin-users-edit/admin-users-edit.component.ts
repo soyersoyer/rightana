@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastyService } from 'ng2-toasty';
 
 import { UserInfo, UserUpdate, BackendService } from '../backend.service';
+import { RValidators } from '../forms/rvalidators';
 
 @Component({
   selector: 'rana-admin-users-edit',
@@ -24,9 +25,9 @@ export class AdminUsersEditComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      name: [null, [Validators.required, Validators.pattern("^[a-z0-9.]+$")]],
-      email: [null, [Validators.required, Validators.email]],
-      password: [null, [Validators.required]],
+      name: [null, RValidators.userName],
+      email: [null, RValidators.email],
+      password: [null, RValidators.password],
       is_admin: [null, [Validators.required]],
       disable_pw_change: [null, [Validators.required]],
       limit_collections: [null, [Validators.required]],

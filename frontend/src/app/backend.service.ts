@@ -286,12 +286,12 @@ export class BackendService {
     return this.http.get<UserInfo[]>(`/api/admin/users`);
   }
 
-  getUserInfo(email: string): Observable<UserInfo> {
-    return this.http.get<UserInfo>(`/api/admin/users/${email}`);
+  getUserInfo(name: string): Observable<UserInfo> {
+    return this.http.get<UserInfo>(`/api/admin/users/${name}`);
   }
 
-  updateUser(email: string, user: UserUpdate): Observable<string> {
-    return this.http.patch<string>(`/api/admin/users/${email}`, user);
+  updateUser(name: string, user: UserUpdate): Observable<string> {
+    return this.http.patch<string>(`/api/admin/users/${name}`, user);
   }
 
   getCollections(): Observable<CollectionInfo[]> {

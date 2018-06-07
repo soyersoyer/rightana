@@ -20,10 +20,10 @@
         </div>
       </div>
       <div class="col-sm-3" *ngIf="collections.length === 0 && selfPage">
-        <div class="card my-2">
-          <div class="card-body" style="width: 18rem">
+        <div class="card my-2" style="width: 18rem">
+          <div class="card-body">
             <div class="card-title">
-              You have {{collections.length}} collection
+              You don't have any collection yet.
             </div>
             <div class="card-text">
               <a routerLink="create">Create new</a>

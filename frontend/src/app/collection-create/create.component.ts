@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import { UserComponent } from '../user/user.component';
 import { BackendService } from '../backend.service';
+import { RValidators } from '../forms/rvalidators';
 
 @Component({
   selector: 'rana-collection-create',
@@ -22,7 +23,7 @@ export class CollectionCreateComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      name: [null, [Validators.required]],
+      name: [null, RValidators.collectionName],
     });
   }
 

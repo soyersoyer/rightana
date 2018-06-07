@@ -6,6 +6,9 @@
         <div class="form-group">
           <label>Name (Domain name / Group name)</label>
           <input type="text" class="form-control" formControlName="name">
+          <div class="invalid-feedback">
+            <rana-invalid-collection-name></rana-invalid-collection-name>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary">Create</button>
       </form>

@@ -86,7 +86,7 @@ func UpdateUser(name string, input *UserUpdateT) error {
 		return errors.UserNotExist.T(name).Wrap(err)
 	}
 
-	if name != input.Name {
+	if user.Name != input.Name {
 		if !usernameCheck(input.Name) {
 			return errors.InvalidUsername.T(input.Name)
 		}

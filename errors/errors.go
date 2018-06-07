@@ -9,6 +9,7 @@ var (
 	RegistrationDisabled    = &Error{"Registration disabled", 403, "", ""}
 	InvalidEmail            = &Error{"Invalid email", 400, "", ""}
 	InvalidUsername         = &Error{"Invalid username", 400, "", ""}
+	InvalidCollectionName   = &Error{"Invalid collection name", 400, "", ""}
 	PasswordNotMatch        = &Error{"Password not match", 403, "", ""}
 	PasswordTooShort        = &Error{"Password too short", 400, "", ""}
 	PasswordChangeDisabled  = &Error{"Password change disabled for this account", 403, "", ""}
@@ -25,6 +26,7 @@ var (
 	BotsDontMatter          = &Error{"Bots don't matter", 403, "", ""}
 	CollectionNotExist      = &Error{"Collection not exist", 404, "", ""}
 	CollectionLimitExceeded = &Error{"Collection limit exceeded", 403, "", ""}
+	CollectionNameExist     = &Error{"Collection name exists", 403, "", ""}
 	SessionNotExist         = &Error{"Session not exist", 404, "", ""}
 	TeammateExist           = &Error{"Teammate exist", 403, "", ""}
 )

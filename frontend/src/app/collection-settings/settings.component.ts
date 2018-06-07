@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Collection, Shard, BackendService } from '../backend.service';
 import { UserComponent } from '../user/user.component';
+import { RValidators } from '../forms/rvalidators';
 
 @Component({
   selector: 'rana-collection-settings',
@@ -27,7 +28,7 @@ export class CollectionSettingsComponent implements OnInit {
   ngOnInit() {
     this.form = this.fb.group({
       id: [null],
-      name: [null, [Validators.required]],
+      name: [null, RValidators.collectionName],
     });
     this.route.parent.params.forEach((params: Params) => {
       const collectionName = params['collectionName'];

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Collection, BackendService, Teammate } from '../backend.service';
 import { UserComponent } from '../user/user.component';
+import { RValidators } from '../forms/rvalidators';
 
 @Component({
   selector: 'rana-collection-teammates',
@@ -21,7 +22,7 @@ export class TeammatesComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      email: [null, [Validators.required]],
+      email: [null, RValidators.email],
     });
     this.getTeammates();
   }

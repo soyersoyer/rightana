@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastyService } from 'ng2-toasty';
 
 import { BackendService, AuthService } from "../../backend.service"
+import { RValidators } from '../../forms/rvalidators';
 
 @Component({
   selector: 'rana-change-password',
@@ -21,9 +22,8 @@ export class ChangePasswordComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      currentPassword: [null, [Validators.required]],
-      password: [null, [Validators.required]],
-      password2: [null, [Validators.required]],
+      currentPassword: [null, RValidators.password],
+      password: [null, RValidators.password],
     });
   }
 

@@ -529,12 +529,12 @@ func TestGetCollection(t *testing.T) {
 }
 
 func TestUpdateCollection(t *testing.T) {
-	collName := "NewName"
+	collName := "newname"
 	collection := collectionT{
 		Name: collName,
 	}
 	createCollectionSuccess(t, userData.Name, &collection)
-	collection.Name = "NewName2"
+	collection.Name = "newname2"
 	w, r := postJSON(collection)
 	r = setCollectionName(r, userData.Name, collName)
 	userBaseHandler(collectionBaseHandler(http.HandlerFunc(updateCollection))).ServeHTTP(w, r)
@@ -548,7 +548,7 @@ func TestUpdateCollection(t *testing.T) {
 
 func TestDeleteCollection(t *testing.T) {
 	collection := collectionT{
-		Name: "NewName",
+		Name: "newname",
 	}
 	createCollectionSuccess(t, userData.Name, &collection)
 	w, r := postJSON(nil)

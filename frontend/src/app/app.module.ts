@@ -9,6 +9,8 @@ import { ToastyModule, ToastyService } from 'ng2-toasty';
 import { AppComponent } from './app.component';
 import { AuthService, BackendService, AuthInterceptor, ErrorInterceptor } from './backend.service';
 import { LoginComponent } from './login/login.component';
+import { InvalidUsernameComponent, InvalidEmailComponent, InvalidPasswordComponent,
+  InvalidCollectionNameComponent } from './forms/invalid.component';
 import { HomeComponent } from './home/home.component';
 import { RegistrationComponent } from './registration/registration.component';
 import { CollectionDashboardComponent } from './collection-dashboard/dashboard.component';
@@ -30,6 +32,7 @@ import { ChartComponent } from './chart/chart.component';
 
 import { ColorPercentComponent } from './utils/color-percent.component';
 import { BytesPipe } from './utils/bytes.pipe';
+import { MarkAsToucedDirective } from './utils/mark-as-touched.directive';
 
 import { AdminComponent } from './admin/admin.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
@@ -77,6 +80,10 @@ const routes: Routes = [
     CollectionComponent,
     CollectionCreateComponent,
     CollectionDashboardComponent,
+    InvalidUsernameComponent,
+    InvalidEmailComponent,
+    InvalidPasswordComponent,
+    InvalidCollectionNameComponent,
     LogoutComponent,
     CollectionSettingsComponent,
     TeammatesComponent,
@@ -90,6 +97,7 @@ const routes: Routes = [
     ChartComponent,
     ColorPercentComponent,
     BytesPipe,
+    MarkAsToucedDirective,
     AdminComponent,
     AdminUsersComponent,
     AdminCollectionsComponent,

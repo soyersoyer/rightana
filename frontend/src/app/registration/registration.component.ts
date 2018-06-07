@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AuthService, BackendService } from '../backend.service';
+import { RValidators } from '../forms/rvalidators';
 
 @Component({
   selector: 'rana-registration',
@@ -20,9 +21,9 @@ export class RegistrationComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      name: [null, [Validators.required, Validators.pattern("^[a-z0-9.]+$")]],
-      email: [null, [Validators.required, Validators.email]],
-      password: [null, [Validators.required]]
+      name: [null, RValidators.userName],
+      email: [null, RValidators.email],
+      password: [null, RValidators.password]
     });
   }
 

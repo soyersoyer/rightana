@@ -6,10 +6,16 @@
         <div class="form-group">
           <label for="name">Username</label>
           <input id="name" type="text" class="form-control form-control-lg" formControlName="name">
+          <div class="invalid-feedback">
+            <rana-invalid-username></rana-invalid-username>
+          </div>
         </div>
         <div class="form-group">
           <label for="email">Email</label>
           <input id="email" type="email" class="form-control form-control-lg" formControlName="email">
+          <div class="invalid-feedback">
+            <rana-invalid-email></rana-invalid-email>
+          </div>
         </div>
         <div class="form-group">
           <label for="password">Password</label>
@@ -33,7 +39,7 @@
             <input type="checkbox" class="form-check-input" id="limit_collections" formControlName="limit_collections">
             <label class="form-check-label" for="limit_collections">Limit Collection creation</label>
           </div>
-          <div class="form-group">
+          <div class="form-group" [hidden]="!form.value.limit_collections">
             <label for="collection_limit">Collection Limit</label>
             <input id="collection_limit" type="number" min="0" class="form-control form-control-lg" formControlName="collection_limit">
           </div>

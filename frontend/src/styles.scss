@@ -45,3 +45,16 @@ a {
 .min-height-100vh-minus-top {
 	min-height: calc(100vh - 56px);
 }
+
+.form-check-input.ng-touched.ng-invalid ~ .invalid-feedback,
+.form-control.ng-touched.ng-invalid ~ .invalid-feedback {
+	display: block;
+}
+
+.form-control.ng-touched.ng-invalid {
+	border-color: theme-color(danger);
+}
+
+.form-check-input.ng-touched.ng-invalid ~ .form-check-label {
+	color: theme-color(danger);
+}

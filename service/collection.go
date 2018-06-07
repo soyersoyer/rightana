@@ -2,6 +2,7 @@ package service
 
 import (
 	"math/rand"
+	"regexp"
 	"sort"
 	"strconv"
 	"time"
@@ -37,6 +38,9 @@ func CreateCollection(ownerID uint64, name string) (*Collection, error) {
 		Name:    name,
 		Created: time.Now().UnixNano(),
 	}
+	if err := validateCollection(collection); err != nil {
+		return nil, err
+	}
 	err = db.InsertCollection(collection)
 	if err != nil {
 		return nil, errors.DBError.Wrap(err, collection)
@@ -54,6 +58,9 @@ func CreateCollectionByID(id string, name string, username string) (*Collection,
 		ID:      id,
 		OwnerID: user.ID,
 		Name:    name,
+	}
+	if err := validateCollection(collection); err != nil {
+		return nil, err
 	}
 	if err := db.InsertCollection(collection); err != nil {
 		if err != nil {
@@ -113,6 +120,9 @@ func GetCollectionByName(user *db.User, name string) (*Collection, error) {
 // UpdateCollection updates the collection's name
 func UpdateCollection(collection *Collection, name string) error {
 	collection.Name = name
+	if err := validateCollection(collection); err != nil {
+		return err
+	}
 	if err := db.UpdateCollection(collection); err != nil {
 		return errors.DBError.Wrap(err, collection)
 	}
@@ -282,4 +292,22 @@ func GetPageviews(collection *Collection, sessionKey string) ([]*db.PageviewData
 // SeedCollection seed a collection with n sessions
 func SeedCollection(from time.Time, to time.Time, collectionID string, n int) error {
 	return db.Seed(from, to, collectionID, n)
+}
+
+var collectionRegexp = regexp.MustCompile("^[a-z0-9.]+$")
+
+func validateCollection(c *Collection) error {
+	if !collectionRegexp.MatchString(c.Name) {
+		return errors.InvalidCollectionName.T(c.Name)
+	}
+
+	aColl, err := db.GetCollectionByName(c.OwnerID, c.Name)
+	if err != nil && err != db.ErrKeyNotExists {
+		return errors.DBError.T(c.Name).Wrap(err)
+	}
+	if err == nil && aColl.ID != c.ID {
+		return errors.CollectionNameExist.T(c.Name)
+	}
+
+	return nil
 }

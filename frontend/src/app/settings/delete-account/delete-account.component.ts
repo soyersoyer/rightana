@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ToastyService } from 'ng2-toasty';
 
 import { BackendService, AuthService } from "../../backend.service"
+import { RValidators } from '../../forms/rvalidators';
 
 @Component({
   selector: 'rana-delete-account',
@@ -23,7 +24,7 @@ export class DeleteAccountComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      password: [null, [Validators.required]],
+      password: [null, RValidators.password],
     });
   }
 
