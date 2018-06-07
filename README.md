@@ -17,10 +17,6 @@ From the user's perspective it is very similar to GA
 - include it to your webpage
 - View the reports
 
-## Who uses RightAna?
-
-We use it to track our and our client's websites.
-
 ## Goals
 
 - Easy to install
@@ -32,6 +28,10 @@ We use it to track our and our client's websites.
 - You don't have to sell your visitor's data to a company
 - Tracks sessions, not users
 - GDPR compliant without any annoying popup
+
+### Demo server
+
+[https://rightana.com](https://rightana.com)
 
 ### Screenshots
 
@@ -109,7 +109,6 @@ This software is under initial development (0.x) and the database format may cha
 
 ## Coming features
 - Admin page
-- Demo server
 - Backup solution
 - Realtime views
 - Clustering
