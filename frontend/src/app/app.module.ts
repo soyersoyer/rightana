@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
 import { ToastyModule, ToastyService } from './toasty/toasty.module';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
 import { AuthService, BackendService, AuthInterceptor, ErrorInterceptor } from './backend.service';
@@ -109,6 +110,7 @@ const routes: Routes = [
     HttpClientModule,
     ReactiveFormsModule,
     RouterModule.forRoot(routes),
+    NgbDropdownModule.forRoot(),
     ToastyModule,
   ],
   providers: [

@@ -12,17 +12,20 @@
       </li>
     </ul>
     <ul *ngIf="loggedIn" class="navbar-nav ml-auto">
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" [routerLink]="user">Collections</a>
-      </li>
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/settings">Settings</a>
-      </li>
-      <li *ngIf="isAdmin" class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/admin">Admin</a>
-      </li>
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/logout">Logout</a>
+      <li class="nav-item">
+        <div ngbDropdown placement="bottom-right" class="dropdown">
+          <a class="nav-link dropdown-toggle" id="profile-menu" ngbDropdownToggle>{{user}}</a>
+          <div ngbDropdownMenu class="dropdown-menu" aria-labelledby="profile-menu">
+            <a class="dropdown-item" routerLinkActive="active" [routerLink]="user">Collections</a>
+            <a class="dropdown-item" routerLinkActive="active" routerLink="/settings">Settings</a>
+            <ng-container *ngIf="isAdmin">
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" routerLinkActive="active" routerLink="/admin">Admin</a>
+            </ng-container>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" routerLinkActive="active" routerLink="/logout">Logout</a>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
