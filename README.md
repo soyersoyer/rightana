@@ -108,7 +108,5 @@ The configuration filename is rightana.yaml (or an another format what the viper
 This software is under initial development (0.x) and the database format may change in the future. In other words, it is not guaranteed that the next version of the software will be able to read the the data stored by the current version.
 
 ## Coming features
-- Admin page
 - Backup solution
 - Realtime views
-- Clustering

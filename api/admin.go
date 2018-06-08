@@ -11,11 +11,7 @@ import (
 func adminAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userID := getUserIDCtx(r.Context())
-			user, err := service.GetUserByID(userID)
-			if err != nil {
-				return err
-			}
+			user := getLoggedInUserCtx(r.Context())
 			if !user.IsAdmin {
 				return service.ErrAccessDenied
 			}

@@ -17,8 +17,8 @@ type collectionT struct {
 
 func getCollectionSummariesE(w http.ResponseWriter, r *http.Request) error {
 	user := getUserCtx(r.Context())
-	reader := getUserIDCtx(r.Context())
-	summary, err := service.GetCollectionSummariesByUserID(user.ID, reader)
+	loggedInUser := getLoggedInUserCtx(r.Context())
+	summary, err := service.GetCollectionSummariesByUserID(user.ID, loggedInUser.ID)
 	if err != nil {
 		return err
 	}
@@ -33,8 +33,8 @@ func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
-	ownerID := getUserIDCtx(r.Context())
-	collection, err := service.CreateCollection(ownerID, input.Name)
+	loggedInUser := getLoggedInUserCtx(r.Context())
+	collection, err := service.CreateCollection(loggedInUser.ID, input.Name)
 	if err != nil {
 		return err
 	}
@@ -72,9 +72,9 @@ func collectionBaseHandler(next http.Handler) http.Handler {
 func collectionReadAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userID := getUserIDCtx(r.Context())
+			loggedInUser := getLoggedInUserCtx(r.Context())
 			collection := getCollectionCtx(r.Context())
-			if err := service.CollectionReadAccessCheck(collection, userID); err != nil {
+			if err := service.CollectionReadAccessCheck(collection, loggedInUser); err != nil {
 				return err
 			}
 			next.ServeHTTP(w, r)
@@ -85,9 +85,9 @@ func collectionReadAccessHandler(next http.Handler) http.Handler {
 func collectionWriteAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userID := getUserIDCtx(r.Context())
+			loggedInUser := getLoggedInUserCtx(r.Context())
 			collection := getCollectionCtx(r.Context())
-			if err := service.CollectionWriteAccessCheck(collection, userID); err != nil {
+			if err := service.CollectionWriteAccessCheck(collection, loggedInUser); err != nil {
 				return err
 			}
 			next.ServeHTTP(w, r)

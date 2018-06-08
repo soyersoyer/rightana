@@ -51,9 +51,9 @@ func userBaseHandler(next http.Handler) http.Handler {
 func userAccessHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(handleError(
 		func(w http.ResponseWriter, r *http.Request) error {
-			userID := getUserIDCtx(r.Context())
+			loggedInUser := getLoggedInUserCtx(r.Context())
 			user := getUserCtx(r.Context())
-			if user.ID != userID {
+			if user.ID != loggedInUser.ID {
 				return service.ErrAccessDenied
 			}
 			next.ServeHTTP(w, r)

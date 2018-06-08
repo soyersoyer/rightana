@@ -7,12 +7,12 @@ import (
 	"github.com/soyersoyer/rightana/service"
 )
 
-func getUserIDCtx(ctx context.Context) uint64 {
-	return ctx.Value(keyUserID).(uint64)
+func getLoggedInUserCtx(ctx context.Context) *service.User {
+	return ctx.Value(keyLoggedInUser).(*service.User)
 }
 
-func setUserIDCtx(ctx context.Context, ID uint64) context.Context {
-	return context.WithValue(ctx, keyUserID, ID)
+func setLoggedInUserCtx(ctx context.Context, user *service.User) context.Context {
+	return context.WithValue(ctx, keyLoggedInUser, user)
 }
 
 func loggedOnlyHandler(next http.Handler) http.Handler {
@@ -25,7 +25,11 @@ func loggedOnlyHandler(next http.Handler) http.Handler {
 				return err
 			}
 
-			ctx := setUserIDCtx(r.Context(), userID)
+			user, err := service.GetUserByID(userID)
+			if err != nil {
+				return err
+			}
+			ctx := setLoggedInUserCtx(r.Context(), user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return nil
 		}))

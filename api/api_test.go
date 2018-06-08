@@ -237,9 +237,8 @@ func TestUserBaseHandler(t *testing.T) {
 
 func TestUserAccessHandler(t *testing.T) {
 	name := "admin"
-	user := getDbUserByName(name)
 	w, r := postJSON(nil)
-	r = setUserIDReq(r, user.ID)
+	r = setLoggedInUserWithNameReq(r, name)
 	r = setUserName(r, name)
 	userBaseHandler(userAccessHandler(getNullHandler())).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -249,7 +248,8 @@ func TestUserAccessHandlerBad(t *testing.T) {
 	name := "admin"
 	user := getDbUserByName(name)
 	w, r := postJSON(nil)
-	r = setUserIDReq(r, user.ID+1)
+	user.ID++
+	r = setLoggedInUserReq(r, user)
 	r = setUserName(r, name)
 	userBaseHandler(userAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -383,8 +383,7 @@ func TestCollectionLimit(t *testing.T) {
 		Name: "azaz.org",
 	}
 	w, r = postJSON(collection)
-	user := getDbUserByName(newUser.Name)
-	r = setUserIDReq(r, user.ID)
+	r = setLoggedInUserWithNameReq(r, newUser.Name)
 	createCollection(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Collection limit exceeded (0)\n")
@@ -393,8 +392,7 @@ func TestCollectionLimit(t *testing.T) {
 func createCollectionSuccess(t *testing.T, username string, collection *collectionT) {
 	collName := collection.Name
 	w, r := postJSON(collection)
-	user := getDbUserByName(username)
-	r = setUserIDReq(r, user.ID)
+	r = setLoggedInUserWithNameReq(r, username)
 	createCollection(w, r)
 	testCode(t, w, 200)
 	testJSONBody(t, w, &collection)
@@ -479,9 +477,9 @@ func TestLoggedInHandlerSuccess(t *testing.T) {
 	w, r := postJSON(nil)
 	setAuthToken(r, token)
 	loggedOnlyHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := getUserIDReq(r)
-		if userID != user.ID {
-			t.Error("bad userid", userID, user.ID)
+		loggedInUser := getLoggedInUserReq(r)
+		if loggedInUser.ID != user.ID {
+			t.Error("bad userid", loggedInUser.ID, user.ID)
 		}
 	})).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -489,8 +487,7 @@ func TestLoggedInHandlerSuccess(t *testing.T) {
 
 func TestGetCollectionZero(t *testing.T) {
 	w, r := postJSON(nil)
-	user := getDbUserByName(userData.Name)
-	r = setUserIDReq(r, user.ID)
+	r = setLoggedInUserWithNameReq(r, userData.Name)
 	getCollections(w, r)
 	testCode(t, w, 200)
 	collections := []service.CollectionSummaryT{}
@@ -506,8 +503,7 @@ func TestCreateCollectionSuccess(t *testing.T) {
 
 func TestGetCollectionsOne(t *testing.T) {
 	w, r := postJSON(nil)
-	user := getDbUserByName(userData.Name)
-	r = setUserIDReq(r, user.ID)
+	r = setLoggedInUserWithNameReq(r, userData.Name)
 	getCollections(w, r)
 	testCode(t, w, 200)
 	collections := []service.CollectionSummaryT{}
@@ -588,8 +584,7 @@ func TestCollectionBaseHandler(t *testing.T) {
 func TestCollectionReadAccessHandler(t *testing.T) {
 	log.Println(userData)
 	w, r := postJSON(nil)
-	user := getDbUserByName(userData.Name)
-	r = setUserIDReq(r, user.ID)
+	r = setLoggedInUserWithNameReq(r, userData.Name)
 	r = setCollectionName(r, userData.Name, collectionData.Name)
 	userBaseHandler(collectionBaseHandler(collectionReadAccessHandler(getNullHandler()))).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -597,8 +592,7 @@ func TestCollectionReadAccessHandler(t *testing.T) {
 
 func TestCollectionWriteAccessHandler(t *testing.T) {
 	w, r := postJSON(nil)
-	user := getDbUserByName(userData.Name)
-	r = setUserIDReq(r, user.ID)
+	r = setLoggedInUserWithNameReq(r, userData.Name)
 	r = setCollectionName(r, userData.Name, collectionData.Name)
 	userBaseHandler(collectionBaseHandler(collectionWriteAccessHandler(getNullHandler()))).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -606,8 +600,7 @@ func TestCollectionWriteAccessHandler(t *testing.T) {
 
 func TestCollectionReadAccessHandlerNoRight(t *testing.T) {
 	w, r := postJSON(nil)
-	user2 := getDbUserByName(user2Data.Name)
-	r = setUserIDReq(r, user2.ID)
+	r = setLoggedInUserWithNameReq(r, user2Data.Name)
 	r = setCollectionName(r, userData.Name, collectionData.Name)
 	userBaseHandler(collectionBaseHandler(collectionReadAccessHandler(getNoHandler(t)))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -615,8 +608,7 @@ func TestCollectionReadAccessHandlerNoRight(t *testing.T) {
 
 func TestCollectionWriteAccessHandlerNoRight(t *testing.T) {
 	w, r := postJSON(nil)
-	user2 := getDbUserByName(user2Data.Name)
-	r = setUserIDReq(r, user2.ID)
+	r = setLoggedInUserWithNameReq(r, user2Data.Name)
 	r = setCollectionName(r, userData.Name, collectionData.Name)
 	userBaseHandler(collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t)))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -665,8 +657,7 @@ func TestGetCollaborators(t *testing.T) {
 
 func TestTeammateCollectionReadAccess(t *testing.T) {
 	w, r := postJSON(nil)
-	user2 := getDbUserByName(user2Data.Name)
-	r = setUserIDReq(r, user2.ID)
+	r = setLoggedInUserWithNameReq(r, user2Data.Name)
 	r = setCollectionName(r, userData.Name, collectionData.Name)
 	userBaseHandler(collectionBaseHandler(collectionReadAccessHandler(getNullHandler()))).ServeHTTP(w, r)
 	testCode(t, w, 200)
@@ -674,8 +665,7 @@ func TestTeammateCollectionReadAccess(t *testing.T) {
 
 func TestTeammateCollectionWriteAccessNoRight(t *testing.T) {
 	w, r := postJSON(nil)
-	user2 := getDbUserByName(user2Data.Name)
-	r = setUserIDReq(r, user2.ID)
+	r = setLoggedInUserWithNameReq(r, user2Data.Name)
 	r = setCollectionName(r, userData.Name, collectionData.Name)
 	userBaseHandler(collectionBaseHandler(collectionWriteAccessHandler(getNoHandler(t)))).ServeHTTP(w, r)
 	testCode(t, w, 403)
@@ -992,12 +982,17 @@ func setUserName(r *http.Request, name string) *http.Request {
 	return getReqWithRouteContext(r, kv{"name": name})
 }
 
-func setUserIDReq(r *http.Request, userID uint64) *http.Request {
-	return r.WithContext(setUserIDCtx(r.Context(), userID))
+func setLoggedInUserReq(r *http.Request, user *db.User) *http.Request {
+	return r.WithContext(setLoggedInUserCtx(r.Context(), user))
 }
 
-func getUserIDReq(r *http.Request) uint64 {
-	return getUserIDCtx(r.Context())
+func setLoggedInUserWithNameReq(r *http.Request, name string) *http.Request {
+	user := getDbUserByName(name)
+	return r.WithContext(setLoggedInUserCtx(r.Context(), user))
+}
+
+func getLoggedInUserReq(r *http.Request) *db.User {
+	return getLoggedInUserCtx(r.Context())
 }
 
 func getDbUserByName(name string) *db.User {

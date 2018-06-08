@@ -75,19 +75,19 @@ func randStringBytes(n int) string {
 }
 
 // CollectionReadAccessCheck checks the read access
-func CollectionReadAccessCheck(collection *Collection, userID uint64) error {
-	if collection.OwnerID != userID && !db.UserIsTeammate(collection, userID) {
-		return ErrAccessDenied
+func CollectionReadAccessCheck(collection *Collection, user *User) error {
+	if collection.OwnerID == user.ID || db.UserIsTeammate(collection, user.ID) || user.IsAdmin {
+		return nil
 	}
-	return nil
+	return ErrAccessDenied
 }
 
 // CollectionWriteAccessCheck checks the write access
-func CollectionWriteAccessCheck(collection *Collection, userID uint64) error {
-	if collection.OwnerID != userID {
-		return ErrAccessDenied
+func CollectionWriteAccessCheck(collection *Collection, user *User) error {
+	if collection.OwnerID == user.ID || user.IsAdmin {
+		return nil
 	}
-	return nil
+	return ErrAccessDenied
 }
 
 // GetCollection fetch a collection by ID
@@ -147,7 +147,7 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 		return nil, ErrDB.Wrap(err, ID)
 	}
 	for _, v := range collections {
-		if err := CollectionReadAccessCheck(&v, readerID); err != nil {
+		if v.OwnerID != readerID && !db.UserIsTeammate(&v, readerID) {
 			continue
 		}
 		pd, err := db.GetPageviewPercent(v.ID, 7)

@@ -22,7 +22,7 @@ import (
 type ctxKey int
 
 const (
-	keyUserID ctxKey = iota
+	keyLoggedInUser ctxKey = iota
 	keyCollection
 	keyUser
 )

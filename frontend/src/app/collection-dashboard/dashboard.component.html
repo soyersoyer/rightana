@@ -11,7 +11,7 @@
         <a class="nav-link" routerLink="sessions" routerLinkActive="active">Sessions</a>
       </li>
       <li class="nav-item">
-        <a *ngIf="collection.owner_name == auth.user" class="nav-link" routerLink="settings" routerLinkActive="active">Settings</a>
+        <a *ngIf="collection.owner_name == auth.user || auth.is_admin" class="nav-link" routerLink="settings" routerLinkActive="active">Settings</a>
       </li>
     </ul>
   </div>
