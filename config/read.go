@@ -16,6 +16,7 @@ type Config struct {
 	UseBundledWebApp   bool
 	TrackingID         string
 	ServerAnnounce     string
+	Backup             map[string]string
 }
 
 var (
@@ -53,6 +54,7 @@ func ReadConfig() Config {
 	ActualConfig.UseBundledWebApp = viper.GetBool("UseBundledWebApp")
 	ActualConfig.TrackingID = viper.GetString("TrackingID")
 	ActualConfig.ServerAnnounce = viper.GetString("ServerAnnounce")
+	ActualConfig.Backup = viper.GetStringMapString("Backup")
 
 	log.Printf("using config: %+v", ActualConfig)
 	return ActualConfig

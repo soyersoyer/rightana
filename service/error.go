@@ -29,6 +29,7 @@ var (
 	ErrCollectionNameExist     = &Error{"Collection name exists", 403, "", ""}
 	ErrSessionNotExist         = &Error{"Session not exist", 404, "", ""}
 	ErrTeammateExist           = &Error{"Teammate exist", 403, "", ""}
+	ErrBackupNotExist          = &Error{"Backup not exist", 404, "", ""}
 )
 
 // Error is the Extended error struct

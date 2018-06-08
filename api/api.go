@@ -73,6 +73,8 @@ func Wire(r *chi.Mux) {
 		})
 		r.Use(cors.Handler)
 		r.Get("/config", getPublicConfig)
+		r.With(loggedOnlyHandler).With(adminAccessHandler).Get("/backups", getBackups)
+		r.Get("/backups/{backupID}/run", runBackup)
 		r.Post("/sessions", createSession)
 		r.Post("/sessions/update", updateSession)
 		r.Post("/pageviews", createPageview)

@@ -1,0 +1,19 @@
+<div class="container mt-2">
+  <h3>Backups</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Dir</th>
+        <th scope="col">Run</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let b of backups">
+        <th scope="row">{{b.id}}</th>
+        <td>{{b.dir}}</td>
+        <td><button class="btn btn-primary" (click)="run(b)">run</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -39,6 +39,8 @@ import { AdminComponent } from './admin/admin.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminCollectionsComponent } from './admin-collections/admin-collections.component';
 import { AdminUsersEditComponent } from './admin-users-edit/admin-users-edit.component';
+import { AdminBackupsComponent } from './admin-backups/admin-backups.component';
+
 import { UserComponent } from './user/user.component';
 
 
@@ -58,6 +60,7 @@ const routes: Routes = [
     { path: 'users', component: AdminUsersComponent},
     { path: 'users/:name', component: AdminUsersEditComponent},
     { path: 'collections', component: AdminCollectionsComponent},
+    { path: 'backups', component: AdminBackupsComponent},
   ]},
   { path: ':user', component: UserComponent, children: [
     { path: "", component: CollectionComponent},
@@ -103,6 +106,7 @@ const routes: Routes = [
     AdminUsersComponent,
     AdminCollectionsComponent,
     AdminUsersEditComponent,
+    AdminBackupsComponent,
     UserComponent,
   ],
   imports: [

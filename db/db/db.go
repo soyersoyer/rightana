@@ -52,6 +52,44 @@ func InitDatabase(basedirParam string) {
 	shardDBs.Store(shardMap{})
 }
 
+// RunBackup copies the database to the dir
+func RunBackup(dir string) error {
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return err
+	}
+	err := cipo.Bolt().View(func(tx *bolt.Tx) error {
+		return tx.CopyFile(dir+"/"+filename, 0600)
+	})
+	if err != nil {
+		return err
+	}
+
+	collections, err := GetCollections()
+	if err != nil {
+		return err
+	}
+	gerrs := []error{}
+	for _, c := range collections {
+		shardDB, err := getShardDB(c.ID)
+		if err != nil {
+			log.Println("can't open shard db for backup:", c.ID, "cause:", err)
+			gerrs = append(gerrs, err)
+			continue
+		}
+		errs := shardDB.RunBackup(dir + "/" + c.ID)
+		if errs != nil {
+			for _, e := range errs {
+				log.Println("can't run backkup on collection", c.Name, "cause:", e)
+			}
+			gerrs = append(gerrs, errs...)
+		}
+	}
+	if len(gerrs) > 0 {
+		return gerrs[0]
+	}
+	return nil
+}
+
 // UpdateUser updates an user
 func UpdateUser(user *User) error {
 	return cipo.Update(user.ID, user)

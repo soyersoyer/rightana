@@ -226,3 +226,23 @@ func (db *DB) getShardArray() shardArray {
 func (db *DB) setShardArray(shards shardArray) {
 	db.shards.Store(shards)
 }
+
+// RunBackup creates a backup for this db
+func (db *DB) RunBackup(dir string) []error {
+	errs := []error{}
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		errs = append(errs, err)
+		return errs
+	}
+	shards := db.getShardArray()
+	for _, shard := range shards {
+		err := shard.db.View(func(tx *bolt.Tx) error {
+			return tx.CopyFile(dir+"/"+shard.id+".bolt", 0600)
+		})
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+	}
+	return errs
+}

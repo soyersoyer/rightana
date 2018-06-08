@@ -124,6 +124,11 @@ export class Shard {
   size: number;
 }
 
+export class Backup {
+  id: string;
+  dir: string;
+}
+
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
   constructor(
@@ -305,6 +310,14 @@ export class BackendService {
 
   getCollections(): Observable<CollectionInfo[]> {
     return this.http.get<CollectionInfo[]>(`/api/admin/collections`);
+  }
+
+  getBackups(): Observable<Backup[]> {
+    return this.http.get<Backup[]>(`/api/backups`);
+  }
+
+  runBackup(id: string): Observable<any> {
+    return this.http.get<any>(`/api/backups/${id}/run`);
   }
 
 }
