@@ -4,8 +4,6 @@ import (
 	"os"
 
 	"gopkg.in/alecthomas/kingpin.v2"
-
-	"github.com/soyersoyer/rightana/cmd"
 )
 
 var (
@@ -35,17 +33,17 @@ func main() {
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case "serve":
-		cmd.Serve()
+		Serve()
 	case "seed":
-		cmd.Seed(*seedCollectionID, *seedCount)
+		Seed(*seedCollectionID, *seedCount)
 	case "netseed":
-		cmd.NetSeed(*netseedServer, *netseedCollectionID, *netseedCount)
+		NetSeed(*netseedServer, *netseedCollectionID, *netseedCount)
 	case "register":
-		cmd.RegisterUser(*registerEmail, *registerName)
+		RegisterUser(*registerEmail, *registerName)
 	case "passwd":
-		cmd.ChangePassword(*passwdName)
+		ChangePassword(*passwdName)
 	case "create-collection":
-		cmd.CreateCollection(*createCollectionID, *createCollectionName, *createCollectionUser)
+		CreateCollection(*createCollectionID, *createCollectionName, *createCollectionUser)
 	}
 
 }
