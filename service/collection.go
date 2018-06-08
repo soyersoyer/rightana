@@ -19,10 +19,24 @@ type CollectionDataInputT = db.CollectionDataInputT
 
 // CreateCollection creates a collection
 func CreateCollection(ownerID uint64, name string) (*Collection, error) {
+	id := randStringBytes(8)
 	user, err := db.GetUserByID(ownerID)
 	if err != nil {
 		return nil, errors.UserNotExist.T(string(ownerID)).Wrap(err)
 	}
+	return createCollection(id, name, user)
+}
+
+// CreateCollectionByID creates a collection with a fixed ID
+func CreateCollectionByID(id string, name string, username string) (*Collection, error) {
+	user, err := GetUserByName(username)
+	if err != nil {
+		return nil, err
+	}
+	return createCollection(id, name, user)
+}
+
+func createCollection(id string, name string, user *User) (*Collection, error) {
 	if user.LimitCollections {
 		collections, err := db.GetCollectionsByUserID(user.ID)
 		if err != nil {
@@ -41,31 +55,9 @@ func CreateCollection(ownerID uint64, name string) (*Collection, error) {
 	if err := validateCollection(collection); err != nil {
 		return nil, err
 	}
-	err = db.InsertCollection(collection)
+	err := db.InsertCollection(collection)
 	if err != nil {
 		return nil, errors.DBError.Wrap(err, collection)
-	}
-	return collection, nil
-}
-
-// CreateCollectionByID creates a collection with a fixed ID
-func CreateCollectionByID(id string, name string, username string) (*Collection, error) {
-	user, err := GetUserByName(username)
-	if err != nil {
-		return nil, err
-	}
-	collection := &Collection{
-		ID:      id,
-		OwnerID: user.ID,
-		Name:    name,
-	}
-	if err := validateCollection(collection); err != nil {
-		return nil, err
-	}
-	if err := db.InsertCollection(collection); err != nil {
-		if err != nil {
-			return nil, errors.DBError.Wrap(err, collection)
-		}
 	}
 	return collection, nil
 }
