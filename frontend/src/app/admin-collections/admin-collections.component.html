@@ -14,8 +14,8 @@
       <tbody>
         <tr *ngFor="let c of collections">
           <th scope="row">{{c.id}}</th>
-          <td>{{c.name}}</td>
-          <td>{{c.owner_name}}</td>
+          <td><a routerLink="/{{c.owner_name}}/{{c.name}}">{{c.name}}</a></td>
+          <td><a routerLink="/{{c.owner_name}}">{{c.owner_name}}</a></td>
           <td>{{c.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>
           <td>{{c.teammate_count}}</td>
           <td><a [routerLink]="[c.id, 'edit']">edit</a></td>

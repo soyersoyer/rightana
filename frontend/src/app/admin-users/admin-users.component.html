@@ -15,7 +15,7 @@
     <tbody>
       <tr *ngFor="let user of users">
         <th scope="row">{{user.id}}</th>
-        <td>{{user.name}}</td>
+        <td><a routerLink="/{{user.name}}">{{user.name}}</a></td>
         <td>{{user.email}}</td>
         <td>{{user.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>
         <td>{{user.collection_count}}</td>
