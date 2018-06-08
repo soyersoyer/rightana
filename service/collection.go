@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/errors"
 )
 
 // Collection is the db's collection struct
@@ -22,7 +21,7 @@ func CreateCollection(ownerID uint64, name string) (*Collection, error) {
 	id := randStringBytes(8)
 	user, err := db.GetUserByID(ownerID)
 	if err != nil {
-		return nil, errors.UserNotExist.T(string(ownerID)).Wrap(err)
+		return nil, ErrUserNotExist.T(string(ownerID)).Wrap(err)
 	}
 	return createCollection(id, name, user)
 }
@@ -40,10 +39,10 @@ func createCollection(id string, name string, user *User) (*Collection, error) {
 	if user.LimitCollections {
 		collections, err := db.GetCollectionsByUserID(user.ID)
 		if err != nil {
-			return nil, errors.DBError.Wrap(err, user.ID)
+			return nil, ErrDB.Wrap(err, user.ID)
 		}
 		if len(collections) >= int(user.CollectionLimit) {
-			return nil, errors.CollectionLimitExceeded.T(strconv.Itoa(int(user.CollectionLimit)))
+			return nil, ErrCollectionLimitExceeded.T(strconv.Itoa(int(user.CollectionLimit)))
 		}
 	}
 	collection := &Collection{
@@ -57,7 +56,7 @@ func createCollection(id string, name string, user *User) (*Collection, error) {
 	}
 	err := db.InsertCollection(collection)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, collection)
+		return nil, ErrDB.Wrap(err, collection)
 	}
 	return collection, nil
 }
@@ -78,7 +77,7 @@ func randStringBytes(n int) string {
 // CollectionReadAccessCheck checks the read access
 func CollectionReadAccessCheck(collection *Collection, userID uint64) error {
 	if collection.OwnerID != userID && !db.UserIsTeammate(collection, userID) {
-		return errors.AccessDenied
+		return ErrAccessDenied
 	}
 	return nil
 }
@@ -86,7 +85,7 @@ func CollectionReadAccessCheck(collection *Collection, userID uint64) error {
 // CollectionWriteAccessCheck checks the write access
 func CollectionWriteAccessCheck(collection *Collection, userID uint64) error {
 	if collection.OwnerID != userID {
-		return errors.AccessDenied
+		return ErrAccessDenied
 	}
 	return nil
 }
@@ -95,7 +94,7 @@ func CollectionWriteAccessCheck(collection *Collection, userID uint64) error {
 func GetCollection(id string) (*Collection, error) {
 	collection, err := db.GetCollection(id)
 	if err != nil {
-		return nil, errors.CollectionNotExist.T(id)
+		return nil, ErrCollectionNotExist.T(id)
 	}
 	return collection, nil
 }
@@ -104,7 +103,7 @@ func GetCollection(id string) (*Collection, error) {
 func GetCollectionByName(user *db.User, name string) (*Collection, error) {
 	collection, err := db.GetCollectionByName(user.ID, name)
 	if err != nil {
-		return nil, errors.CollectionNotExist.T(user.Name + "/" + name)
+		return nil, ErrCollectionNotExist.T(user.Name + "/" + name)
 	}
 	return collection, nil
 }
@@ -116,7 +115,7 @@ func UpdateCollection(collection *Collection, name string) error {
 		return err
 	}
 	if err := db.UpdateCollection(collection); err != nil {
-		return errors.DBError.Wrap(err, collection)
+		return ErrDB.Wrap(err, collection)
 	}
 	return nil
 }
@@ -124,7 +123,7 @@ func UpdateCollection(collection *Collection, name string) error {
 // DeleteCollection deletes the collection
 func DeleteCollection(collection *Collection) error {
 	if err := db.DeleteCollection(collection); err != nil {
-		return errors.DBError.Wrap(err, collection)
+		return ErrDB.Wrap(err, collection)
 	}
 	return nil
 }
@@ -145,7 +144,7 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 	ret := []CollectionSummaryT{}
 	collections, err := db.GetCollectionsByUserID(ID)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, ID)
+		return nil, ErrDB.Wrap(err, ID)
 	}
 	for _, v := range collections {
 		if err := CollectionReadAccessCheck(&v, readerID); err != nil {
@@ -153,11 +152,11 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 		}
 		pd, err := db.GetPageviewPercent(v.ID, 7)
 		if err != nil {
-			return nil, errors.DBError.Wrap(err, v.ID)
+			return nil, ErrDB.Wrap(err, v.ID)
 		}
 		user, err := db.GetUserByID(v.OwnerID)
 		if err != nil {
-			return nil, errors.DBError.Wrap(err, "can't get user", v.OwnerID)
+			return nil, ErrDB.Wrap(err, "can't get user", v.OwnerID)
 		}
 		ret = append(ret, CollectionSummaryT{
 			ID:              v.ID,
@@ -179,7 +178,7 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 func GetCollectionShards(collection *Collection) ([]db.ShardDataT, error) {
 	shards, err := db.GetCollectionShardDatas(collection)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, collection)
+		return nil, ErrDB.Wrap(err, collection)
 	}
 	return shards, nil
 }
@@ -187,7 +186,7 @@ func GetCollectionShards(collection *Collection) ([]db.ShardDataT, error) {
 // DeleteCollectionShard deletes a shard
 func DeleteCollectionShard(collection *Collection, shardID string) error {
 	if err := db.DeleteCollectionShard(collection, shardID); err != nil {
-		return errors.DBError.Wrap(err, shardID)
+		return ErrDB.Wrap(err, shardID)
 	}
 	return nil
 }
@@ -201,13 +200,13 @@ type TeammateT struct {
 func AddTeammate(collection *Collection, input TeammateT) error {
 	user, err := db.GetUserByEmail(input.Email)
 	if err != nil {
-		return errors.UserNotExist.T(input.Email).Wrap(err)
+		return ErrUserNotExist.T(input.Email).Wrap(err)
 	}
 	if coll := db.GetTeammate(collection, user.ID); coll != nil {
-		return errors.TeammateExist.T(input.Email)
+		return ErrTeammateExist.T(input.Email)
 	}
 	if err := db.AddTeammate(collection, user); err != nil {
-		return errors.DBError.Wrap(err, collection.ID, input.Email)
+		return ErrDB.Wrap(err, collection.ID, input.Email)
 	}
 	return nil
 }
@@ -216,13 +215,13 @@ func AddTeammate(collection *Collection, input TeammateT) error {
 func RemoveTeammate(collection *Collection, email string) error {
 	user, err := db.GetUserByEmail(email)
 	if err != nil {
-		return errors.UserNotExist.T(email).Wrap(err)
+		return ErrUserNotExist.T(email).Wrap(err)
 	}
 	if coll := db.GetTeammate(collection, user.ID); coll == nil {
-		return errors.UserNotExist.T(email)
+		return ErrUserNotExist.T(email)
 	}
 	if err := db.RemoveTeammate(collection, user.ID); err != nil {
-		return errors.DBError.Wrap(err, collection, email)
+		return ErrDB.Wrap(err, collection, email)
 	}
 	return nil
 }
@@ -233,7 +232,7 @@ func GetCollectionTeammates(collection *Collection) ([]TeammateT, error) {
 	for _, v := range collection.Teammates {
 		user, err := GetUserByID(v.ID)
 		if err != nil {
-			return nil, errors.DBError.T(string(v.ID)).Wrap(err)
+			return nil, ErrDB.T(string(v.ID)).Wrap(err)
 		}
 		tms = append(tms, TeammateT{user.Email})
 	}
@@ -244,7 +243,7 @@ func GetCollectionTeammates(collection *Collection) ([]TeammateT, error) {
 func GetCollectionData(collection *Collection, input *CollectionDataInputT) (*db.CollectionDataT, error) {
 	data, err := db.GetBucketSums(collection, input)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, collection, input)
+		return nil, ErrDB.Wrap(err, collection, input)
 	}
 	return data, nil
 }
@@ -253,7 +252,7 @@ func GetCollectionData(collection *Collection, input *CollectionDataInputT) (*db
 func GetCollectionStatData(collection *Collection, input *CollectionDataInputT) (*db.CollectionStatDataT, error) {
 	data, err := db.GetStatistics(collection, input)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, collection, input)
+		return nil, ErrDB.Wrap(err, collection, input)
 	}
 	return data, nil
 }
@@ -262,7 +261,7 @@ func GetCollectionStatData(collection *Collection, input *CollectionDataInputT) 
 func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*db.SessionDataT, error) {
 	data, err := db.GetSessions(collection, input)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, collection, input)
+		return nil, ErrDB.Wrap(err, collection, input)
 	}
 	return data, nil
 }
@@ -271,16 +270,16 @@ func GetSessions(collection *Collection, input *CollectionDataInputT) ([]*db.Ses
 func GetPageviews(collection *Collection, sessionKey string) ([]*db.PageviewDataT, error) {
 	key, err := db.DecodeSessionKey(sessionKey)
 	if err != nil {
-		return nil, errors.SessionNotExist.T(sessionKey).Wrap(err)
+		return nil, ErrSessionNotExist.T(sessionKey).Wrap(err)
 	}
 	session, err := db.GetSession(collection.ID, key)
 	if err != nil {
-		return nil, errors.SessionNotExist.T(sessionKey).Wrap(err, collection.ID)
+		return nil, ErrSessionNotExist.T(sessionKey).Wrap(err, collection.ID)
 	}
 
 	data, err := db.GetPageviews(collection, key)
 	if err != nil {
-		return nil, errors.DBError.Wrap(err, collection.ID, session)
+		return nil, ErrDB.Wrap(err, collection.ID, session)
 	}
 	return data, nil
 }
@@ -294,15 +293,15 @@ var collectionRegexp = regexp.MustCompile("^[a-z0-9.]+$")
 
 func validateCollection(c *Collection) error {
 	if !collectionRegexp.MatchString(c.Name) {
-		return errors.InvalidCollectionName.T(c.Name)
+		return ErrInvalidCollectionName.T(c.Name)
 	}
 
 	aColl, err := db.GetCollectionByName(c.OwnerID, c.Name)
 	if err != nil && err != db.ErrKeyNotExists {
-		return errors.DBError.T(c.Name).Wrap(err)
+		return ErrDB.T(c.Name).Wrap(err)
 	}
 	if err == nil && aColl.ID != c.ID {
-		return errors.CollectionNameExist.T(c.Name)
+		return ErrCollectionNameExist.T(c.Name)
 	}
 
 	return nil

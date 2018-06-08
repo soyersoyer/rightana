@@ -10,7 +10,6 @@ import (
 	"github.com/mssola/user_agent"
 
 	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/errors"
 	"github.com/soyersoyer/rightana/geoip"
 )
 
@@ -31,7 +30,7 @@ func CreateSession(userAgent string, remoteAddr string, input CreateSessionInput
 	ua := user_agent.New(userAgent)
 
 	if ua.Bot() {
-		return "", errors.BotsDontMatter
+		return "", ErrBotsDontMatter
 	}
 
 	ip, err := getIP(remoteAddr)
@@ -53,9 +52,9 @@ func CreateSession(userAgent string, remoteAddr string, input CreateSessionInput
 	collection, err := db.GetCollection(input.CollectionID)
 	if err != nil {
 		if err == db.ErrKeyNotExists {
-			return "", errors.CollectionNotExist.T(input.CollectionID).Wrap(err)
+			return "", ErrCollectionNotExist.T(input.CollectionID).Wrap(err)
 		}
-		return "", errors.DBError.Wrap(err, input.CollectionID)
+		return "", ErrDB.Wrap(err, input.CollectionID)
 	}
 
 	session := &db.Session{
@@ -79,7 +78,7 @@ func CreateSession(userAgent string, remoteAddr string, input CreateSessionInput
 	}
 	key := db.GetKey(now, rand.Uint32())
 	if err := db.ShardUpsertBatch(collection.ID, key, session); err != nil {
-		return "", errors.DBError.Wrap(err, session)
+		return "", ErrDB.Wrap(err, session)
 	}
 	sessionKey := db.EncodeSessionKey(key)
 	return sessionKey, nil
@@ -90,22 +89,22 @@ func UpdateSession(userAgent string, CollectionID string, sessionKey string) err
 	ua := user_agent.New(userAgent)
 
 	if ua.Bot() {
-		return errors.BotsDontMatter
+		return ErrBotsDontMatter
 	}
 
 	key, err := db.DecodeSessionKey(sessionKey)
 	if err != nil {
-		return errors.SessionNotExist.T(sessionKey).Wrap(err)
+		return ErrSessionNotExist.T(sessionKey).Wrap(err)
 	}
 	session, err := db.GetSession(CollectionID, key)
 	if err != nil {
-		return errors.SessionNotExist.T(sessionKey).Wrap(err, CollectionID)
+		return ErrSessionNotExist.T(sessionKey).Wrap(err, CollectionID)
 	}
 	sessionBegin := db.GetTimeFromKey(key)
 	session.Duration = int32(time.Now().Sub(sessionBegin).Seconds())
 
 	if err := db.ShardUpsertBatch(CollectionID, key, session); err != nil {
-		return errors.DBError.Wrap(err, CollectionID, key, session)
+		return ErrDB.Wrap(err, CollectionID, key, session)
 	}
 	return nil
 }
@@ -123,16 +122,16 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 	ua := user_agent.New(userAgent)
 
 	if ua.Bot() {
-		return errors.BotsDontMatter
+		return ErrBotsDontMatter
 	}
 
 	key, err := base64.StdEncoding.DecodeString(input.SessionKey)
 	if err != nil {
-		return errors.SessionNotExist.T(input.SessionKey).Wrap(err, input.SessionKey)
+		return ErrSessionNotExist.T(input.SessionKey).Wrap(err, input.SessionKey)
 	}
 	_, err = db.GetSession(input.CollectionID, key)
 	if err != nil {
-		return errors.SessionNotExist.T(input.SessionKey).Wrap(err, input.CollectionID)
+		return ErrSessionNotExist.T(input.SessionKey).Wrap(err, input.CollectionID)
 	}
 
 	pvKey := db.GetPVKey(key, now)
@@ -145,7 +144,7 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 	}
 
 	if err := db.ShardUpsertBatch(input.CollectionID, pvKey, pageview); err != nil {
-		return errors.DBError.Wrap(err, input)
+		return ErrDB.Wrap(err, input)
 	}
 	return nil
 }

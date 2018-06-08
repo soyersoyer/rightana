@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/errors"
 )
 
 // UserInfoT is struct for clients, stores the user information
@@ -23,13 +22,13 @@ type UserInfoT struct {
 func GetUsers() ([]UserInfoT, error) {
 	users, err := db.GetUsers()
 	if err != nil {
-		return nil, errors.DBError.Wrap(err)
+		return nil, ErrDB.Wrap(err)
 	}
 	userInfos := []UserInfoT{}
 	for _, u := range users {
 		collections, err := db.GetCollectionsOwnedByUser(u.ID)
 		if err != nil {
-			return nil, errors.DBError.Wrap(err)
+			return nil, ErrDB.Wrap(err)
 		}
 		userInfos = append(userInfos, UserInfoT{
 			u.ID,
@@ -51,7 +50,7 @@ func GetUsers() ([]UserInfoT, error) {
 func GetUserInfo(name string) (*UserInfoT, error) {
 	user, err := db.GetUserByName(name)
 	if err != nil {
-		return nil, errors.UserNotExist.T(name).Wrap(err)
+		return nil, ErrUserNotExist.T(name).Wrap(err)
 	}
 	return &UserInfoT{
 		user.ID,
@@ -83,32 +82,32 @@ type UserUpdateT struct {
 func UpdateUser(name string, input *UserUpdateT) error {
 	user, err := db.GetUserByName(name)
 	if err != nil {
-		return errors.UserNotExist.T(name).Wrap(err)
+		return ErrUserNotExist.T(name).Wrap(err)
 	}
 
 	if user.Name != input.Name {
 		if !usernameCheck(input.Name) {
-			return errors.InvalidUsername.T(input.Name)
+			return ErrInvalidUsername.T(input.Name)
 		}
 		_, err = db.GetUserByName(input.Name)
 		if err != nil && err != db.ErrKeyNotExists {
-			return errors.DBError.T(input.Name).Wrap(err)
+			return ErrDB.T(input.Name).Wrap(err)
 		}
 		if err == nil {
-			return errors.UserNameExist.T(input.Name)
+			return ErrUserNameExist.T(input.Name)
 		}
 
 		user.Name = input.Name
 	}
 
 	if !emailCheck(input.Email) {
-		return errors.InvalidEmail.T(input.Email)
+		return ErrInvalidEmail.T(input.Email)
 	}
 	user.Email = input.Email
 
 	if input.Password != "" {
 		if !passwordCheck(input.Password) {
-			return errors.PasswordTooShort
+			return ErrPasswordTooShort
 		}
 		hashedPass, err := hashPassword(input.Password)
 		if err != nil {
@@ -124,7 +123,7 @@ func UpdateUser(name string, input *UserUpdateT) error {
 			return err
 		}
 		if len(admins) == 1 && admins[0].Email == user.Email {
-			return errors.UserIsTheLastAdmin
+			return ErrUserIsTheLastAdmin
 		}
 	}
 
@@ -137,7 +136,7 @@ func UpdateUser(name string, input *UserUpdateT) error {
 
 	err = db.UpdateUser(user)
 	if err != nil {
-		return errors.DBError.Wrap(err)
+		return ErrDB.Wrap(err)
 	}
 	return nil
 }
@@ -155,13 +154,13 @@ type CollectionInfoT struct {
 func GetCollections() ([]CollectionInfoT, error) {
 	collections, err := db.GetCollections()
 	if err != nil {
-		return nil, errors.DBError.Wrap(err)
+		return nil, ErrDB.Wrap(err)
 	}
 	collectionInfos := []CollectionInfoT{}
 	for _, c := range collections {
 		user, err := db.GetUserByID(c.OwnerID)
 		if err != nil {
-			return nil, errors.DBError.T(string(c.OwnerID)).Wrap(err)
+			return nil, ErrDB.T(string(c.OwnerID)).Wrap(err)
 		}
 		collectionInfos = append(collectionInfos, CollectionInfoT{
 			c.ID,

@@ -16,7 +16,7 @@ import (
 
 	_ "github.com/soyersoyer/rightana/api/statik" //the embedded statik fs data
 	"github.com/soyersoyer/rightana/config"
-	"github.com/soyersoyer/rightana/errors"
+	"github.com/soyersoyer/rightana/service"
 )
 
 type ctxKey int
@@ -150,7 +150,7 @@ func handleError(fn handlerFuncWithError) http.HandlerFunc {
 			default:
 				log.Println(e)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			case *errors.Error:
+			case *service.Error:
 				log.Println(e)
 				http.Error(w, e.HTTPMessage(), e.Code)
 			}

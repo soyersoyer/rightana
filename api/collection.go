@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/soyersoyer/rightana/errors"
 	"github.com/soyersoyer/rightana/service"
 )
 
@@ -31,7 +30,7 @@ var getCollectionSummaries = handleError(getCollectionSummariesE)
 func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 	var input collectionT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	ownerID := getUserIDCtx(r.Context())
@@ -110,7 +109,7 @@ func updateCollectionE(w http.ResponseWriter, r *http.Request) error {
 	collection := getCollectionCtx(r.Context())
 	var input collectionT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	if err := service.UpdateCollection(collection, input.Name); err != nil {
@@ -172,7 +171,7 @@ func addTeammateE(w http.ResponseWriter, r *http.Request) error {
 	collection := getCollectionCtx(r.Context())
 	var input service.TeammateT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 	if err := service.AddTeammate(collection, input); err != nil {
 		return err
@@ -196,7 +195,7 @@ var removeTeammate = handleError(removeTeammateE)
 func getCollectionDataE(w http.ResponseWriter, r *http.Request) error {
 	var input service.CollectionDataInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	collection := getCollectionCtx(r.Context())
@@ -212,7 +211,7 @@ var getCollectionData = handleError(getCollectionDataE)
 func getCollectionStatDataE(w http.ResponseWriter, r *http.Request) error {
 	var input service.CollectionDataInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	collection := getCollectionCtx(r.Context())
@@ -228,7 +227,7 @@ var getCollectionStatData = handleError(getCollectionStatDataE)
 func getSessionsE(w http.ResponseWriter, r *http.Request) error {
 	var input service.CollectionDataInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	collection := getCollectionCtx(r.Context())
@@ -248,7 +247,7 @@ type pageviewInputT struct {
 func getPageviewsE(w http.ResponseWriter, r *http.Request) error {
 	var input pageviewInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	collection := getCollectionCtx(r.Context())

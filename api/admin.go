@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/soyersoyer/rightana/errors"
 	"github.com/soyersoyer/rightana/service"
 )
 
@@ -18,7 +17,7 @@ func adminAccessHandler(next http.Handler) http.Handler {
 				return err
 			}
 			if !user.IsAdmin {
-				return errors.AccessDenied
+				return service.ErrAccessDenied
 			}
 			next.ServeHTTP(w, r)
 			return nil
@@ -50,7 +49,7 @@ var getUserInfo = handleError(getUserInfoE)
 func updateUserE(w http.ResponseWriter, r *http.Request) error {
 	var input service.UserUpdateT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	name := chi.URLParam(r, "name")

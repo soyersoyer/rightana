@@ -7,14 +7,13 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/soyersoyer/rightana/errors"
 	"github.com/soyersoyer/rightana/service"
 )
 
 func createUserE(w http.ResponseWriter, r *http.Request) error {
 	var input service.CreateUserT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	user, err := service.CreateUser(&input)
@@ -55,7 +54,7 @@ func userAccessHandler(next http.Handler) http.Handler {
 			userID := getUserIDCtx(r.Context())
 			user := getUserCtx(r.Context())
 			if user.ID != userID {
-				return errors.AccessDenied
+				return service.ErrAccessDenied
 			}
 			next.ServeHTTP(w, r)
 			return nil
@@ -71,7 +70,7 @@ func updateUserPasswordE(w http.ResponseWriter, r *http.Request) error {
 	user := getUserCtx(r.Context())
 	var input updateUserPasswordT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	if err := service.ChangePassword(user, input.CurrentPassword, input.Password); err != nil {
@@ -91,7 +90,7 @@ func deleteUserE(w http.ResponseWriter, r *http.Request) error {
 	user := getUserCtx(r.Context())
 	var input deleteUserInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	if err := service.DeleteUser(user, input.Password); err != nil {

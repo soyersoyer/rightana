@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/soyersoyer/rightana/errors"
 	"github.com/soyersoyer/rightana/service"
 )
 
@@ -21,7 +20,7 @@ type createSessionInputT struct {
 func createSessionE(w http.ResponseWriter, r *http.Request) error {
 	var input createSessionInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	sessionKey, err := service.CreateSession(r.UserAgent(), r.RemoteAddr, service.CreateSessionInputT(input))
@@ -42,7 +41,7 @@ type updateSessionInputT struct {
 func updateSessionE(w http.ResponseWriter, r *http.Request) error {
 	var input updateSessionInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	return service.UpdateSession(r.UserAgent(), input.CollectionID, input.SessionKey)
@@ -59,7 +58,7 @@ type createPageviewInputT struct {
 func createPageviewE(w http.ResponseWriter, r *http.Request) error {
 	var input createPageviewInputT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	return service.CreatePageview(r.UserAgent(), service.CreatePageviewInputT(input))

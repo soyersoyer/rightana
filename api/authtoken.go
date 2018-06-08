@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/soyersoyer/rightana/errors"
 	"github.com/soyersoyer/rightana/service"
 )
 
@@ -23,7 +22,7 @@ type createTokenOutT struct {
 func createTokenE(w http.ResponseWriter, r *http.Request) error {
 	var input createTokenT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return errors.InputDecodeFailed.Wrap(err)
+		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
 	tokenID, user, err := service.CreateAuthToken(input.NameOrEmail, input.Password)

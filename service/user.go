@@ -8,7 +8,6 @@ import (
 
 	"github.com/soyersoyer/rightana/config"
 	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/errors"
 )
 
 var (
@@ -29,33 +28,33 @@ type CreateUserT struct {
 // CreateUser can create an user
 func CreateUser(input *CreateUserT) (*User, error) {
 	if !config.ActualConfig.EnableRegistration {
-		return nil, errors.RegistrationDisabled
+		return nil, ErrRegistrationDisabled
 	}
 
 	if !usernameCheck(input.Name) {
-		return nil, errors.InvalidUsername.T(input.Name)
+		return nil, ErrInvalidUsername.T(input.Name)
 	}
 	if !emailCheck(input.Email) {
-		return nil, errors.InvalidEmail.T(input.Email)
+		return nil, ErrInvalidEmail.T(input.Email)
 	}
 	if !passwordCheck(input.Password) {
-		return nil, errors.PasswordTooShort
+		return nil, ErrPasswordTooShort
 	}
 
 	_, err := db.GetUserByEmail(input.Email)
 	if err != nil && err != db.ErrKeyNotExists {
-		return nil, errors.DBError.T(input.Email).Wrap(err)
+		return nil, ErrDB.T(input.Email).Wrap(err)
 	}
 	if err == nil {
-		return nil, errors.UserEmailExist.T(input.Email)
+		return nil, ErrUserEmailExist.T(input.Email)
 	}
 
 	_, err = db.GetUserByName(input.Name)
 	if err != nil && err != db.ErrKeyNotExists {
-		return nil, errors.DBError.T(input.Name).Wrap(err)
+		return nil, ErrDB.T(input.Name).Wrap(err)
 	}
 	if err == nil {
-		return nil, errors.UserNameExist.T(input.Name)
+		return nil, ErrUserNameExist.T(input.Name)
 	}
 
 	hashedPass, err := hashPassword(input.Password)
@@ -76,7 +75,7 @@ func CreateUser(input *CreateUserT) (*User, error) {
 	}
 
 	if err := db.InsertUser(user); err != nil {
-		return nil, errors.DBError.Wrap(err, user)
+		return nil, ErrDB.Wrap(err, user)
 	}
 
 	return user, nil
@@ -85,13 +84,13 @@ func CreateUser(input *CreateUserT) (*User, error) {
 // ChangePassword change a user's password when the password match
 func ChangePassword(user *User, currentPassword string, password string) error {
 	if !passwordCheck(password) {
-		return errors.PasswordTooShort
+		return ErrPasswordTooShort
 	}
 	if user.DisablePwChange {
-		return errors.PasswordChangeDisabled
+		return ErrPasswordChangeDisabled
 	}
 	if err := compareHashAndPassword(user.Password, currentPassword); err != nil {
-		return errors.PasswordNotMatch
+		return ErrPasswordNotMatch
 	}
 	hashedPass, err := hashPassword(password)
 	if err != nil {
@@ -100,7 +99,7 @@ func ChangePassword(user *User, currentPassword string, password string) error {
 	user.Password = hashedPass
 
 	if err := db.UpdateUser(user); err != nil {
-		return errors.DBError.Wrap(err, user)
+		return ErrDB.Wrap(err, user)
 	}
 
 	return nil
@@ -109,7 +108,7 @@ func ChangePassword(user *User, currentPassword string, password string) error {
 // ChangePasswordForce change a user's password
 func ChangePasswordForce(user *User, password string) error {
 	if !passwordCheck(password) {
-		return errors.PasswordTooShort
+		return ErrPasswordTooShort
 	}
 	hashedPass, err := hashPassword(password)
 	if err != nil {
@@ -118,7 +117,7 @@ func ChangePasswordForce(user *User, password string) error {
 	user.Password = hashedPass
 
 	if err := db.UpdateUser(user); err != nil {
-		return errors.DBError.Wrap(err, user)
+		return ErrDB.Wrap(err, user)
 	}
 
 	return nil
@@ -127,7 +126,7 @@ func ChangePasswordForce(user *User, password string) error {
 // DeleteUser deletes a user when the password patch
 func DeleteUser(user *User, password string) error {
 	if user.DisableUserDeletion {
-		return errors.UserDeletionDisabled
+		return ErrUserDeletionDisabled
 	}
 	if user.IsAdmin {
 		admins, err := db.GetAdminUsers()
@@ -135,14 +134,14 @@ func DeleteUser(user *User, password string) error {
 			return err
 		}
 		if len(admins) == 1 && admins[0].Email == user.Email {
-			return errors.UserIsTheLastAdmin
+			return ErrUserIsTheLastAdmin
 		}
 	}
 	if err := compareHashAndPassword(user.Password, password); err != nil {
-		return errors.PasswordNotMatch
+		return ErrPasswordNotMatch
 	}
 	if err := db.DeleteUser(user); err != nil {
-		return errors.DBError.Wrap(err, user)
+		return ErrDB.Wrap(err, user)
 	}
 	return nil
 }
@@ -151,7 +150,7 @@ func DeleteUser(user *User, password string) error {
 func GetUserByEmail(email string) (*User, error) {
 	user, err := db.GetUserByEmail(email)
 	if err != nil {
-		return nil, errors.UserNotExist.T(email).Wrap(err)
+		return nil, ErrUserNotExist.T(email).Wrap(err)
 	}
 	return user, nil
 }
@@ -160,7 +159,7 @@ func GetUserByEmail(email string) (*User, error) {
 func GetUserByName(name string) (*User, error) {
 	user, err := db.GetUserByName(name)
 	if err != nil {
-		return nil, errors.UserNotExist.T(name).Wrap(err)
+		return nil, ErrUserNotExist.T(name).Wrap(err)
 	}
 	return user, nil
 }
@@ -169,7 +168,7 @@ func GetUserByName(name string) (*User, error) {
 func GetUserByID(ID uint64) (*User, error) {
 	user, err := db.GetUserByID(ID)
 	if err != nil {
-		return nil, errors.UserNotExist.T(string(ID)).Wrap(err)
+		return nil, ErrUserNotExist.T(string(ID)).Wrap(err)
 	}
 	return user, nil
 }
@@ -177,7 +176,7 @@ func GetUserByID(ID uint64) (*User, error) {
 func isFirstUser() (bool, error) {
 	userCount, err := db.CountUsers()
 	if err != nil {
-		return false, errors.DBError.Wrap(err)
+		return false, ErrDB.Wrap(err)
 	}
 	return userCount == 0, nil
 }
