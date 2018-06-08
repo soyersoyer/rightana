@@ -13,8 +13,14 @@
                 <a *ngIf="c.user === user" [routerLink]="['..', c.user, c.name]" routerLinkActive="active">{{c.name}}</a>
             </div>
             <div class="card-text d-flex justify-content-between pr-4">
-              {{c.pageview_count}}
-              <rana-color-percent [percent]="c.pageview_percent"></rana-color-percent>
+              <div>
+                {{c.session_count}}
+                <rana-color-percent [percent]="c.session_percent" class="ml-1"></rana-color-percent>
+              </div>
+              <div>
+                {{c.pageview_count}}
+                <rana-color-percent [percent]="c.pageview_percent" class="ml-1"></rana-color-percent>
+              </div>
             </div>
           </div>
         </div>

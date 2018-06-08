@@ -54,6 +54,8 @@ export class CollectionSummary {
   id: string;
   user: string;
   name: string;
+  session_count: number;
+  session_percent: number;
   pageview_count: number;
   pageview_percent: number;
 }

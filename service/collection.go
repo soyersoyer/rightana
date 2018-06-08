@@ -134,6 +134,8 @@ type CollectionSummaryT struct {
 	ID              string  `json:"id"`
 	User            string  `json:"user"`
 	Name            string  `json:"name"`
+	SessionCount    int     `json:"session_count"`
+	SessionPercent  float32 `json:"session_percent"`
 	PageviewCount   int     `json:"pageview_count"`
 	PageviewPercent float32 `json:"pageview_percent"`
 }
@@ -149,7 +151,7 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 		if err := CollectionReadAccessCheck(&v, readerID); err != nil {
 			continue
 		}
-		count, percent, err := db.GetPageviewPercent(v.ID, 7)
+		pd, err := db.GetPageviewPercent(v.ID, 7)
 		if err != nil {
 			return nil, errors.DBError.Wrap(err, v.ID)
 		}
@@ -161,8 +163,10 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 			ID:              v.ID,
 			User:            user.Name,
 			Name:            v.Name,
-			PageviewCount:   count,
-			PageviewPercent: percent,
+			SessionCount:    pd.SessionCount,
+			SessionPercent:  pd.SessionPercent,
+			PageviewCount:   pd.PageviewCount,
+			PageviewPercent: pd.PageviewPercent,
 		})
 	}
 	sort.Slice(ret, func(i, j int) bool {

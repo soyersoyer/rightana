@@ -383,8 +383,16 @@ func GetSession(collectionID string, key []byte) (*Session, error) {
 	return session, err
 }
 
+// PercentData contains some stat for the collection
+type PercentData struct {
+	SessionCount    int
+	SessionPercent  float32
+	PageviewCount   int
+	PageviewPercent float32
+}
+
 // GetPageviewPercent returns the last week versus the before last week difference in percent, and the pageview
-func GetPageviewPercent(collectionID string, dayBefore int) (int, float32, error) {
+func GetPageviewPercent(collectionID string, dayBefore int) (PercentData, error) {
 	now := time.Now()
 	n7dAgo := now.AddDate(0, 0, -dayBefore)
 	n14dAgo := n7dAgo.AddDate(0, 0, -dayBefore)
@@ -393,24 +401,41 @@ func GetPageviewPercent(collectionID string, dayBefore int) (int, float32, error
 	n7dAgoK := GetKeyFromTime(n7dAgo)
 	n14dAgoK := GetKeyFromTime(n14dAgo)
 
+	pd := PercentData{}
+
 	sdb, err := getShardDB(collectionID)
 	if err != nil {
-		return 0, 0, err
+		return pd, err
 	}
-	sumFirst := 0
-	sdb.Iterate(BPageview, n14dAgoK, n7dAgoK, func(k []byte, v []byte) {
-		sumFirst++
+	sumSFirst := 0
+	sdb.Iterate(BSession, n14dAgoK, n7dAgoK, func(k []byte, v []byte) {
+		sumSFirst++
 	})
 
-	sumSecond := 0
-	sdb.Iterate(BPageview, n7dAgoK, nowK, func(k []byte, v []byte) {
-		sumSecond++
+	sumSSecond := 0
+	sdb.Iterate(BSession, n7dAgoK, nowK, func(k []byte, v []byte) {
+		sumSSecond++
 	})
-	percent := float32(0.0)
-	if sumFirst != 0 {
-		percent = float32(sumSecond)/float32(sumFirst) - 1.0
+	pd.SessionCount = sumSSecond
+	if sumSFirst != 0 {
+		pd.SessionPercent = float32(sumSSecond)/float32(sumSFirst) - 1.0
 	}
-	return sumSecond, percent, nil
+
+	sumPVFirst := 0
+	sdb.Iterate(BPageview, n14dAgoK, n7dAgoK, func(k []byte, v []byte) {
+		sumPVFirst++
+	})
+
+	sumPVSecond := 0
+	sdb.Iterate(BPageview, n7dAgoK, nowK, func(k []byte, v []byte) {
+		sumPVSecond++
+	})
+	pd.PageviewCount = sumPVSecond
+	if sumPVFirst != 0 {
+		pd.PageviewPercent = float32(sumPVSecond)/float32(sumPVFirst) - 1.0
+	}
+
+	return pd, nil
 }
 
 func getShardDB(collectionID string) (*shardbolt.DB, error) {
