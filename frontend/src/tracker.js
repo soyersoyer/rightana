@@ -33,8 +33,8 @@ window.rightana = function() {
       c: collectionId,
       h: location.hostname,
       bl: navigator.language,
-      sr: screen.width + "x" + screen.height,
-      wr: window.innerWidth + "x" + window.innerHeight,
+      sr: screen.width + 'x' + screen.height,
+      wr: window.innerWidth + 'x' + window.innerHeight,
       dt: getDeviceType(),
       r: document.referrer,
     }
@@ -92,7 +92,7 @@ window.rightana = function() {
     var httpRequest = new XMLHttpRequest();
 
     if (!httpRequest) {
-      alert('Giving up :( Cannot create an XMLHTTP instance');
+      console.log('Giving up :( Cannot create an XMLHTTP instance');
       return false;
     }
     httpRequest.onreadystatechange = function() {
@@ -115,12 +115,12 @@ window.rightana = function() {
     var ua = navigator.userAgent,
       tablet = /Tablet|iPad/i.test(ua),
       mobile = typeof orientation !== 'undefined' || /mobile/i.test(ua);
-    return tablet ? "tablet" : mobile ? "mobile" : "desktop";
+    return tablet ? 'tablet' : mobile ? 'mobile' : 'desktop';
   },
 
   commands = {
-    "trackPageview": trackPageview,
-    "setup": setup,
+    'trackPageview': trackPageview,
+    'setup': setup,
   },
 
   processCommands = function() {
@@ -129,7 +129,7 @@ window.rightana = function() {
     commands[c].apply(this, args);
   };
 
-  window.addEventListener("beforeunload", function(event) {
+  window.addEventListener('beforeunload', function(event) {
     updateSessionEnd();
   });
 
