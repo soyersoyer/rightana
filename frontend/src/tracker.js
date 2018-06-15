@@ -13,7 +13,7 @@ window.rightana = function() {
   },
 
   trackPageview = function() {
-    if( navigator.DonotTrack == 1 ) {
+    if (navigator.doNotTrack == 1) {
       return;
     }
     getSessionKey(sendPageView);
