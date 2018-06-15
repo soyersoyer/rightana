@@ -27,4 +27,8 @@ export class AdminBackupsComponent implements OnInit {
     this.backend.runBackup(b.id)
       .subscribe(_ => this.toasty.success(`Backup (${b.id}) success`));
   }
+
+  get origin(): string {
+    return window.location.origin;
+  }
 }

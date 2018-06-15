@@ -4,7 +4,8 @@
     <thead>
       <tr>
         <th scope="col">ID</th>
-        <th scope="col">Dir</th>
+        <th scope="col">Destination dir</th>
+        <th scope="col">Trigger URL</th>
         <th scope="col">Run</th>
       </tr>
     </thead>
@@ -12,6 +13,7 @@
       <tr *ngFor="let b of backups">
         <th scope="row">{{b.id}}</th>
         <td>{{b.dir}}</td>
+        <td>{{origin}}/api/backups/{{b.id}}/run</td>
         <td><button class="btn btn-primary" (click)="run(b)">run</button></td>
       </tr>
     </tbody>
