@@ -90,6 +90,14 @@ func CollectionWriteAccessCheck(collection *Collection, user *User) error {
 	return ErrAccessDenied
 }
 
+// CollectionCreateAccessCheck checks the create access
+func CollectionCreateAccessCheck(user *User, loggedInUser *User) error {
+	if loggedInUser.IsAdmin || user.ID == loggedInUser.ID {
+		return nil
+	}
+	return ErrAccessDenied
+}
+
 // GetCollection fetch a collection by ID
 func GetCollection(id string) (*Collection, error) {
 	collection, err := db.GetCollection(id)

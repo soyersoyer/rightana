@@ -383,8 +383,8 @@ func TestCollectionLimit(t *testing.T) {
 		Name: "azaz.org",
 	}
 	w, r = postJSON(collection)
-	r = setLoggedInUserWithNameReq(r, newUser.Name)
-	createCollection(w, r)
+	r = setUserName(r, newUser.Name)
+	userBaseHandler(http.HandlerFunc(createCollection)).ServeHTTP(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Collection limit exceeded (0)\n")
 }
@@ -392,8 +392,8 @@ func TestCollectionLimit(t *testing.T) {
 func createCollectionSuccess(t *testing.T, username string, collection *collectionT) {
 	collName := collection.Name
 	w, r := postJSON(collection)
-	r = setLoggedInUserWithNameReq(r, username)
-	createCollection(w, r)
+	r = setUserName(r, username)
+	userBaseHandler(http.HandlerFunc(createCollection)).ServeHTTP(w, r)
 	testCode(t, w, 200)
 	testJSONBody(t, w, &collection)
 	if collection.Name != collName {
@@ -596,6 +596,22 @@ func TestCollectionWriteAccessHandler(t *testing.T) {
 	r = setCollectionName(r, userData.Name, collectionData.Name)
 	userBaseHandler(collectionBaseHandler(collectionWriteAccessHandler(getNullHandler()))).ServeHTTP(w, r)
 	testCode(t, w, 200)
+}
+
+func TestCollectionCreateAccessHandler(t *testing.T) {
+	w, r := postJSON(nil)
+	r = setLoggedInUserWithNameReq(r, userData.Name)
+	r = setUserName(r, userData.Name)
+	userBaseHandler(collectionCreateAccessHandler(getNullHandler())).ServeHTTP(w, r)
+	testCode(t, w, 200)
+}
+
+func TestCollectionCreateAccessHandlerNoRight(t *testing.T) {
+	w, r := postJSON(nil)
+	r = setLoggedInUserWithNameReq(r, user2Data.Name)
+	r = setUserName(r, userData.Name)
+	userBaseHandler(collectionCreateAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
+	testCode(t, w, 403)
 }
 
 func TestCollectionReadAccessHandlerNoRight(t *testing.T) {

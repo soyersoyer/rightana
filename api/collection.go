@@ -33,8 +33,8 @@ func createCollectionE(w http.ResponseWriter, r *http.Request) error {
 		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
-	loggedInUser := getLoggedInUserCtx(r.Context())
-	collection, err := service.CreateCollection(loggedInUser.ID, input.Name)
+	user := getUserCtx(r.Context())
+	collection, err := service.CreateCollection(user.ID, input.Name)
 	if err != nil {
 		return err
 	}
@@ -88,6 +88,19 @@ func collectionWriteAccessHandler(next http.Handler) http.Handler {
 			loggedInUser := getLoggedInUserCtx(r.Context())
 			collection := getCollectionCtx(r.Context())
 			if err := service.CollectionWriteAccessCheck(collection, loggedInUser); err != nil {
+				return err
+			}
+			next.ServeHTTP(w, r)
+			return nil
+		}))
+}
+
+func collectionCreateAccessHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(handleError(
+		func(w http.ResponseWriter, r *http.Request) error {
+			user := getUserCtx(r.Context())
+			loggedInUser := getLoggedInUserCtx(r.Context())
+			if err := service.CollectionCreateAccessCheck(user, loggedInUser); err != nil {
 				return err
 			}
 			next.ServeHTTP(w, r)

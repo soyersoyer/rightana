@@ -21,7 +21,10 @@
         <td><a routerLink="/{{user.name}}">{{user.name}}</a></td>
         <td>{{user.email}}</td>
         <td>{{user.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>
-        <td>{{user.collection_count}}</td>
+        <td class="text-right">
+          <a routerLink="../collections">{{user.collection_count}}</a>
+          <a role="button" class="btn btn-light btn-sm ml-2" routerLink="/{{user.name}}/create">✚</a>
+        </td>
         <td>{{user.is_admin}}</td>
         <td><a [routerLink]="[user.name]">edit</a></td>
       </tr>

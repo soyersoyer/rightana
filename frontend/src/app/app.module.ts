@@ -109,9 +109,9 @@ const routes: Routes = [
     AdminUsersComponent,
     AdminCollectionsComponent,
     AdminUsersEditComponent,
+    AdminUsersCreateComponent,
     AdminBackupsComponent,
     UserComponent,
-    AdminUsersCreateComponent,
   ],
   imports: [
     BrowserModule,
