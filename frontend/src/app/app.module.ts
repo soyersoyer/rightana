@@ -39,9 +39,11 @@ import { AdminComponent } from './admin/admin.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminCollectionsComponent } from './admin-collections/admin-collections.component';
 import { AdminUsersEditComponent } from './admin-users-edit/admin-users-edit.component';
+import { AdminUsersCreateComponent } from './admin-users-create/admin-users-create.component';
 import { AdminBackupsComponent } from './admin-backups/admin-backups.component';
 
 import { UserComponent } from './user/user.component';
+
 
 
 
@@ -58,6 +60,7 @@ const routes: Routes = [
   { path: 'admin', component: AdminComponent, children: [
     { path: '', redirectTo: 'users', pathMatch: 'full'},
     { path: 'users', component: AdminUsersComponent},
+    { path: 'users/create-new', component: AdminUsersCreateComponent},
     { path: 'users/:name', component: AdminUsersEditComponent},
     { path: 'collections', component: AdminCollectionsComponent},
     { path: 'backups', component: AdminBackupsComponent},
@@ -108,6 +111,7 @@ const routes: Routes = [
     AdminUsersEditComponent,
     AdminBackupsComponent,
     UserComponent,
+    AdminUsersCreateComponent,
   ],
   imports: [
     BrowserModule,

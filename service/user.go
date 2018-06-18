@@ -25,12 +25,16 @@ type CreateUserT struct {
 	Password string `json:"password"`
 }
 
-// CreateUser can create an user
-func CreateUser(input *CreateUserT) (*User, error) {
+// RegisterUser register an user by the user
+func RegisterUser(input *CreateUserT) (*User, error) {
 	if !config.ActualConfig.EnableRegistration {
 		return nil, ErrRegistrationDisabled
 	}
+	return CreateUser(input)
+}
 
+// CreateUser can create an user
+func CreateUser(input *CreateUserT) (*User, error) {
 	if !usernameCheck(input.Name) {
 		return nil, ErrInvalidUsername.T(input.Name)
 	}
@@ -128,20 +132,44 @@ func DeleteUser(user *User, password string) error {
 	if user.DisableUserDeletion {
 		return ErrUserDeletionDisabled
 	}
-	if user.IsAdmin {
-		admins, err := db.GetAdminUsers()
-		if err != nil {
-			return err
-		}
-		if len(admins) == 1 && admins[0].Email == user.Email {
-			return ErrUserIsTheLastAdmin
-		}
+	if err := lastAdminCheck(user); err != nil {
+		return err
 	}
 	if err := compareHashAndPassword(user.Password, password); err != nil {
 		return ErrPasswordNotMatch
 	}
 	if err := db.DeleteUser(user); err != nil {
 		return ErrDB.Wrap(err, user)
+	}
+	return nil
+}
+
+// DeleteUserByAdmin deletes a user by Admin
+func DeleteUserByAdmin(name string) error {
+	user, err := GetUserByName(name)
+	if err != nil {
+		return err
+	}
+	if err := lastAdminCheck(user); err != nil {
+		return err
+	}
+	if err := db.DeleteUser(user); err != nil {
+		return ErrDB.Wrap(err, user)
+	}
+	return nil
+}
+
+func lastAdminCheck(user *User) error {
+	if !user.IsAdmin {
+		return nil
+	}
+
+	admins, err := db.GetAdminUsers()
+	if err != nil {
+		return err
+	}
+	if len(admins) == 1 && admins[0].Email == user.Email {
+		return ErrUserIsTheLastAdmin
 	}
 	return nil
 }

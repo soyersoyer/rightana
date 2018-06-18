@@ -48,4 +48,13 @@
       </form>
     </div>
   </div>
+  <h3 class="my-2">Delete user</h3>
+  <div class="card border-danger">
+    <div class="card-body">
+      <div class="alert alert-danger text-small" role="alert">
+        The operation will delete this user and the owned collections permanently, and CANNOT be undone!
+      </div>
+      <button class="btn btn-danger btn-lg w-100" (click)="delete()">Delete user</button>
+    </div>
+  </div>
 </div>

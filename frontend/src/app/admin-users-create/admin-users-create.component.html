@@ -1,0 +1,28 @@
+<div class="container mt-2" style="max-width: 500px">
+  <h3>Create User</h3>
+  <div class="card">
+    <div class="card-body">
+      <form [formGroup]="form" (submit)="create()">
+        <div class="form-group">
+          <label for="name">Username</label>
+          <input id="name" type="text" class="form-control form-control-lg" formControlName="name">
+          <div class="invalid-feedback">
+            <rana-invalid-username></rana-invalid-username>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" class="form-control form-control-lg" formControlName="email">
+          <div class="invalid-feedback">
+            <rana-invalid-email></rana-invalid-email>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" class="form-control form-control-lg" formControlName="password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100">Create</button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -84,22 +84,22 @@ func TestPublicConfig(t *testing.T) {
 	}
 }
 
-func TestCreateUserRegistrationDisabled(t *testing.T) {
+func TestRegisterUserRegistrationDisabled(t *testing.T) {
 	config.ActualConfig.EnableRegistration = false
 	w, r := postJSON(userData)
-	createUser(w, r)
+	registerUser(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Registration disabled\n")
 	config.ActualConfig.EnableRegistration = true
 }
 
-func TestCreateUser(t *testing.T) {
-	testCreateUserSuccess(t, userData)
+func TestRegisterUser(t *testing.T) {
+	testRegisterUserSuccess(t, userData)
 }
 
-func testCreateUserSuccess(t *testing.T, userData service.CreateUserT) string {
+func testRegisterUserSuccess(t *testing.T, userData service.CreateUserT) string {
 	w, r := postJSON(userData)
-	createUser(w, r)
+	registerUser(w, r)
 	testCode(t, w, 200)
 	var email string
 	testJSONBody(t, w, &email)
@@ -109,22 +109,22 @@ func testCreateUserSuccess(t *testing.T, userData service.CreateUserT) string {
 	return email
 }
 
-func TestCreateUserSecondEmailFail(t *testing.T) {
+func TestRegisterUserSecondEmailFail(t *testing.T) {
 	w, r := postJSON(userData)
-	createUser(w, r)
+	registerUser(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "User Email exist ("+userData.Email+")\n")
 }
 
-func TestCreateUserSecondNameFail(t *testing.T) {
+func TestRegisterUserSecondNameFail(t *testing.T) {
 	w, r := postJSON(userSameNameData)
-	createUser(w, r)
+	registerUser(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "User Name exist ("+userSameNameData.Name+")\n")
 }
-func TestCreateUser2(t *testing.T) {
+func TestRegisterUser2(t *testing.T) {
 	w, r := postJSON(user2Data)
-	createUser(w, r)
+	registerUser(w, r)
 	testCode(t, w, 200)
 	var email string
 	testJSONBody(t, w, &email)
@@ -133,26 +133,26 @@ func TestCreateUser2(t *testing.T) {
 	}
 }
 
-func TestCreateUserShortPw(t *testing.T) {
+func TestRegisterUserShortPw(t *testing.T) {
 	userData := service.CreateUserT{
 		Email:    "shortpw@irl.hu",
 		Name:     "short",
 		Password: "short",
 	}
 	w, r := postJSON(userData)
-	createUser(w, r)
+	registerUser(w, r)
 	testCode(t, w, 400)
 	testBody(t, w, "Password too short\n")
 }
 
-func TestCreateUserBadEmail(t *testing.T) {
+func TestRegisterUserBadEmail(t *testing.T) {
 	userData := service.CreateUserT{
 		Email:    "bademail",
 		Name:     "short",
 		Password: "short",
 	}
 	w, r := postJSON(userData)
-	createUser(w, r)
+	registerUser(w, r)
 	testCode(t, w, 400)
 	testBody(t, w, "Invalid email ("+userData.Email+")\n")
 }
@@ -303,7 +303,7 @@ func TestPWChangeDisabled(t *testing.T) {
 		Password: "pwchangedisabled",
 	}
 
-	testCreateUserSuccess(t, newUser)
+	testRegisterUserSuccess(t, newUser)
 
 	updateUserData := service.UserUpdateT{
 		Name:            newUser.Name,
@@ -332,7 +332,7 @@ func TestUserDeletionDisabled(t *testing.T) {
 		Password: "userdeletiondisabled",
 	}
 
-	testCreateUserSuccess(t, newUser)
+	testRegisterUserSuccess(t, newUser)
 
 	updateUserData := service.UserUpdateT{
 		Name:                newUser.Name,
@@ -365,7 +365,7 @@ func TestCollectionLimit(t *testing.T) {
 		Password: "collectionlimit",
 	}
 
-	testCreateUserSuccess(t, newUser)
+	testRegisterUserSuccess(t, newUser)
 
 	updateUserData := service.UserUpdateT{
 		Name:             newUser.Name,
@@ -411,7 +411,7 @@ func TestDeleteUser(t *testing.T) {
 		Name: "azaz.org",
 	}
 	var emailOut string
-	testCreateUserSuccess(t, user)
+	testRegisterUserSuccess(t, user)
 	token := testCreateTokenSuccess(t, createTokenT{user.Email, user.Password})
 
 	createCollectionSuccess(t, user.Name, &collection)
@@ -709,8 +709,8 @@ func TestDeleteUserAndTeammate(t *testing.T) {
 		Name: "azaz.org",
 	}
 
-	testCreateUserSuccess(t, user1)
-	testCreateUserSuccess(t, user2)
+	testRegisterUserSuccess(t, user1)
+	testRegisterUserSuccess(t, user2)
 	createCollectionSuccess(t, user1.Name, &collection)
 
 	teammate := service.TeammateT{Email: user2.Email}

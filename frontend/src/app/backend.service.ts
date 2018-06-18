@@ -27,6 +27,12 @@ export class UserInfo {
   collection_count: number;
 }
 
+export class UserCreate {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export class UserUpdate {
   password: string;
   is_admin: string;
@@ -304,9 +310,17 @@ export class BackendService {
     return this.http.get<UserInfo>(`/api/admin/users/${name}`);
   }
 
+  createUserAdmin(user: UserCreate): Observable<string> {
+    return this.http.post<string>(`/api/admin/users`, user);
+  }
+
   updateUser(name: string, user: UserUpdate): Observable<string> {
     return this.http.patch<string>(`/api/admin/users/${name}`, user);
   }
+
+  deleteUserAdmin(user: string): Observable<any> {
+    return this.http.delete(`/api/admin/users/${user}`);
+   }
 
   getCollections(): Observable<CollectionInfo[]> {
     return this.http.get<CollectionInfo[]>(`/api/admin/collections`);

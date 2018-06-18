@@ -54,4 +54,12 @@ export class AdminUsersEditComponent implements OnInit {
       this.router.navigate(["..", this.form.value.name], {relativeTo: this.route});
     });
   }
+
+  delete() {
+    this.backend.deleteUserAdmin(this.user.name)
+    .subscribe(_ => {
+      this.toasty.success("Delete success");
+      this.router.navigate([".."], {relativeTo: this.route});
+    });
+  }
 }

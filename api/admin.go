@@ -31,6 +31,22 @@ func getUsersE(w http.ResponseWriter, r *http.Request) error {
 
 var getUsers = handleError(getUsersE)
 
+func createUserAdminE(w http.ResponseWriter, r *http.Request) error {
+	var input service.CreateUserT
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		return service.ErrInputDecodeFailed.Wrap(err)
+	}
+
+	user, err := service.CreateUser(&input)
+	if err != nil {
+		return err
+	}
+
+	return respond(w, user.Email)
+}
+
+var createUserAdmin = handleError(createUserAdminE)
+
 func getUserInfoE(w http.ResponseWriter, r *http.Request) error {
 	name := chi.URLParam(r, "name")
 	user, err := service.GetUserInfo(name)
@@ -57,6 +73,16 @@ func updateUserE(w http.ResponseWriter, r *http.Request) error {
 }
 
 var updateUser = handleError(updateUserE)
+
+func deleteUserAdminE(w http.ResponseWriter, r *http.Request) error {
+	name := chi.URLParam(r, "name")
+	if err := service.DeleteUserByAdmin(name); err != nil {
+		return err
+	}
+	return respond(w, name)
+}
+
+var deleteUserAdmin = handleError(deleteUserAdminE)
 
 func getCollectionsE(w http.ResponseWriter, r *http.Request) error {
 	collections, err := service.GetCollections()

@@ -10,13 +10,13 @@ import (
 	"github.com/soyersoyer/rightana/service"
 )
 
-func createUserE(w http.ResponseWriter, r *http.Request) error {
+func registerUserE(w http.ResponseWriter, r *http.Request) error {
 	var input service.CreateUserT
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return service.ErrInputDecodeFailed.Wrap(err)
 	}
 
-	user, err := service.CreateUser(&input)
+	user, err := service.RegisterUser(&input)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func createUserE(w http.ResponseWriter, r *http.Request) error {
 	return respond(w, user.Email)
 }
 
-var createUser = handleError(createUserE)
+var registerUser = handleError(registerUserE)
 
 func setUserCtx(ctx context.Context, user *service.User) context.Context {
 	return context.WithValue(ctx, keyUser, user)
