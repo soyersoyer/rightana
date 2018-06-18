@@ -33,6 +33,7 @@ export class AdminUsersEditComponent implements OnInit {
       limit_collections: [null, [Validators.required]],
       collection_limit: [null, [Validators.required]],
       disable_user_deletion: [null, [Validators.required]],
+      email_verified: [null, [Validators.required]],
     });
     this.route.params.forEach((params: Params) => {
       this.getUser(params['name']);
@@ -61,5 +62,9 @@ export class AdminUsersEditComponent implements OnInit {
       this.toasty.success("Delete success");
       this.router.navigate([".."], {relativeTo: this.route});
     });
+  }
+
+  sendVerifyEmail(user: UserInfo) {
+    this.backend.sendVerifyEmail(user.name).subscribe(_ => this.toasty.success('Verify email sent!'));
   }
 }

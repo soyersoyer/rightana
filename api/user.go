@@ -53,7 +53,7 @@ func userAccessHandler(next http.Handler) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) error {
 			loggedInUser := getLoggedInUserCtx(r.Context())
 			user := getUserCtx(r.Context())
-			if user.ID != loggedInUser.ID {
+			if user.ID != loggedInUser.ID && !loggedInUser.IsAdmin {
 				return service.ErrAccessDenied
 			}
 			next.ServeHTTP(w, r)
@@ -100,3 +100,74 @@ func deleteUserE(w http.ResponseWriter, r *http.Request) error {
 }
 
 var deleteUser = handleError(deleteUserE)
+
+func sendVerifyEmailE(w http.ResponseWriter, r *http.Request) error {
+	user := getUserCtx(r.Context())
+	if err := service.SendVerifyEmail(user); err != nil {
+		return err
+	}
+	return respond(w, user.Email)
+}
+
+var sendVerifyEmail = handleError(sendVerifyEmailE)
+
+type verifyEmailInputT struct {
+	VerificationKey string
+}
+
+func verifyEmailE(w http.ResponseWriter, r *http.Request) error {
+	user := getUserCtx(r.Context())
+	var input verifyEmailInputT
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		return service.ErrInputDecodeFailed.Wrap(err)
+	}
+	if err := service.VerifyEmail(user, input.VerificationKey); err != nil {
+		return err
+	}
+	return respond(w, user.Email)
+}
+
+var verifyEmail = handleError(verifyEmailE)
+
+type sendResetPasswordInput struct {
+	Email string
+}
+
+func sendResetPasswordE(w http.ResponseWriter, r *http.Request) error {
+	var input sendResetPasswordInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		return service.ErrInputDecodeFailed.Wrap(err)
+	}
+
+	user, err := service.GetUserByEmail(input.Email)
+	if err != nil {
+		return err
+	}
+
+	err = service.SendResetPassword(user)
+	if err != nil {
+		return err
+	}
+	return respond(w, user.Email)
+}
+
+var sendResetPassword = handleError(sendResetPasswordE)
+
+type resetPasswordInput struct {
+	ResetKey string
+	Password string
+}
+
+func resetPasswordE(w http.ResponseWriter, r *http.Request) error {
+	user := getUserCtx(r.Context())
+	var input resetPasswordInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		return service.ErrInputDecodeFailed.Wrap(err)
+	}
+	if err := service.ChangePasswordWithResetKey(user, input.ResetKey, input.Password); err != nil {
+		return err
+	}
+	return respond(w, user.Email)
+}
+
+var resetPassword = handleError(resetPasswordE)

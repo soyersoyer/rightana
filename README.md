@@ -104,11 +104,19 @@ The configuration filename is rightana.yaml (or an another format what the viper
 |TrackingID||The server's tracking ID, if you want to track it|
 |ServerAnnounce||An announce which will show on the home page|
 |Backup||The backup configuration in a map[id]dir format|
+|AppName|RightAna|The application name in the mails|
+|AppURL||The application url in the mails|
+|EmailExpiryMinutes|15|When should the keys in the emails expire|
+|SMTPHostname|localhost|The SMTP server's hostname|
+|SMTPPort|25|The SMTP server's port|
+|SMTPUser||The SMTP user|
+|SMTPPassword||The SMTP password|
+|SMTPSender||The SMTP sender|
+
 
 ## Limitations
 This software is under initial development (0.x) and the database format may change in the future. In other words, it is not guaranteed that the next version of the software will be able to read the the data stored by the current version.
 
-## Coming features
-- Realtime views
-- Emails for registration
+## Coming features to 0.5
+- Graphs for the collections page
 - Compressed logs

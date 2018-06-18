@@ -88,14 +88,19 @@ func Wire(r *chi.Mux) {
 func userRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", registerUser)
+	r.Post("/send-reset-password", sendResetPassword)
 	r.Route("/{name}", func(r chi.Router) {
 		r.Use(userBaseHandler)
+		r.Post("/verify-email", verifyEmail)
+		r.Post("/reset-password", resetPassword)
 		r.Mount("/collections", collectionRouter())
+		r.With(loggedOnlyHandler).With(userAccessHandler).Get("/", getUserInfo)
 		r.Route("/settings", func(r chi.Router) {
 			r.Use(loggedOnlyHandler)
 			r.Use(userAccessHandler)
 			r.Patch("/password", updateUserPassword)
 			r.Post("/delete", deleteUser)
+			r.Post("/send-verify-email", sendVerifyEmail)
 		})
 	})
 
@@ -132,7 +137,6 @@ func adminRouter() http.Handler {
 	r.Use(adminAccessHandler)
 	r.Get("/users", getUsers)
 	r.Post("/users", createUserAdmin)
-	r.Get("/users/{name}", getUserInfo)
 	r.Patch("/users/{name}", updateUser)
 	r.Delete("/users/{name}", deleteUserAdmin)
 	r.Get("/collections", getCollections)

@@ -15,6 +15,7 @@ import (
 	"github.com/soyersoyer/rightana/config"
 	"github.com/soyersoyer/rightana/db/db"
 	"github.com/soyersoyer/rightana/geoip"
+	"github.com/soyersoyer/rightana/mail"
 	"github.com/soyersoyer/rightana/service"
 )
 
@@ -22,6 +23,15 @@ func inits() {
 	config.ReadConfig()
 	geoip.OpenDB(config.ActualConfig.GeoIPCityFile, config.ActualConfig.GeoIPASNFile)
 	db.InitDatabase(config.ActualConfig.DataDir)
+	mail.Configure(mail.SMTPConfig{
+		Hostname: config.ActualConfig.SMTPHostname,
+		User:     config.ActualConfig.SMTPUser,
+		Password: config.ActualConfig.SMTPPassword,
+		Port:     config.ActualConfig.SMTPPort,
+		Sender:   config.ActualConfig.SMTPSender,
+		AppName:  config.ActualConfig.AppName,
+		AppURL:   config.ActualConfig.AppURL,
+	})
 }
 
 // Serve starts a http server

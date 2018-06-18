@@ -38,8 +38,14 @@ export class RegistrationComponent implements OnInit {
       .createAuthToken(this.form.value.name, this.form.value.password)
       .subscribe(token => {
         this.auth.set(token.id, token.user_info.name, token.user_info.is_admin);
+        this.sendVerifyEmail();
         this.router.navigateByUrl(token.user_info.name);
       });
+  }
+
+  sendVerifyEmail() {
+    this.backend
+      .sendVerifyEmail(this.form.value.name).subscribe();
   }
 
 }

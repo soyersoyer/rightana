@@ -12,6 +12,7 @@
         <th scope="col">Created</th>
         <th scope="col">Collections</th>
         <th scope="col">Admin</th>
+        <th scope="col">Email Verified</th>
         <th scope="col">Edit</th>
       </tr>
     </thead>
@@ -23,9 +24,10 @@
         <td>{{user.created / 1000000 | date:"yyyy.MM.dd HH:mm:ss"}}</td>
         <td class="text-right">
           <a routerLink="../collections">{{user.collection_count}}</a>
-          <a role="button" class="btn btn-light btn-sm ml-2" routerLink="/{{user.name}}/create">✚</a>
+          <a role="button" class="btn btn-secondary btn-sm ml-2" routerLink="/{{user.name}}/create">✚</a>
         </td>
-        <td>{{user.is_admin}}</td>
+        <td><span *ngIf="user.is_admin">✓</span></td>
+        <td><span *ngIf="user.email_verified">✓</span></td>
         <td><a [routerLink]="[user.name]">edit</a></td>
       </tr>
     </tbody>

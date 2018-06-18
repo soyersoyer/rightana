@@ -25,6 +25,7 @@ export class UserInfo {
   created: number;
   is_admin: boolean;
   collection_count: number;
+  email_verified: boolean;
 }
 
 export class UserCreate {
@@ -294,6 +295,10 @@ export class BackendService {
    return this.http.post<Pageview[]>(`/api/users/${user}/collections/${collectionName}/pageviews`, {session_key: sessionKey});
   }
 
+  getUserInfo(name: string): Observable<UserInfo> {
+    return this.http.get<UserInfo>(`/api/users/${name}`);
+  }
+
   updateUserPassword(user: string, currentPassword: string, password: string): Observable<any> {
     return this.http.patch(`/api/users/${user}/settings/password`, {currentPassword, password});
   }
@@ -302,12 +307,24 @@ export class BackendService {
    return this.http.post(`/api/users/${user}/settings/delete`, {password});
   }
 
-  getUsers(): Observable<UserInfo[]> {
-    return this.http.get<UserInfo[]>(`/api/admin/users`);
+  sendVerifyEmail(user: string): Observable<any> {
+    return this.http.post(`/api/users/${user}/settings/send-verify-email`, {});
   }
 
-  getUserInfo(name: string): Observable<UserInfo> {
-    return this.http.get<UserInfo>(`/api/admin/users/${name}`);
+  verifyEmail(user: string, verificationKey: string): Observable<any> {
+    return this.http.post(`/api/users/${user}/verify-email`, {verificationKey});
+  }
+
+  sendResetPassword(email: string): Observable<any> {
+    return this.http.post(`/api/users/send-reset-password`, {email});
+  }
+
+  resetPassword(user: string, resetKey: string, password: string): Observable<any> {
+    return this.http.post(`/api/users/${user}/reset-password`, {resetKey, password});
+  }
+
+  getUsers(): Observable<UserInfo[]> {
+    return this.http.get<UserInfo[]>(`/api/admin/users`);
   }
 
   createUserAdmin(user: UserCreate): Observable<string> {

@@ -17,6 +17,14 @@ type Config struct {
 	TrackingID         string
 	ServerAnnounce     string
 	Backup             map[string]string
+	AppName            string
+	AppURL             string
+	EmailExpiryMinutes int
+	SMTPHostname       string
+	SMTPPort           int
+	SMTPUser           string
+	SMTPPassword       string
+	SMTPSender         string
 }
 
 var (
@@ -42,6 +50,13 @@ func ReadConfig() Config {
 	viper.SetDefault("EnableRegistration", true)
 	viper.SetDefault("UseBundledWebApp", true)
 
+	viper.SetDefault("AppName", "RightAna")
+
+	viper.SetDefault("EmailExpiryMinutes", 15)
+
+	viper.SetDefault("SMTPHostname", "localhost")
+	viper.SetDefault("SMTPPort", 25)
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Println(err)
@@ -56,6 +71,19 @@ func ReadConfig() Config {
 	ActualConfig.ServerAnnounce = viper.GetString("ServerAnnounce")
 	ActualConfig.Backup = viper.GetStringMapString("Backup")
 
+	ActualConfig.AppName = viper.GetString("AppName")
+	ActualConfig.AppURL = viper.GetString("AppURL")
+
+	ActualConfig.EmailExpiryMinutes = viper.GetInt("EmailExpiryMinutes")
+
+	ActualConfig.SMTPHostname = viper.GetString("SMTPHostname")
+	ActualConfig.SMTPPort = viper.GetInt("SMTPPort")
+	ActualConfig.SMTPUser = viper.GetString("SMTPUser")
+	ActualConfig.SMTPSender = viper.GetString("SMTPSender")
+
 	log.Printf("using config: %+v", ActualConfig)
+
+	ActualConfig.SMTPPassword = viper.GetString("SMTPPassword")
+
 	return ActualConfig
 }

@@ -30,6 +30,8 @@ var (
 	ErrSessionNotExist         = &Error{"Session not exist", 404, "", ""}
 	ErrTeammateExist           = &Error{"Teammate exist", 403, "", ""}
 	ErrBackupNotExist          = &Error{"Backup not exist", 404, "", ""}
+	ErrEmailSending            = &Error{"Can't send email", 500, "", ""}
+	ErrEmailExpired            = &Error{"Email expired", 403, "", ""}
 )
 
 // Error is the Extended error struct

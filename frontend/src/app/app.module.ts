@@ -14,6 +14,10 @@ import { InvalidUsernameComponent, InvalidEmailComponent, InvalidPasswordCompone
   InvalidCollectionNameComponent } from './forms/invalid.component';
 import { HomeComponent } from './home/home.component';
 import { RegistrationComponent } from './registration/registration.component';
+import { VerifyEmailComponent } from './verify-email/verify-email.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+
 import { CollectionDashboardComponent } from './collection-dashboard/dashboard.component';
 import { CollectionComponent } from './collection/collection.component';
 import { CollectionCreateComponent } from './collection-create/create.component';
@@ -28,6 +32,7 @@ import { TableSumComponent } from './collection-stat/table-sum.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ChangePasswordComponent } from './settings/change-password/change-password.component';
 import { DeleteAccountComponent } from './settings/delete-account/delete-account.component';
+import { ProfileComponent } from './settings/profile/profile.component';
 
 import { ChartComponent } from './chart/chart.component';
 
@@ -52,8 +57,10 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent},
   { path: 'logout', component: LogoutComponent},
   { path: 'registration', component: RegistrationComponent},
+  { path: 'forgot-password', component: ForgotPasswordComponent},
   { path: 'settings', component: SettingsComponent, children: [
-    { path: '', redirectTo: 'change-password', pathMatch: 'full'},
+    { path: '', redirectTo: 'profile', pathMatch: 'full'},
+    { path: 'profile', component: ProfileComponent},
     { path: 'change-password', component: ChangePasswordComponent},
     { path: 'delete-account', component: DeleteAccountComponent},
   ]},
@@ -66,6 +73,8 @@ const routes: Routes = [
     { path: 'backups', component: AdminBackupsComponent},
   ]},
   { path: ':user', component: UserComponent, children: [
+    { path: 'verify-email', component: VerifyEmailComponent},
+    { path: 'reset-password', component: ResetPasswordComponent},
     { path: "", component: CollectionComponent},
     { path: 'create', component: CollectionCreateComponent},
     { path: ':collectionName', component: CollectionDashboardComponent, children: [
@@ -112,6 +121,10 @@ const routes: Routes = [
     AdminUsersCreateComponent,
     AdminBackupsComponent,
     UserComponent,
+    ProfileComponent,
+    VerifyEmailComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     BrowserModule,

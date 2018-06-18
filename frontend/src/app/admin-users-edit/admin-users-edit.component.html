@@ -34,7 +34,12 @@
           <input type="checkbox" class="form-check-input" id="disable_user_deletion" formControlName="disable_user_deletion">
           <label class="form-check-label" for="disable_user_deletion">User can't delete this account</label>
         </div>
-        <div class="form-group my-4">
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="email_verified" formControlName="email_verified">
+          <label class="form-check-label" for="email_verified">Email verified</label>
+          <button type="button" *ngIf="!form.value.email_verified"class="btn btn-primary btn-sm ml-3" (click)="sendVerifyEmail(user)">Resend verify email</button>
+        </div>
+        <div class="form-group">
           <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="limit_collections" formControlName="limit_collections">
             <label class="form-check-label" for="limit_collections">Limit Collection creation</label>

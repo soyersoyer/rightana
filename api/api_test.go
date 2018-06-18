@@ -245,7 +245,7 @@ func TestUserAccessHandler(t *testing.T) {
 }
 
 func TestUserAccessHandlerBad(t *testing.T) {
-	name := "admin"
+	name := "admin2"
 	user := getDbUserByName(name)
 	w, r := postJSON(nil)
 	user.ID++
@@ -254,6 +254,28 @@ func TestUserAccessHandlerBad(t *testing.T) {
 	userBaseHandler(userAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
 	testCode(t, w, 403)
 	testBody(t, w, "Access denied\n")
+}
+
+func TestUserAccessHandlerBadNoAdmin(t *testing.T) {
+	name := "admin"
+	second := "admin2"
+	user := getDbUserByName(second)
+	w, r := postJSON(nil)
+	r = setLoggedInUserReq(r, user)
+	r = setUserName(r, name)
+	userBaseHandler(userAccessHandler(getNoHandler(t))).ServeHTTP(w, r)
+	testCode(t, w, 403)
+	testBody(t, w, "Access denied\n")
+}
+
+func TestUserAccessHandlerAdmin(t *testing.T) {
+	name := "admin2"
+	admin := "admin"
+	w, r := postJSON(nil)
+	r = setLoggedInUserWithNameReq(r, admin)
+	r = setUserName(r, name)
+	userBaseHandler(userAccessHandler(getNullHandler())).ServeHTTP(w, r)
+	testCode(t, w, 200)
 }
 
 func TestUpdateUserPassword(t *testing.T) {

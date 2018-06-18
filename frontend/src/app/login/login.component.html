@@ -20,9 +20,12 @@
           </form>
         </div>
       </div>
-      <p *ngIf="config?.enable_registration">
+      <div *ngIf="config?.enable_registration">
         Don't have an account? <a routerLink="/registration">Create one</a>
-      </p>
+      </div>
+      <div>
+        <a routerLink="/forgot-password">Forgot password?</a>
+      </div>
     </div>
   </div>
 </div>

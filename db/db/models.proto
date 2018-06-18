@@ -12,6 +12,11 @@ message User {
 	bool LimitCollections = 12;
 	uint32 CollectionLimit = 13;
 	bool DisableUserDeletion = 14;
+	bool EmailVerified = 20;
+	string EmailVerificationKey = 21;
+	int64 EmailVerificationAt = 22; // unixnano
+	string PasswordResetKey = 23;
+	int64 PasswordResetAt = 24; // unixnano
 }
 
 message Teammate {

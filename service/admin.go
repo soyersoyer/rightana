@@ -15,6 +15,7 @@ type UserInfoT struct {
 	LimitCollections    bool   `json:"limit_collections"`
 	CollectionLimit     uint32 `json:"collection_limit"`
 	DisableUserDeletion bool   `json:"disable_user_deletion"`
+	EmailVerified       bool   `json:"email_verified"`
 	CollectionCount     int    `json:"collection_count"`
 }
 
@@ -40,6 +41,7 @@ func GetUsers() ([]UserInfoT, error) {
 			u.LimitCollections,
 			u.CollectionLimit,
 			u.DisableUserDeletion,
+			u.EmailVerified,
 			len(collections),
 		})
 	}
@@ -62,6 +64,7 @@ func GetUserInfo(name string) (*UserInfoT, error) {
 		user.LimitCollections,
 		user.CollectionLimit,
 		user.DisableUserDeletion,
+		user.EmailVerified,
 		0,
 	}, nil
 }
@@ -76,6 +79,7 @@ type UserUpdateT struct {
 	LimitCollections    bool   `json:"limit_collections"`
 	CollectionLimit     uint32 `json:"collection_limit"`
 	DisableUserDeletion bool   `json:"disable_user_deletion"`
+	EmailVerified       bool   `json:"email_verified"`
 }
 
 // UpdateUser updates a user with UserUpdateT struct
@@ -133,6 +137,8 @@ func UpdateUser(name string, input *UserUpdateT) error {
 	user.CollectionLimit = input.CollectionLimit
 
 	user.DisableUserDeletion = input.DisableUserDeletion
+
+	user.EmailVerified = input.EmailVerified
 
 	err = db.UpdateUser(user)
 	if err != nil {

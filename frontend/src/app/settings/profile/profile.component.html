@@ -1,0 +1,23 @@
+<div class="container mt-2" *ngIf="user">
+  <div style="max-width: 500px">
+    <h3>Profile</h3>
+    <div class="card">
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-3">Username:</dt>
+          <dd class="col-sm-9">{{user.name}}</dd>
+          <dt class="col-sm-3">Email:</dt>
+          <dd class="col-sm-9 d-flex justify-content-between">
+            <div>{{user.email}}
+              <b *ngIf="user.email_verified" class="text-success">(verified)</b>
+              <b *ngIf="!user.email_verified" class="text-warning">(not verified)</b>
+            </div>
+            <div *ngIf="!user.email_verified">
+              <button class="btn btn-primary btn-sm" (click)="sendVerifyEmail()">Resend verify email</button>
+            </div>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>

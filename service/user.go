@@ -4,10 +4,12 @@ import (
 	"regexp"
 	"time"
 
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/soyersoyer/rightana/config"
 	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/mail"
 )
 
 var (
@@ -159,21 +161,6 @@ func DeleteUserByAdmin(name string) error {
 	return nil
 }
 
-func lastAdminCheck(user *User) error {
-	if !user.IsAdmin {
-		return nil
-	}
-
-	admins, err := db.GetAdminUsers()
-	if err != nil {
-		return err
-	}
-	if len(admins) == 1 && admins[0].Email == user.Email {
-		return ErrUserIsTheLastAdmin
-	}
-	return nil
-}
-
 // GetUserByEmail fetch an user by the user's email
 func GetUserByEmail(email string) (*User, error) {
 	user, err := db.GetUserByEmail(email)
@@ -199,6 +186,107 @@ func GetUserByID(ID uint64) (*User, error) {
 		return nil, ErrUserNotExist.T(string(ID)).Wrap(err)
 	}
 	return user, nil
+}
+
+// SendVerifyEmail sends an email verify email to a user
+func SendVerifyEmail(user *User) error {
+	if err := setupVerifyEmail(user); err != nil {
+		return err
+	}
+	if err := mail.SendVerifyEmail(user.Name, user.Email, user.Name, user.EmailVerificationKey); err != nil {
+		return ErrEmailSending.Wrap(err)
+	}
+	return nil
+}
+
+// TODO: tests
+func setupVerifyEmail(user *User) error {
+	user.EmailVerified = false
+	user.EmailVerificationAt = time.Now().UnixNano()
+	user.EmailVerificationKey = uuid.Must(uuid.NewV4()).String()
+	if err := db.UpdateUser(user); err != nil {
+		return ErrDB.Wrap(err)
+	}
+	return nil
+}
+
+// VerifyEmail verifies the user email address with the verificationKey
+func VerifyEmail(user *User, verificationKey string) error {
+	expiryTime := time.Unix(0, user.EmailVerificationAt).Add(time.Duration(config.ActualConfig.EmailExpiryMinutes) * time.Minute)
+	if verificationKey != user.EmailVerificationKey || expiryTime.Before(time.Now()) {
+		return ErrEmailExpired
+	}
+	user.EmailVerified = true
+	if err := db.UpdateUser(user); err != nil {
+		return ErrDB.Wrap(err)
+	}
+	return nil
+}
+
+// SendResetPassword sends an email to change user's password
+func SendResetPassword(user *User) error {
+	if err := setupResetPassword(user); err != nil {
+		return err
+	}
+	if err := mail.SendResetPassword(
+		user.Name,
+		user.Email,
+		user.Name,
+		user.PasswordResetKey,
+		config.ActualConfig.EmailExpiryMinutes); err != nil {
+		return ErrEmailSending.Wrap(err)
+	}
+	return nil
+}
+
+// TODO: tests
+func setupResetPassword(user *User) error {
+	user.PasswordResetKey = uuid.Must(uuid.NewV4()).String()
+	user.PasswordResetAt = time.Now().UnixNano()
+	if err := db.UpdateUser(user); err != nil {
+		return ErrDB.Wrap(err)
+	}
+	return nil
+}
+
+// ChangePasswordWithResetKey changes the user's password with a resetKey
+func ChangePasswordWithResetKey(user *User, resetKey, password string) error {
+	expiryTime := time.Unix(0, user.PasswordResetAt).Add(time.Duration(config.ActualConfig.EmailExpiryMinutes) * time.Minute)
+	if resetKey != user.PasswordResetKey || expiryTime.Before(time.Now()) {
+		return ErrEmailExpired
+	}
+	if !passwordCheck(password) {
+		return ErrPasswordTooShort
+	}
+	if user.DisablePwChange {
+		return ErrPasswordChangeDisabled
+	}
+	hashedPass, err := hashPassword(password)
+	if err != nil {
+		return err
+	}
+	user.Password = hashedPass
+
+	if err := db.UpdateUser(user); err != nil {
+		return ErrDB.Wrap(err, user)
+	}
+
+	return nil
+}
+
+func lastAdminCheck(user *User) error {
+	if !user.IsAdmin {
+		return nil
+	}
+
+	admins, err := db.GetAdminUsers()
+	if err != nil {
+		return ErrDB.Wrap(err)
+	}
+	if len(admins) == 1 && admins[0].Email == user.Email {
+		return ErrUserIsTheLastAdmin
+	}
+	return nil
 }
 
 func isFirstUser() (bool, error) {
