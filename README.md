@@ -31,9 +31,12 @@ From the user's perspective it is very similar to GA
 
 ### Demo server
 
-[https://rightana.com](https://rightana.com)
+[https://rightana.com](https://rightana.com) (user: demo pass: demo1234)
 
 ### Screenshots
+
+### Multiple collections
+![collections](https://user-images.githubusercontent.com/5169997/42170576-3714edec-7e17-11e8-9ae9-f7909f112c43.png)
 
 ### Simple overview
 ![chart](https://user-images.githubusercontent.com/5169997/34117162-1f82043a-e41b-11e7-9ff5-72a0d82f1bfb.png)
@@ -60,14 +63,7 @@ From the user's perspective it is very similar to GA
 ### Watch sessions
 ![sessions](https://user-images.githubusercontent.com/5169997/34117093-e0f252d8-e41a-11e7-8811-5c90d73560b5.png)
 
-### Multiple user and site support
-![registration](https://user-images.githubusercontent.com/5169997/34117560-533d43ce-e41c-11e7-8254-bce5390ed326.png)
-![multiple-site](https://user-images.githubusercontent.com/5169997/34117484-2461c25a-e41c-11e7-86f6-3280a5d46291.png)
-
-### You can easily get a tracking code for your site in the settings
-![tracking-code](https://user-images.githubusercontent.com/5169997/34116917-498f58d2-e41a-11e7-8d3c-80190269a1cc.png)
-
-### Add teammates
+### Adding teammates
 ![teammates](https://user-images.githubusercontent.com/5169997/34117250-6577d690-e41b-11e7-9931-2c3ccca01b91.png)
 
 ### Deleting old data is easy
@@ -118,5 +114,4 @@ The configuration filename is rightana.yaml (or an another format what the viper
 This software is under initial development (0.x) and the database format may change in the future. In other words, it is not guaranteed that the next version of the software will be able to read the the data stored by the current version.
 
 ## Coming features to 0.5
-- Graphs for the collections page
 - Compressed logs
