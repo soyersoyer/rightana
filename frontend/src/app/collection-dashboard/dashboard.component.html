@@ -16,17 +16,17 @@
     </ul>
   </div>
   <div *ngIf="showChart()">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center flex-wrap justify-content-end">
       <div stlye="height:27px">
         <a *ngFor="let key of keys(setup.filter)" href="" class="badge badge-pill badge-secondary m-1" (click)="setup.del(key); false">
           {{setup.filter[key]}}
           <b>x</b>
         </a>
       </div>
-      <div class="btn-group btn-group-sm my-1 mr-1 ml-auto" role="group">
+      <div class="btn-group btn-group-sm my-1" role="group">
         <button *ngFor="let interval of intervals" type="button" class="btn btn-secondary" [class.active]="interval === selectedInterval" [disabled]="interval.day < selectedBucket.minInterval?.day" (click)="selectInterval(interval)">{{interval.label}}</button>
       </div>
-      <div class="btn-group btn-group-sm my-1" role="group">
+      <div class="btn-group btn-group-sm my-1 ml-1" role="group">
         <button *ngFor="let bucket of buckets" type="button" class="btn btn-secondary" [class.active]="bucket === selectedBucket" (click)="selectBucket(bucket)">{{bucket.label}}</button>
       </div>
     </div>
