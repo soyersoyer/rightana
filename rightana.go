@@ -28,7 +28,7 @@ var (
 )
 
 func main() {
-	app.Version("0.4")
+	app.Version("0.4.1")
 	app.UsageTemplate(kingpin.CompactUsageTemplate)
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
