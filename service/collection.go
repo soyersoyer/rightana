@@ -138,17 +138,17 @@ func DeleteCollection(collection *Collection) error {
 
 // CollectionSummaryT the struct for the Collection's summary
 type CollectionSummaryT struct {
-	ID              string  `json:"id"`
-	User            string  `json:"user"`
-	Name            string  `json:"name"`
-	SessionCount    int     `json:"session_count"`
-	SessionPercent  float32 `json:"session_percent"`
-	PageviewCount   int     `json:"pageview_count"`
-	PageviewPercent float32 `json:"pageview_percent"`
+	ID   string `json:"id"`
+	User string `json:"user"`
+	Name string `json:"name"`
+	db.CollectionSummary
 }
 
+//CollectionSummaryOptions contains options for the db.GetCollectionSummary function
+type CollectionSummaryOptions = db.CollectionSummaryOptions
+
 // GetCollectionSummariesByUserID returns the collection summaries for the user
-func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSummaryT, error) {
+func GetCollectionSummariesByUserID(ID uint64, readerID uint64, options CollectionSummaryOptions) ([]CollectionSummaryT, error) {
 	ret := []CollectionSummaryT{}
 	collections, err := db.GetCollectionsByUserID(ID)
 	if err != nil {
@@ -158,7 +158,7 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 		if v.OwnerID != readerID && !db.UserIsTeammate(&v, readerID) {
 			continue
 		}
-		pd, err := db.GetPageviewPercent(v.ID, 7)
+		cs, err := db.GetCollectionSummary(v.ID, 7, options)
 		if err != nil {
 			return nil, ErrDB.Wrap(err, v.ID)
 		}
@@ -167,13 +167,10 @@ func GetCollectionSummariesByUserID(ID uint64, readerID uint64) ([]CollectionSum
 			return nil, ErrDB.Wrap(err, "can't get user", v.OwnerID)
 		}
 		ret = append(ret, CollectionSummaryT{
-			ID:              v.ID,
-			User:            user.Name,
-			Name:            v.Name,
-			SessionCount:    pd.SessionCount,
-			SessionPercent:  pd.SessionPercent,
-			PageviewCount:   pd.PageviewCount,
-			PageviewPercent: pd.PageviewPercent,
+			ID:                v.ID,
+			User:              user.Name,
+			Name:              v.Name,
+			CollectionSummary: cs,
 		})
 	}
 	sort.Slice(ret, func(i, j int) bool {

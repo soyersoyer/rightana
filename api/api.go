@@ -110,8 +110,8 @@ func userRouter() http.Handler {
 func collectionRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(loggedOnlyHandler)
-	r.Get("/", getCollectionSummaries)
-	r.With(collectionCreateAccessHandler).Post("/", createCollection)
+	r.Post("/", getCollectionSummaries)
+	r.With(collectionCreateAccessHandler).Post("/create-new", createCollection)
 	r.Route("/{collectionName}", func(r chi.Router) {
 		r.Use(collectionBaseHandler)
 		r.Use(collectionReadAccessHandler)

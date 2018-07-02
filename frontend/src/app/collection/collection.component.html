@@ -5,21 +5,26 @@
       <a *ngIf="selfPage" role="button" class="btn btn-secondary btn-sm ml-auto" routerLink="create">✚</a>
     </div>
     <div class="row">
-      <div class="col-sm-3" *ngFor="let c of collections">
+      <div class="col-sm-3" *ngFor="let c of collections;let idx = index">
         <div class="card my-2">
           <div class="card-body" style="width: 18rem">
             <div class="card-title">
                 <a *ngIf="c.user !== user" [routerLink]="['..', c.user, c.name]" routerLinkActive="active">{{c.user}} / {{c.name}}</a>
                 <a *ngIf="c.user === user" [routerLink]="['..', c.user, c.name]" routerLinkActive="active">{{c.name}}</a>
             </div>
-            <div class="card-text d-flex justify-content-between pr-4">
-              <div>
-                {{c.session_count}}
-                <rana-color-percent [percent]="c.session_percent" class="ml-1"></rana-color-percent>
-              </div>
-              <div>
-                {{c.pageview_count}}
-                <rana-color-percent [percent]="c.pageview_percent" class="ml-1"></rana-color-percent>
+            <div class="card-text">
+              <a [routerLink]="['..', c.user, c.name]" routerLinkActive="active" *ngIf="data">
+                <rana-chart style="height: 100px; width: calc(100% - 25px);" type="line" [data]="data[idx]" [options]="options"></rana-chart>
+              </a>
+              <div class="d-flex justify-content-between pr-4 mt-4">
+                <div class="text-center">
+                  <div class="badge badge-primary">{{c.session_count}} sessions</div>
+                  <rana-color-percent [percent]="c.session_percent" class="ml-1"></rana-color-percent>
+                </div>
+                <div class="text-center">
+                  <div class="badge badge-primary">{{c.pageview_count}} pageviews</div>
+                  <rana-color-percent [percent]="c.pageview_percent" class="ml-1"></rana-color-percent>
+                </div>
               </div>
             </div>
           </div>

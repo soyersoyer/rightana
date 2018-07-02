@@ -3,6 +3,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { BackendService, AuthService, CollectionData, BucketSum } from '../backend.service';
 import { UserComponent } from '../user/user.component';
+import { getDateStrFromUnixTime } from '../utils/date';
 
 class Interval {
   day: number;
@@ -297,19 +298,6 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
     return this.userComp.user;
   }
 
-  padNumber(n: number): string {
-    return n<10?"0"+n:""+n
-  }
-
-  getDateStrFromUnixTime(unix: number): string {
-    var d = new Date(unix*1000);
-    var datestr = d.getFullYear()+"-"+this.padNumber(d.getMonth()+1)+"-"+this.padNumber(d.getDate());
-    if (this.selectedBucket.name === "hour") {
-      return datestr+" "+this.padNumber(d.getHours())+":"+this.padNumber(d.getMinutes());
-    }
-    return datestr;
-  }
-
   colorizeBuckets() {
     if (this.setup.selectedBucket !== undefined) {
       this.data.datasets[0].backgroundColor = this.collection.session_sums.map(_ => this.options.color0u)
@@ -323,15 +311,15 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
   }
 
   setData(collection: CollectionData) {
-    const labels = collection.session_sums.map(s => this.getDateStrFromUnixTime(s.bucket));
+    const labels = collection.session_sums.map(s => getDateStrFromUnixTime(s.bucket, this.selectBucket.name));
     const datasets = [
       {
         label: 'Sessions',
-        data: collection.session_sums.map(s => ({x: this.getDateStrFromUnixTime(s.bucket), y: s.count})),
+        data: collection.session_sums.map(s => ({x: getDateStrFromUnixTime(s.bucket, this.selectBucket.name), y: s.count})),
       },
       {
         label: 'Page views',
-        data: collection.pageview_sums.map(s => ({x: this.getDateStrFromUnixTime(s.bucket), y: s.count})),
+        data: collection.pageview_sums.map(s => ({x: getDateStrFromUnixTime(s.bucket, this.selectBucket.name), y: s.count})),
       },
     ];
     this.data = {labels, datasets};

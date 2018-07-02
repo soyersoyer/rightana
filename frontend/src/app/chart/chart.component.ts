@@ -8,7 +8,7 @@ import { Chart } from 'chart.js';
   styles: [':host { display: block; }']
 })
 export class ChartComponent implements OnInit, OnChanges  {
-  chart: any;
+  chart: Chart;
 
   @Input() type: string;
   @Input() data: any;

@@ -16,9 +16,14 @@ type collectionT struct {
 }
 
 func getCollectionSummariesE(w http.ResponseWriter, r *http.Request) error {
+	var input service.CollectionSummaryOptions
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		return service.ErrInputDecodeFailed.Wrap(err)
+	}
+
 	user := getUserCtx(r.Context())
 	loggedInUser := getLoggedInUserCtx(r.Context())
-	summary, err := service.GetCollectionSummariesByUserID(user.ID, loggedInUser.ID)
+	summary, err := service.GetCollectionSummariesByUserID(user.ID, loggedInUser.ID, input)
 	if err != nil {
 		return err
 	}

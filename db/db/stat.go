@@ -135,6 +135,81 @@ func (bg *bucketGen) Close() []*bucketSumT {
 	return bucketSums
 }
 
+// CollectionSummary contains summary for the collection
+type CollectionSummary struct {
+	SessionCount    int           `json:"session_count"`
+	SessionPercent  float32       `json:"session_percent"`
+	SessionSums     []*bucketSumT `json:"session_sums"`
+	PageviewCount   int           `json:"pageview_count"`
+	PageviewPercent float32       `json:"pageview_percent"`
+	PageviewSums    []*bucketSumT `json:"pageview_sums"`
+}
+
+// CollectionSummaryOptions contains the options for the GetColectionSummary function
+type CollectionSummaryOptions struct {
+	Timezone string `json:"timezone"`
+}
+
+// GetCollectionSummary returns the last daybefore days versus the previous daybefore days summary
+func GetCollectionSummary(collectionID string, dayBefore int, options CollectionSummaryOptions) (CollectionSummary, error) {
+	loc, err := time.LoadLocation(options.Timezone)
+	if err != nil {
+		log.Println("invalid timezone", err, options.Timezone)
+	}
+	now := time.Now()
+	ndayAgo := now.AddDate(0, 0, -dayBefore).In(loc)
+	ndayAgo = time.Date(ndayAgo.Year(), ndayAgo.Month(), ndayAgo.Day(), 0, 0, 0, 0, loc)
+	n2dayAgo := ndayAgo.AddDate(0, 0, -dayBefore)
+
+	nowK := GetKeyFromTime(now)
+	ndayAgoK := GetKeyFromTime(ndayAgo)
+	n2dayAgoK := GetKeyFromTime(n2dayAgo)
+
+	cs := CollectionSummary{}
+
+	sdb, err := getShardDB(collectionID)
+	if err != nil {
+		return cs, err
+	}
+	sumSFirst := 0
+	sdb.Iterate(BSession, n2dayAgoK, ndayAgoK, func(k []byte, v []byte) {
+		sumSFirst++
+	})
+	sg := createBucketGen("day", ndayAgo, now, options.Timezone)
+	sumSSecond := 0
+	sdb.Iterate(BSession, ndayAgoK, nowK, func(k []byte, v []byte) {
+		sumSSecond++
+		sg.Add(GetTimeFromKey(k))
+	})
+
+	cs.SessionCount = sumSSecond
+	if sumSFirst != 0 {
+		cs.SessionPercent = float32(sumSSecond)/float32(sumSFirst) - 1.0
+	}
+
+	sumPVFirst := 0
+	sdb.Iterate(BPageview, n2dayAgoK, ndayAgoK, func(k []byte, v []byte) {
+		sumPVFirst++
+	})
+
+	sumPVSecond := 0
+	pg := createBucketGen("day", ndayAgo, now, options.Timezone)
+	sdb.Iterate(BPageview, ndayAgoK, nowK, func(k []byte, v []byte) {
+		sumPVSecond++
+		pg.Add(GetTimeFromPVKey(k))
+	})
+
+	cs.PageviewCount = sumPVSecond
+	if sumPVFirst != 0 {
+		cs.PageviewPercent = float32(sumPVSecond)/float32(sumPVFirst) - 1.0
+	}
+
+	cs.SessionSums = sg.Close()
+	cs.PageviewSums = pg.Close()
+
+	return cs, nil
+}
+
 func readSessions(sdb *shardbolt.DB, from, to time.Time,
 	filter map[string]string,
 	sessionFunc func(session *ExtSession),

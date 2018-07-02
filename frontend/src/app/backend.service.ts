@@ -63,8 +63,10 @@ export class CollectionSummary {
   name: string;
   session_count: number;
   session_percent: number;
+  session_sums: BucketSum[];
   pageview_count: number;
   pageview_percent: number;
+  pageview_sums: BucketSum[];
 }
 
 export class Total {
@@ -240,11 +242,11 @@ export class BackendService {
   }
 
   createCollection(user: string, formData: any): Observable<Collection> {
-   return this.http.post<Collection>(`/api/users/${user}/collections`, formData);
+   return this.http.post<Collection>(`/api/users/${user}/collections/create-new`, formData);
   }
 
-  getCollectionSummaries(user: string): Observable<CollectionSummary[]> {
-    return this.http.get<CollectionSummary[]>(`/api/users/${user}/collections`);
+  getCollectionSummaries(user: string, timezone: string): Observable<CollectionSummary[]> {
+    return this.http.post<CollectionSummary[]>(`/api/users/${user}/collections`, {timezone});
   }
 
   getCollection(user: string, collectionName: string): Observable<Collection> {
