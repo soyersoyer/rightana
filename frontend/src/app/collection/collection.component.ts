@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UserComponent } from '../user/user.component';
@@ -23,6 +23,7 @@ export class CollectionComponent implements OnInit {
       data: {x: string, y: number}[],
     }[],
   }[];
+  dataTime: Date;
   options = {
     tooltips: {mode: 'index', intersect: false},
     hover: {mode: 'nearest', intersect: true},
@@ -66,6 +67,14 @@ export class CollectionComponent implements OnInit {
     })
   }
 
+  @HostListener('window:focus', ['$event'])
+  onFocus(): void {
+    const min10 = 10*60*1000;
+    if((new Date()).getTime() > this.dataTime.getTime() + min10) {
+      this.getCollections(this.user);
+    }
+  }
+
   get user(): string {
     return this.userComp.user;
   }
@@ -102,6 +111,7 @@ export class CollectionComponent implements OnInit {
         },
       ]
     }));
+    this.dataTime = new Date();
   }
 
 
