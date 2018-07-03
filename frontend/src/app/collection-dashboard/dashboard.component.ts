@@ -311,15 +311,15 @@ export class CollectionDashboardComponent implements OnInit, OnDestroy {
   }
 
   setData(collection: CollectionData) {
-    const labels = collection.session_sums.map(s => getDateStrFromUnixTime(s.bucket, this.selectBucket.name));
+    const labels = collection.session_sums.map(s => getDateStrFromUnixTime(s.bucket, this.selectedBucket.name));
     const datasets = [
       {
         label: 'Sessions',
-        data: collection.session_sums.map(s => ({x: getDateStrFromUnixTime(s.bucket, this.selectBucket.name), y: s.count})),
+        data: collection.session_sums.map(s => ({x: getDateStrFromUnixTime(s.bucket, this.selectedBucket.name), y: s.count})),
       },
       {
         label: 'Page views',
-        data: collection.pageview_sums.map(s => ({x: getDateStrFromUnixTime(s.bucket, this.selectBucket.name), y: s.count})),
+        data: collection.pageview_sums.map(s => ({x: getDateStrFromUnixTime(s.bucket, this.selectedBucket.name), y: s.count})),
       },
     ];
     this.data = {labels, datasets};
