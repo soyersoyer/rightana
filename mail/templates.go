@@ -24,7 +24,7 @@ func init() {
 		<p>Hi <b>{{.DisplayName}}</b>,</p>`
 	footer := `
 		<p>Not working? Try copying and pasting it to your browser.</p>
-		<p>© {{.YearStr}} <a target="_blank" href="{{.AppURL}}" ref="noopener">{{.AppName}}</a></p>
+		<p>© {{.YearStr}} <a target="_blank" href="{{.AppURL}}" rel="noopener">{{.AppName}}</a></p>
 		</body>
 		</html>`
 
