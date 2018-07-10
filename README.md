@@ -6,7 +6,7 @@ Carefree web analytics on your server
 
 ## What is RightAna?
 
-Its a self hosted web analytics software.
+It's a self-hosted web analytics software.
 
 ## How does it work?
 
@@ -78,11 +78,11 @@ From the user's perspective it is very similar to GA
 
 ### From source
 
-1. Get a working go environment
-1. Get a working node environment (for building the Angular frontend)
-1. go get -u github.com/soyersoyer/rightana
-1. cd ~/go/src/github.com/soyersoyer/rightana
-1. ./build.sh
+1. Get a working Go environment
+1. Get a working Node.js environment (for building the Angular frontend)
+1. `git clone https://github.com/soyersoyer/rightana.git $GOPATH/src/github.com/soyersoyer/rightana`
+1. `cd $GOPATH/src/github.com/soyersoyer/rightana`
+1. `./build.sh`
 1. Start it and/or add to your service starter
 
 ## Configuration
