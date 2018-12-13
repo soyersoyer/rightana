@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/coreos/bbolt"
+	bolt "github.com/etcd-io/bbolt"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/soyersoyer/cipobolt"
