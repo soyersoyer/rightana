@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/soyersoyer/rightana/service"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 func registerUserE(w http.ResponseWriter, r *http.Request) error {

@@ -4,9 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/satori/go.uuid"
-
-	"github.com/soyersoyer/rightana/db/db"
+	"github.com/gofrs/uuid"
+	"github.com/soyersoyer/rightana/internal/db"
 )
 
 // AuthToken is the db's authToken struct

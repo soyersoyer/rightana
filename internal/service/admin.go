@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/internal/db"
 )
 
 // UserInfoT is struct for clients, stores the user information

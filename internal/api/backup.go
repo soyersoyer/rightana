@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/soyersoyer/rightana/service"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 func getBackupsE(w http.ResponseWriter, r *http.Request) error {

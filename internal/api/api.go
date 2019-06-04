@@ -1,6 +1,6 @@
 package api
 
-//go:generate statik -src=../frontend/dist/
+//go:generate statik -src=../../web/dist/
 
 import (
 	"encoding/json"
@@ -14,9 +14,9 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/rakyll/statik/fs"
 
-	_ "github.com/soyersoyer/rightana/api/statik" //the embedded statik fs data
-	"github.com/soyersoyer/rightana/config"
-	"github.com/soyersoyer/rightana/service"
+	_ "github.com/soyersoyer/rightana/internal/api/statik" //the embedded statik fs data
+	"github.com/soyersoyer/rightana/internal/config"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 type ctxKey int

@@ -1,9 +1,8 @@
 #!/bin/sh
-cd frontend &&
-npm install &&
+cd web &&
+npm ci &&
 npm run dist &&
 cd .. &&
-go get github.com/rakyll/statik &&
-go generate ./api &&
-go get ./... &&
+go get &&
+go generate ./internal/api &&
 go build

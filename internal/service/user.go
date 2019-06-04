@@ -4,12 +4,12 @@ import (
 	"regexp"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/soyersoyer/rightana/config"
-	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/mail"
+	"github.com/soyersoyer/rightana/internal/config"
+	"github.com/soyersoyer/rightana/internal/db"
+	"github.com/soyersoyer/rightana/internal/mail"
 )
 
 var (

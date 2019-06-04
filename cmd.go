@@ -11,12 +11,12 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"golang.org/x/crypto/ssh/terminal"
 
-	"github.com/soyersoyer/rightana/api"
-	"github.com/soyersoyer/rightana/config"
-	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/geoip"
-	"github.com/soyersoyer/rightana/mail"
-	"github.com/soyersoyer/rightana/service"
+	"github.com/soyersoyer/rightana/internal/api"
+	"github.com/soyersoyer/rightana/internal/config"
+	"github.com/soyersoyer/rightana/internal/db"
+	"github.com/soyersoyer/rightana/internal/geoip"
+	"github.com/soyersoyer/rightana/internal/mail"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 func inits() {

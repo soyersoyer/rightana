@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/soyersoyer/rightana/config"
+	"github.com/soyersoyer/rightana/internal/config"
 )
 
 type publicConfigT struct {

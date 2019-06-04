@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/soyersoyer/rightana/service"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 func adminAccessHandler(next http.Handler) http.Handler {

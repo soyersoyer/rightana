@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/soyersoyer/rightana/config"
-	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/internal/config"
+	"github.com/soyersoyer/rightana/internal/db"
 )
 
 // Backup stores the backup's properties

@@ -9,8 +9,8 @@ import (
 
 	"github.com/mssola/user_agent"
 
-	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/geoip"
+	"github.com/soyersoyer/rightana/internal/db"
+	"github.com/soyersoyer/rightana/internal/geoip"
 )
 
 // CreateSessionInputT is the struct for creating a session
@@ -125,16 +125,16 @@ func CreatePageview(userAgent string, input CreatePageviewInputT) error {
 		return ErrBotsDontMatter
 	}
 
-	key, err := base64.StdEncoding.DecodeString(input.SessionKey)
+	sessKey, err := base64.StdEncoding.DecodeString(input.SessionKey)
 	if err != nil {
 		return ErrSessionNotExist.T(input.SessionKey).Wrap(err, input.SessionKey)
 	}
-	_, err = db.GetSession(input.CollectionID, key)
+	_, err = db.GetSession(input.CollectionID, sessKey)
 	if err != nil {
 		return ErrSessionNotExist.T(input.SessionKey).Wrap(err, input.CollectionID)
 	}
 
-	pvKey := db.GetPVKey(key, now)
+	pvKey := db.GetPVKey(sessKey, now)
 
 	path, queryString := splitURL(input.Path)
 

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/soyersoyer/rightana/db/db"
+	"github.com/soyersoyer/rightana/internal/db"
 )
 
 // Collection is the db's collection struct

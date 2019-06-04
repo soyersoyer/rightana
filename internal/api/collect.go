@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/soyersoyer/rightana/service"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 type createSessionInputT struct {

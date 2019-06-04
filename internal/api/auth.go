@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/soyersoyer/rightana/service"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 func getLoggedInUserCtx(ctx context.Context) *service.User {
