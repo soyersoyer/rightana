@@ -1,4 +1,12 @@
 language: go
+go: 1.12
+node_js: 10
+
+env:
+  - GO111MODULE=on
+
+before_install:
+  - npm i -g npm
 
 install:
   - ./build.sh
