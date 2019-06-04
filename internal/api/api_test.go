@@ -16,9 +16,9 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/soyersoyer/rightana/config"
-	"github.com/soyersoyer/rightana/db/db"
-	"github.com/soyersoyer/rightana/service"
+	"github.com/soyersoyer/rightana/internal/config"
+	"github.com/soyersoyer/rightana/internal/db"
+	"github.com/soyersoyer/rightana/internal/service"
 )
 
 type kv map[string]string
